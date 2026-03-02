@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning PC – Inicio</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+
+<body>
+    <header id="navbar">
+        <div id="nav-info">
+            <span id="saludo">Hola, <strong id="nombre-usuario"></strong></span>
+            <span id="progreso-total">Progreso: <strong id="progreso-valor">0%</strong></span>
+        </div>
+        <div id="nav-controles">
+            <button id="btn-fullscreen" class="btn-icon" title="Pantalla Completa (F11)">⛶</button>
+            <button id="btn-cerrar-sesion" class="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main id="home-container">
+        <h2>Categorías</h2>
+        <section id="lista-categorias">
+            <!-- Las categorías se renderizan dinámicamente desde home.js -->
+        </section>
+    </main>
+
+    <script src="../js/home.js"></script>
+</body>
+
+</html>

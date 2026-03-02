@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning PC – Registro</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+
+<body>
+    <main id="registro-container">
+        <h1>Learning PC</h1>
+        <h2>Crear cuenta</h2>
+
+        <form id="form-registro">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" name="usuario" placeholder="Elige un nombre de usuario" required />
+
+            <label for="contraseña">Contraseña</label>
+            <input type="password" id="contraseña" name="contraseña" placeholder="Crea una contraseña" required />
+
+            <label for="edad">Edad</label>
+            <input type="number" id="edad" name="edad" placeholder="Tu edad" min="1" max="120" />
+
+            <p id="error-registro" class="mensaje-error" hidden></p>
+            <p id="exito-registro" class="mensaje-exito" hidden>¡Cuenta creada! Redirigiendo...</p>
+
+            <button type="submit" id="btn-registro">Registrarse</button>
+        </form>
+
+        <p>¿Ya tienes cuenta? <a href="#" id="link-login">Inicia sesión</a></p>
+    </main>
+
+    <script src="../js/registro.js"></script>
+</body>
+
+</html>

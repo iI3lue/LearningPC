@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+*.db
+*.db-journal
+dist/
+package-lock.json
+.gemini/
+test-electron.js
+minimal.js
+package-orig.json
+package-temp.json

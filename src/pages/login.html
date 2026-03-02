@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning PC – Iniciar sesión</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <main id="login-container">
+        <h1>Learning PC</h1>
+        <h2>Iniciar sesión</h2>
+
+        <form id="form-login">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" name="usuario" placeholder="Tu nombre de usuario" required />
+
+            <label for="contraseña">Contraseña</label>
+            <input type="password" id="contraseña" name="contraseña" placeholder="Tu contraseña" required />
+
+            <p id="error-login" class="mensaje-error" hidden></p>
+
+            <button type="submit" id="btn-login">Ingresar</button>
+        </form>
+
+        <p>¿No tienes cuenta? <a href="#" id="link-registro">Regístrate aquí</a></p>
+    </main>
+
+    <script src="../js/login.js"></script>
+</body>
+</html>
