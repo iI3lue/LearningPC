@@ -6,27 +6,551 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Learning PC – Inicio</title>
     <link rel="stylesheet" href="../css/styles.css" />
+    <style>
+        /* Dashboard layout - Estilo original */
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, sans-serif;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-row: 1 / -1;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-solid);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        /* Profile */
+        .profile-section {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-pastel);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--accent-solid);
+            margin: 0 auto 12px;
+        }
+
+        .profile-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .profile-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-principiante { background: #e0f2fe; color: #0369a1; }
+        .badge-intermedio { background: #dcfce7; color: #15803d; }
+        .badge-avanzado { background: #fef3c7; color: #b45309; }
+        .badge-experto { background: #fce7f3; color: #be185d; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-solid);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        /* Nav */
+        .nav-menu {
+            margin-top: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .nav-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        /* Main content */
+        .main-content {
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .welcome-section {
+            margin-bottom: 32px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        /* Progress ring */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: var(--sidebar-bg);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .progress-ring-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: var(--border-color);
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke: var(--accent-solid);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .progress-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0 0 8px 0;
+        }
+
+        .progress-info p {
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.7;
+            margin: 0;
+        }
+
+        /* Categories grid */
+        .categories-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+        }
+
+        .categorias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .categoria-card {
+            background: var(--sidebar-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .categoria-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--elevation-2);
+        }
+
+        .categoria-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .categoria-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cat-office-bg);
+            border-radius: 8px;
+        }
+
+        .categoria-header h4 {
+            flex: 1;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .categoria-progreso {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-solid);
+        }
+
+        .categoria-progress-bar {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-solid);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .niveles-resumen {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px 0;
+        }
+
+        .subcategoria {
+            font-size: 13px;
+            color: var(--text-color);
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .subcategoria:last-child {
+            border-bottom: none;
+        }
+
+        .sub-progress {
+            color: var(--accent-solid);
+            font-weight: 600;
+        }
+
+        .btn-expandir {
+            width: 100%;
+            padding: 10px;
+            background: var(--accent-pastel);
+            color: var(--accent-solid);
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-expandir:hover {
+            background: var(--accent-solid);
+            color: white;
+        }
+
+        /* Niveles expandidos */
+        .niveles-expandidos {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .subcategoria-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-solid);
+            margin: 16px 0 8px 0;
+        }
+
+        .nivel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--bg-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .nivel-info {
+            flex: 1;
+        }
+
+        .nivel-info strong {
+            display: block;
+            font-size: 13px;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .nivel-info span {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .nivel-info .badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            background: #dcfce7;
+            color: #15803d;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .btn-iniciar-simulacion {
+            padding: 8px 16px;
+            background: var(--accent-solid);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter 0.15s;
+        }
+
+        .btn-iniciar-simulacion:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-repetir {
+            background: var(--hover-bg);
+            color: var(--text-color);
+        }
+
+        .sin-niveles {
+            font-size: 12px;
+            color: var(--text-color);
+            opacity: 0.5;
+            padding: 8px 0;
+        }
+
+        /* Header actions */
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .header-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+
+        .header-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <header id="navbar">
-        <div id="nav-info">
-            <span id="saludo">Hola, <strong id="nombre-usuario"></strong></span>
-            <span id="progreso-total">Progreso: <strong id="progreso-valor">0%</strong></span>
-        </div>
-        <div id="nav-controles">
-            <button id="btn-fullscreen" class="btn-icon" title="Pantalla Completa (F11)">⛶</button>
-            <button id="btn-cerrar-sesion" class="btn-logout">Cerrar sesión</button>
-        </div>
-    </header>
+    <!-- Debug: mostrar errores en pantalla -->
+    <div id="debug-panel" style="position:fixed; bottom:20px; right:20px; background:#1a1a1a; color:#0f0; padding:16px; border-radius:8px; font-family:monospace; font-size:12px; max-width:400px; max-height:300px; overflow:auto; z-index:9999; display:none;">
+    </div>
+    
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">💻</span>
+                <span>LearningPC</span>
+            </div>
 
-    <main id="home-container">
-        <h2>Categorías</h2>
-        <section id="lista-categorias">
-            <!-- Las categorías se renderizan dinámicamente desde home.js -->
-        </section>
-    </main>
+            <div class="profile-section">
+                <div class="profile-avatar" id="profile-avatar">U</div>
+                <div class="profile-name" id="profile-name">Usuario</div>
+                <span class="profile-badge badge-principiante" id="profile-badge">Principiante</span>
+            </div>
 
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="niveles-completados">0</div>
+                    <div class="stat-label">Niveles<br>completados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="streak-count">0 días</div>
+                    <div class="stat-label">Racha<br>actual</div>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-item" data-page="reportes">
+                    <span class="nav-icon">📊</span>
+                    <span>Reportes</span>
+                </div>
+                <div class="nav-item" data-page="ajustes">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Ajustes</span>
+                </div>
+                <div class="nav-item" id="link-admin" style="display: none;">
+                    <span class="nav-icon">🔧</span>
+                    <span>Admin</span>
+                </div>
+            </nav>
+
+            <div class="header-actions">
+                <button class="header-btn" id="btn-fullscreen">⛶ Pantalla</button>
+                <button class="header-btn" id="btn-toggle-theme">🌓 Tema</button>
+                <button class="header-btn" id="btn-cerrar-sesion">↪ Salir</button>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <div class="welcome-section">
+                <h1 class="welcome-title">Bienvenido, <span id="nombre-usuario">Usuario</span></h1>
+                <p class="welcome-subtitle" id="progreso-mensaje">Continúa donde lo dejaste</p>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-ring-container">
+                    <svg class="progress-ring" width="120" height="120">
+                        <circle class="progress-ring-bg" cx="60" cy="60" r="45" />
+                        <circle class="progress-ring-fill" id="progress-ring" cx="60" cy="60" r="45" />
+                    </svg>
+                    <div class="progress-text" id="progreso-texto">0%</div>
+                </div>
+                <div class="progress-info">
+                    <h3>Tu progreso</h3>
+                    <p id="periodo-mensaje">Completa niveles para comenzar tu racha</p>
+                    <p style="margin-top: 8px; font-size: 13px; color: var(--accent-solid);">
+                        Siguiente: <strong id="siguiente-nivel-nombre">-</strong>
+                    </p>
+                    <p style="margin-top: 4px; font-size: 12px; opacity: 0.7;">
+                        <span id="niveles-completados2">0</span> de <span id="niveles-total">0</span> niveles completados
+                    </p>
+                </div>
+            </div>
+
+            <div class="categories-section">
+                <h2>Categorías</h2>
+                <div class="categorias-grid" id="categorias-grid">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/theme-manager.js"></script>
     <script src="../js/home.js"></script>
 </body>
 

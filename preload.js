@@ -13,16 +13,28 @@ contextBridge.exposeInMainWorld('api', {
 
     // Ventana
     toggleFullScreen: () => ipcRenderer.send('window:toggleFullScreen'),
+    toggleTheme: () => ipcRenderer.send('theme:toggle'),
+    openDevTools: () => ipcRenderer.send('window:openDevTools'),
 
     // ── Navegación entre páginas ───────────────────────────────
     irA: (pagina) =>
         ipcRenderer.send('nav:irA', pagina),
 
-    // ── Categorías ─────────────────────────────────────────────
+    // ── Datos Jerárquicos (Nueva estructura) ───────────────────
+    
+    // Categorías (Nivel 0)
     getCategorias: () =>
         ipcRenderer.invoke('data:getCategorias'),
 
-    // ── Niveles ────────────────────────────────────────────────
+    // Subcategorías (Nivel 1)
+    getSubcategoriasPorCategoria: (idCategoria) =>
+        ipcRenderer.invoke('data:getSubcategoriasPorCategoria', idCategoria),
+
+    // Niveles (Nivel 2)
+    getNivelesPorSubcategoria: (idSubcategoria) =>
+        ipcRenderer.invoke('data:getNivelesPorSubcategoria', idSubcategoria),
+
+    // Niveles por categoría (legacy -兼容性)
     getNivelesPorCategoria: (idCategoria) =>
         ipcRenderer.invoke('data:getNivelesPorCategoria', idCategoria),
 
@@ -32,4 +44,12 @@ contextBridge.exposeInMainWorld('api', {
 
     marcarNivelCompletado: (idUsuario, idNivel) =>
         ipcRenderer.invoke('data:marcarNivelCompletado', { idUsuario, idNivel }),
+
+    // ── Administración (CRUD) ──────────────────────────────────
+    getTodosLosNiveles: () => ipcRenderer.invoke('admin:getTodosLosNiveles'),
+    getTodasLasSubcategorias: () => ipcRenderer.invoke('admin:getTodasLasSubcategorias'),
+    guardarNivel: (datos) => ipcRenderer.invoke('admin:guardarNivel', datos),
+    eliminarNivel: (idNivel) => ipcRenderer.invoke('admin:eliminarNivel', idNivel),
+    actualizarRutaNivel: (idNivel, ruta) => ipcRenderer.invoke('admin:actualizarRutaNivel', { idNivel, rutaArchivo: ruta }),
+    getReporteGeneral: () => ipcRenderer.invoke('admin:getReporteGeneral'),
 });

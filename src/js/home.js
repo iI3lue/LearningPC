@@ -1,101 +1,405 @@
-// home.js - Lógica de la pantalla principal (categorías y progreso)
+// home.js - Dashboard Informativo Learning PC
 
-// Recuperar el usuario guardado en sesión
-const usuario = JSON.parse(sessionStorage.getItem('usuario'));
-
-// Si no hay sesión activa, redirigir al login
-if (!usuario) {
-    window.api.irA('login');
-}
-
-// Referencias al DOM
-const nombreUsuario = document.getElementById('nombre-usuario');
-const progresoValor = document.getElementById('progreso-valor');
-const listaCategorias = document.getElementById('lista-categorias');
-const btnCerrarSesion = document.getElementById('btn-cerrar-sesion');
-
-// Mostrar nombre y progreso inicial del usuario
-nombreUsuario.textContent = usuario.usuario;
-progresoValor.textContent = `${usuario.progreso_total ?? 0}%`;
-
-// Cargar y renderizar categorías
-async function cargarCategorias() {
-    const categorias = await window.api.getCategorias();
-
-    listaCategorias.innerHTML = '';
-
-    for (const cat of categorias) {
-        const tarjeta = document.createElement('div');
-        tarjeta.className = 'tarjeta-categoria';
-        tarjeta.dataset.idCategoria = cat.id_categoria;
-
-        tarjeta.innerHTML = `
-            <h3>${cat.nombre}</h3>
-            <p>${cat.descripcion ?? ''}</p>
-            <button class="btn-ver-niveles" data-id="${cat.id_categoria}">
-                Ver niveles
-            </button>
-            <ul class="lista-niveles" id="niveles-${cat.id_categoria}" hidden></ul>
-        `;
-
-        listaCategorias.appendChild(tarjeta);
+(function() {
+    // Debug inicial
+    const debugPanel = document.getElementById('debug-panel');
+    function log(msg) {
+        console.log(msg);
+        if (debugPanel) {
+            debugPanel.innerHTML += '<div>' + msg + '</div>';
+            debugPanel.style.display = 'block';
+        }
     }
+    
+    log('[HOME] Script iniciado');
 
-    // Escuchar clics en "Ver niveles"
-    document.querySelectorAll('.btn-ver-niveles').forEach((btn) => {
-        btn.addEventListener('click', () => toggleNiveles(btn.dataset.id));
-    });
-}
+    const usuario = JSON.parse(sessionStorage.getItem('usuario'));
 
-// Mostrar/ocultar niveles de una categoría
-async function toggleNiveles(idCategoria) {
-    const lista = document.getElementById(`niveles-${idCategoria}`);
-
-    if (!lista.hidden) {
-        lista.hidden = true;
+    if (!usuario) {
+        log('[HOME] No hay usuario, redirigiendo...');
+        window.api.irA('login');
         return;
     }
 
-    // Cargar niveles si aún no se han cargado
-    if (lista.children.length === 0) {
-        const niveles = await window.api.getNivelesPorCategoria(idCategoria);
-        const progreso = await window.api.getProgreso(usuario.id_usuario);
-        const completados = new Set(progreso.filter(p => p.completado).map(p => p.id_nivel));
+    log('[HOME] Usuario: ' + usuario.usuario);
 
-        if (niveles.length === 0) {
-            lista.innerHTML = '<li>No hay niveles disponibles aún.</li>';
-        } else {
-            niveles.forEach((nivel) => {
-                const li = document.createElement('li');
-                const estaCompletado = completados.has(nivel.id_nivel);
+    // Función helper para obtener elementos del DOM cuando se necesiten
+    function getEl(id) {
+        const el = document.getElementById(id);
+        if (!el) log('[ERROR] No encontrado: ' + id);
+        return el;
+    }
 
-                li.className = estaCompletado ? 'nivel completado' : 'nivel';
-                li.innerHTML = `
-                    <strong>${nivel.orden}. ${nivel.titulo}</strong>
-                    <span>${nivel.descripcion ?? ''}</span>
-                    ${estaCompletado ? '<span class="badge">✓ Completado</span>' : ''}
-                `;
-                lista.appendChild(li);
+    // User info - obtener elementos cuando se usen
+    const nombreUsuario = getEl('nombre-usuario');
+    if (nombreUsuario) nombreUsuario.textContent = usuario.usuario;
+    
+    const profileName = getEl('profile-name');
+    if (profileName) profileName.textContent = usuario.usuario;
+    
+    const profileAvatar = getEl('profile-avatar');
+    if (profileAvatar) profileAvatar.textContent = usuario.usuario.charAt(0).toUpperCase();
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.dataset.page;
+            if (page === 'reportes') {
+                window.api.irA('reportes');
+            } else if (page === 'ajustes') {
+                window.api.irA('ajustes');
+            }
+        });
+    });
+
+    // Admin link
+    const linkAdmin = getEl('link-admin');
+    if (linkAdmin) {
+        linkAdmin.addEventListener('click', () => {
+            window.api.irA('gestion');
+        });
+    }
+
+    // Helpers
+    function getNivelUsuario(progreso) {
+        if (progreso >= 100) return { nombre: 'Experto', clase: 'experto' };
+        if (progreso >= 76) return { nombre: 'Avanzado', clase: 'avanzado' };
+        if (progreso >= 26) return { nombre: 'Intermedio', clase: 'intermedio' };
+        return { nombre: 'Principiante', clase: 'principiante' };
+    }
+
+    function getMensajeProgreso(progreso, nombre) {
+        if (progreso >= 100) return `Felicidades, ${nombre}! Completaste todo.`;
+        if (progreso >= 76) return `Casi lo logras, ${nombre}!`;
+        if (progreso >= 51) return `Impresionante progreso, ${nombre}!`;
+        if (progreso >= 26) return `Vas bien, ${nombre}. Sigue aprendiendo.`;
+        if (progreso > 0) return `Bienvenido, ${nombre}. Cada paso cuenta.`;
+        return `Comienza tu viaje de aprendizaje!`;
+    }
+
+    function getMensajeRacha(dias) {
+        if (dias <= 0) return 'Comienza tu racha hoy mismo.';
+        return `${dias} dias de aprendizaje consecutivo`;
+    }
+
+    // Progress ring animation
+    function animateProgressRing(percent) {
+        const progressRing = getEl('progress-ring');
+        if (!progressRing) return;
+        const circumference = 283;
+        const offset = circumference - (percent / 100) * circumference;
+        progressRing.style.strokeDashoffset = offset;
+    }
+
+    // Render stats
+    function renderStats(progresoData, categoriasData) {
+        let totalNiveles = 0;
+        let completadosCount = 0;
+        
+        categoriasData.forEach(cat => {
+            if (cat.subcategorias) {
+                cat.subcategorias.forEach(sub => {
+                    if (sub.niveles) {
+                        totalNiveles += sub.niveles.length;
+                        sub.niveles.forEach(nivel => {
+                            if (progresoData.some(p => p.id_nivel === nivel.id_nivel && p.completado)) {
+                                completadosCount++;
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        
+        const progreso = totalNiveles > 0 ? Math.round((completadosCount / totalNiveles) * 100) : 0;
+
+        const nivel = getNivelUsuario(progreso);
+        
+        const profileBadge = getEl('profile-badge');
+        if (profileBadge) {
+            profileBadge.textContent = nivel.nombre;
+            profileBadge.className = `profile-badge badge-${nivel.clase}`;
+        }
+
+        const progresoTexto = getEl('progreso-texto');
+        if (progresoTexto) progresoTexto.textContent = `${progreso}%`;
+        
+        const progresoMensaje = getEl('progreso-mensaje');
+        if (progresoMensaje) progresoMensaje.textContent = getMensajeProgreso(progreso, usuario.usuario);
+        
+        const nivelesCompletados = getEl('niveles-completados');
+        if (nivelesCompletados) nivelesCompletados.textContent = completadosCount;
+        
+        const nivelesTotal = getEl('niveles-total');
+        if (nivelesTotal) nivelesTotal.textContent = totalNiveles;
+
+        animateProgressRing(progreso);
+
+        const streak = usuario.racha || 0;
+        
+        const streakCount = getEl('streak-count');
+        if (streakCount) streakCount.textContent = streak <= 0 ? '0 días' : `${streak} días`;
+
+        const restantes = 3 - (streak % 3 || 0);
+        const periodoMensaje = getEl('periodo-mensaje');
+        if (periodoMensaje) {
+            if (restantes > 0 && streak > 0) {
+                periodoMensaje.textContent = `Completa ${restantes} niveles para mantener tu racha`;
+            } else if (streak > 0) {
+                periodoMensaje.textContent = `Racha activa! Sigue asi`;
+            } else {
+                periodoMensaje.textContent = 'Completa niveles para comenzar tu racha';
+            }
+        }
+
+        return { progreso, completadosCount, totalNiveles, progresoData };
+    }
+
+    // Get next level
+    function getSiguienteNivel(categoriasData, progresoData) {
+        const completados = new Set(progresoData.filter(p => p.completado).map(p => p.id_nivel));
+        
+        for (const cat of categoriasData) {
+            if (cat.subcategorias) {
+                for (const sub of cat.subcategorias) {
+                    if (sub.niveles) {
+                        for (const nivel of sub.niveles) {
+                            if (!completados.has(nivel.id_nivel)) {
+                                return nivel.titulo;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return 'Todos completados';
+    }
+
+    // Render category cards
+    function renderCategorias(categoriasData, progresoData, stats) {
+        log('[RENDER] Iniciando render de ' + categoriasData.length + ' categorías');
+        
+        const categoriasGrid = getEl('categorias-grid');
+        if (!categoriasGrid) {
+            log('[RENDER] ERROR: categoriasGrid es null');
+            return;
+        }
+
+        log('[RENDER] categoriasGrid encontrado, limpándolo...');
+        categoriasGrid.innerHTML = '';
+
+        categoriasData.forEach((cat, index) => {
+            log('[RENDER] Renderizando categoría: ' + cat.nombre);
+            
+            let totalNiveles = 0;
+            let completados = 0;
+            
+            if (cat.subcategorias) {
+                cat.subcategorias.forEach(sub => {
+                    if (sub.niveles) {
+                        totalNiveles += sub.niveles.length;
+                        sub.niveles.forEach(nivel => {
+                            if (progresoData.some(p => p.id_nivel === nivel.id_nivel && p.completado)) {
+                                completados++;
+                            }
+                        });
+                    }
+                });
+            }
+            
+            const percent = totalNiveles > 0 ? Math.round((completados / totalNiveles) * 100) : 0;
+
+            const card = document.createElement('article');
+            card.className = 'categoria-card';
+            card.style.cssText = 'background: var(--sidebar-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 16px;';
+            card.dataset.idCategoria = cat.id_categoria;
+
+            let subcategoriasHtml = '';
+            if (cat.subcategorias) {
+                subcategoriasHtml = cat.subcategorias.map(sub => {
+                    const subCompletados = sub.niveles ? sub.niveles.filter(n => 
+                        progresoData.some(p => p.id_nivel === n.id_nivel && p.completado)
+                    ).length : 0;
+                    const subTotal = sub.niveles ? sub.niveles.length : 0;
+                    return `<li style="padding: 4px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;"><span>${sub.nombre}</span><span style="color: var(--accent-solid);">${subCompletados}/${subTotal}</span></li>`;
+                }).join('');
+            }
+
+            card.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <span style="font-size: 24px;">${getCategoriaIcon(cat.nombre)}</span>
+                    <h4 style="margin: 0; flex: 1;">${cat.nombre}</h4>
+                    <span style="font-weight: 600; color: var(--accent-solid);">${completados}/${totalNiveles}</span>
+                </div>
+                <div style="height: 6px; background: var(--border-color); border-radius: 3px; margin-bottom: 16px; overflow: hidden;">
+                    <div style="height: 100%; width: ${percent}%; background: var(--accent-solid); border-radius: 3px;"></div>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0 0 16px 0;">${subcategoriasHtml}</ul>
+                <button class="btn-expandir" data-id="${cat.id_categoria}" style="width: 100%; padding: 10px; background: var(--accent-pastel); color: var(--accent-solid); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Ver niveles</button>
+            `;
+
+            card.querySelector('.btn-expandir').addEventListener('click', () => toggleNiveles(cat.id_categoria, card));
+            categoriasGrid.appendChild(card);
+            log('[RENDER] Card agregada para: ' + cat.nombre);
+        });
+        
+        log('[RENDER] Completado. Total elementos: ' + categoriasGrid.children.length);
+    }
+
+    function getCategoriaIcon(nombre) {
+        const icons = {
+            'Office': '📎', 'office': '📎',
+            'Navegación en Internet': '🌐', 'Internet': '🌐', 'internet': '🌐',
+            'Navegación en Windows': '🪟', 'Windows': '🪟', 'windows': '🪟',
+            'Trucos Adicionales': '💡', 'Trucos': '💡', 'trucos': '💡'
+        };
+        return icons[nombre] || '📚';
+    }
+
+    // Toggle niveles
+    function toggleNiveles(idCategoria, card) {
+        log('[TOGGLE] Click en categoría: ' + idCategoria);
+        const existente = card.querySelector('.niveles-expandidos');
+        if (existente) {
+            existente.remove();
+            return;
+        }
+        loadAndRenderNiveles(idCategoria, card);
+    }
+
+    async function loadAndRenderNiveles(idCategoria, card) {
+        try {
+            log('[TOGGLE] Cargando niveles para categoría: ' + idCategoria);
+            
+            const subcategorias = await window.api.getSubcategoriasPorCategoria(idCategoria);
+            log('[TOGGLE] Subcategorías: ' + subcategorias.length);
+            
+            const progreso = await window.api.getProgreso(usuario.id_usuario);
+            const completados = new Set(progreso.filter(p => p.completado).map(p => p.id_nivel));
+
+            for (const sub of subcategorias) {
+                sub.niveles = await window.api.getNivelesPorSubcategoria(sub.id_subcategoria);
+            }
+
+            const container = document.createElement('div');
+            container.className = 'niveles-expandidos';
+            container.style.cssText = 'margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);';
+
+            if (subcategorias.length === 0) {
+                container.innerHTML = '<p>No hay subcategorías disponibles.</p>';
+            } else {
+                let html = '';
+                subcategorias.forEach(sub => {
+                    html += `<div style="font-weight: 600; color: var(--accent-solid); margin: 16px 0 8px 0;">${sub.nombre}</div>`;
+                    if (sub.niveles && sub.niveles.length > 0) {
+                        sub.niveles.forEach(nivel => {
+                            const estaCompletado = completados.has(nivel.id_nivel);
+                            const ruta = nivel.ruta_archivo || '';
+                            const tiempo = nivel.tiempo_estimado_min ? `(${nivel.tiempo_estimado_min} min)` : '';
+                            
+                            html += `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border-radius: 6px; margin-bottom: 8px;">
+                                    <div>
+                                        <strong style="font-size: 13px;">Nivel ${nivel.nivel_ordinal}: ${nivel.titulo}</strong>
+                                        <div style="font-size: 12px; opacity: 0.7;">${nivel.descripcion || ''} ${tiempo}</div>
+                                        ${estaCompletado ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: #dcfce7; color: #15803d; border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
+                                    </div>
+                                    <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" style="padding: 8px 16px; background: var(--accent-solid); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += '<p style="font-size: 12px; opacity: 0.5;">No hay niveles en esta subcategoría.</p>';
+                    }
+                });
+                container.innerHTML = html;
+            }
+
+            card.appendChild(container);
+
+            container.querySelectorAll('.btn-iniciar').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.dataset.id;
+                    const ruta = decodeURIComponent(e.target.dataset.ruta);
+                    const titulo = decodeURIComponent(e.target.dataset.titulo);
+                    
+                    if (ruta && ruta !== 'null' && ruta !== '') {
+                        sessionStorage.setItem('simulacion_id', id);
+                        sessionStorage.setItem('simulacion_ruta', ruta);
+                        sessionStorage.setItem('simulacion_titulo', titulo);
+                        window.api.irA('simulacion');
+                    } else {
+                        alert('Esta lección aún no tiene contenido disponible.');
+                    }
+                });
             });
+        } catch (error) {
+            log('[TOGGLE] ERROR: ' + error.message);
         }
     }
 
-    lista.hidden = false;
-}
+    // Load all data
+    async function cargarDashboard() {
+        try {
+            log('[HOME] Iniciando carga...');
+            
+            const [categorias, progreso] = await Promise.all([
+                window.api.getCategorias(),
+                window.api.getProgreso(usuario.id_usuario)
+            ]);
 
-// Pantalla completa
-const btnFullScreen = document.getElementById('btn-fullscreen');
-if (btnFullScreen) {
-    btnFullScreen.addEventListener('click', () => {
-        window.api.toggleFullScreen();
-    });
-}
+            log('[HOME] Categorías obtenidas: ' + categorias.length);
+            
+            if (!categorias || categorias.length === 0) {
+                log('[HOME] ERROR: No hay categorías');
+                const grid = getEl('categorias-grid');
+                if (grid) grid.innerHTML = '<p style="color:red;">No hay categorías en la base de datos</p>';
+                return;
+            }
 
-// Cerrar sesión
-btnCerrarSesion.addEventListener('click', () => {
-    sessionStorage.removeItem('usuario');
-    window.api.irA('login');
-});
+            // Cargar subcategorías y niveles
+            const categoriasConDatos = await Promise.all(
+                categorias.map(async cat => {
+                    const subcategorias = await window.api.getSubcategoriasPorCategoria(cat.id_categoria);
+                    log('[HOME] Subcats de ' + cat.nombre + ': ' + subcategorias.length);
+                    for (const sub of subcategorias) {
+                        sub.niveles = await window.api.getNivelesPorSubcategoria(sub.id_subcategoria);
+                    }
+                    return { ...cat, subcategorias };
+                })
+            );
 
-// Inicializar
-cargarCategorias();
+            log('[HOME] Datos cargados, renderizando...');
+
+            const stats = renderStats(progreso, categoriasConDatos);
+            const siguiente = getSiguienteNivel(categoriasConDatos, progreso);
+            const siguienteNivelNombre = getEl('siguiente-nivel-nombre');
+            if (siguienteNivelNombre) siguienteNivelNombre.textContent = siguiente;
+
+            renderCategorias(categoriasConDatos, progreso, stats);
+            log('[HOME] COMPLETO');
+        } catch (error) {
+            log('[HOME] ERROR: ' + error.message);
+        }
+    }
+
+    // Button handlers
+    const btnCerrarSesion = getEl('btn-cerrar-sesion');
+    if (btnCerrarSesion) {
+        btnCerrarSesion.addEventListener('click', () => {
+            sessionStorage.removeItem('usuario');
+            window.api.irA('login');
+        });
+    }
+
+    const btnFullscreen = getEl('btn-fullscreen');
+    if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', () => {
+            window.api.toggleFullScreen();
+        });
+    }
+
+    // Init
+    log('[HOME] Llamando cargarDashboard...');
+    cargarDashboard();
+})();

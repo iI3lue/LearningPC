@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación - Learning PC</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #simulacion-container {
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+        }
+        .simulacion-toolbar {
+            background: #1a1a1a;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            border-bottom: 1px solid #333;
+        }
+        .simulacion-toolbar h2 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+        }
+        .btn-simulacion {
+            background: #0078d4;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-simulacion:hover {
+            background: #1084d8;
+        }
+        .btn-volver {
+            background: #333;
+        }
+        .btn-volver:hover {
+            background: #444;
+        }
+    </style>
+    <style>
+        #feedback-toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 120, 212, 0.95);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Segoe UI', sans-serif;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        #feedback-toast.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="simulacion-toolbar">
+        <h2 id="titulo-nivel">Cargando simulación...</h2>
+        <div>
+            <button class="btn-simulacion btn-volver" id="btn-volver">← Volver</button>
+            <button class="btn-simulacion" id="btn-completar">✓ Completar Nivel</button>
+        </div>
+    </div>
+    <iframe id="simulacion-container" src=""></iframe>
+    <div id="feedback-toast"></div>
+
+    <script>
+        const idNivel = sessionStorage.getItem('simulacion_id');
+        const rutaArchivo = sessionStorage.getItem('simulacion_ruta');
+        const titulo = sessionStorage.getItem('simulacion_titulo');
+
+        document.getElementById('titulo-nivel').textContent = titulo || 'Simulación';
+
+        // Cargar la simulación
+        const iframe = document.getElementById('simulacion-container');
+        
+        if (rutaArchivo) {
+            console.log('[SIMULACION] Cargando:', rutaArchivo);
+            iframe.src = rutaArchivo;
+            
+            iframe.addEventListener('loaderror', (e) => {
+                console.log('[SIMULACION] Error al cargar:', e);
+            });
+        } else {
+            console.log('[SIMULACION] No hay ruta de archivo');
+        }
+
+        document.getElementById('btn-volver').addEventListener('click', () => {
+            sessionStorage.removeItem('simulacion_id');
+            sessionStorage.removeItem('simulacion_ruta');
+            sessionStorage.removeItem('simulacion_titulo');
+            window.api.irA('home');
+        });
+
+        document.getElementById('btn-completar').addEventListener('click', async () => {
+            const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+            if (usuario && idNivel) {
+                const resultado = await window.api.marcarNivelCompletado(usuario.id_usuario, parseInt(idNivel));
+                if (resultado.ok) {
+                    alert('¡Nivel completado! Progreso: ' + resultado.progreso_total + '%');
+                    sessionStorage.removeItem('simulacion_id');
+                    sessionStorage.removeItem('simulacion_ruta');
+                    sessionStorage.removeItem('simulacion_titulo');
+                    window.api.irA('home');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

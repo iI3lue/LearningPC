@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearningPC - Formulario de Nivel</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .form-admin {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="navbar">
+        <div id="nav-info">
+            <strong id="form-title">NUEVO NIVEL</strong>
+        </div>
+        <div id="nav-controles">
+            <button id="btn-cancelar" class="btn-icon">Cancelar</button>
+        </div>
+    </header>
+
+    <main id="home-container">
+        <form id="form-nivel" class="form-admin">
+            <input type="hidden" id="id_nivel">
+
+            <div class="form-group">
+                <label for="titulo">Título del Nivel</label>
+                <input type="text" id="titulo" required placeholder="Ej: Comandos de teclas">
+            </div>
+
+            <div class="form-group">
+                <label for="id_categoria">Categoría (Nivel 0)</label>
+                <select id="id_categoria" required>
+                    <!-- Se llena dinámicamente -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="id_subcategoria">Subcategoría (Nivel 1)</label>
+                <select id="id_subcategoria" required>
+                    <option value="">Selecciona una categoría primero</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" rows="3"
+                    placeholder="Explica brevemente de qué trata este nivel..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="ruta_archivo">Archivo de Simulación (opcional)</label>
+                <input type="text" id="ruta_archivo" placeholder="Ej: tru...">
+                <small style="color: #666;">Nombre del archivo en la carpeta contenido/</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nivel_ordinal">Nivel (ordinal)</label>
+                    <input type="number" id="nivel_ordinal" value="1" min="1" placeholder="1, 2, 3...">
+                    <small style="color: #666;">Número secuencial dentro de la subcategoría</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="orden">Orden de aparición</label>
+                    <input type="number" id="orden" value="0" min="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="tiempo_estimado_min">Tiempo estimado (minutos)</label>
+                <input type="number" id="tiempo_estimado_min" placeholder="Ej: 10" min="1">
+            </div>
+
+            <button type="submit" id="btn-guardar" style="width: 100%; background-color: #16a34a; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                Guardar Cambios
+            </button>
+        </form>
+    </main>
+
+    <script src="../js/formulario.js"></script>
+</body>
+
+</html>

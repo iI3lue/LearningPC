@@ -1,6 +1,11 @@
 // main.js - Proceso principal de Electron
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
+
+// Rutas de archivos
+const DB_PATH = path.join(__dirname, 'learning_pc.db');
+
 const { initDatabase, getDatabase } = require('./db/database');
 
 let mainWindow;
@@ -10,8 +15,8 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1024,
         height: 720,
-        resizable: true, // Modificable
-        minWidth: 800,   // Escala mínima para responsividad
+        resizable: true,
+        minWidth: 800,
         minHeight: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -22,11 +27,36 @@ function createWindow() {
 
     // Cargar la pantalla de login al inicio
     mainWindow.loadFile(path.join(__dirname, 'src', 'pages', 'login.html'));
+
+    // NO iniciar en pantalla completa automáticamente
+    // mainWindow.setFullScreen(true);
 }
 
 // ── Inicializar app ──────────────────────────────────────────────────────────
 app.whenReady().then(() => {
-    initDatabase(); // Crear/conectar BD al arrancar
+    // Solo inicializar (mantiene BD existente)
+    initDatabase();
+    
+    // Corregir rutas de simulaciones (solo si existen niveles)
+    try {
+        const db = getDatabase();
+        const niveles = db.prepare("SELECT id_nivel, ruta_archivo FROM niveles WHERE ruta_archivo IS NOT NULL AND ruta_archivo != ''").all();
+        for (const nivel of niveles) {
+            if (nivel.ruta_archivo && !nivel.ruta_archivo.startsWith('../../')) {
+                const partes = nivel.ruta_archivo.split('/');
+                const nombreArchivo = partes[partes.length - 1];
+                const nuevaRuta = '../../contenido/' + nombreArchivo;
+                
+                db.prepare('UPDATE niveles SET ruta_archivo = ? WHERE id_nivel = ?')
+                    .run(nuevaRuta, nivel.id_nivel);
+                console.log('[DB] Ruta corregida: ' + nuevaRuta);
+            }
+        }
+    } catch (e) {
+        // Si no existe la tabla, no hacer nada
+        console.log('[DB] Base de datos vacía o sin niveles');
+    }
+    
     createWindow();
 });
 
@@ -40,7 +70,12 @@ ipcMain.on('window:toggleFullScreen', () => {
     mainWindow.setFullScreen(!isFullScreen);
 });
 
-// Atajo F11 para pantalla completa (Global o local a la ventana)
+// DevTools shortcut (Ctrl+Shift+I)
+ipcMain.on('window:openDevTools', () => {
+    mainWindow.webContents.openDevTools();
+});
+
+// Atajo F11 para pantalla completa
 app.on('browser-window-focus', () => {
     const { globalShortcut } = require('electron');
     globalShortcut.register('F11', () => {
@@ -60,6 +95,10 @@ ipcMain.on('nav:irA', (event, pagina) => {
         login: path.join(__dirname, 'src', 'pages', 'login.html'),
         registro: path.join(__dirname, 'src', 'pages', 'registro.html'),
         home: path.join(__dirname, 'src', 'pages', 'home.html'),
+        gestion: path.join(__dirname, 'src', 'pages', 'gestion.html'),
+        formulario: path.join(__dirname, 'src', 'pages', 'formulario.html'),
+        reportes: path.join(__dirname, 'src', 'pages', 'reportes.html'),
+        simulacion: path.join(__dirname, 'src', 'pages', 'simulacion.html'),
     };
     if (paginas[pagina]) mainWindow.loadFile(paginas[pagina]);
 });
@@ -90,19 +129,49 @@ ipcMain.handle('auth:registrar', (event, { usuario, contraseña, edad }) => {
     }
 });
 
-// ── Datos ────────────────────────────────────────────────────────────────────
+// ── Datos - Estructura jerárquica ────────────────────────────────────────────
+
+// Obtener todas las categorías (mostrar todas, no solo activas)
 ipcMain.handle('data:getCategorias', () => {
     const db = getDatabase();
-    return db.prepare('SELECT * FROM categorias').all();
+    const cats = db.prepare('SELECT * FROM categorias ORDER BY orden').all();
+    console.log('[MAIN] getCategorias:', cats.length, 'categorías');
+    return cats;
 });
 
+// Obtener subcategorías por categoría (mostrar todas)
+ipcMain.handle('data:getSubcategoriasPorCategoria', (event, idCategoria) => {
+    const db = getDatabase();
+    const subs = db.prepare(
+        'SELECT * FROM subcategorias WHERE id_categoria = ? ORDER BY orden'
+    ).all(idCategoria);
+    console.log('[MAIN] getSubcategoriasPorCategoria(', idCategoria, '):', subs.length, 'subcategorías');
+    return subs;
+});
+
+// Obtener niveles por subcategoría
+ipcMain.handle('data:getNivelesPorSubcategoria', (event, idSubcategoria) => {
+    const db = getDatabase();
+    const nivs = db.prepare(
+        'SELECT * FROM niveles WHERE id_subcategoria = ? ORDER BY nivel_ordinal ASC, orden ASC'
+    ).all(idSubcategoria);
+    console.log('[MAIN] getNivelesPorSubcategoria(', idSubcategoria, '):', nivs.length, 'niveles');
+    return nivs;
+});
+
+// Obtener niveles por categoría (legacy para compatibilidad)
 ipcMain.handle('data:getNivelesPorCategoria', (event, idCategoria) => {
     const db = getDatabase();
-    return db.prepare(
-        'SELECT * FROM niveles WHERE id_categoria = ? ORDER BY orden ASC'
-    ).all(idCategoria);
+    return db.prepare(`
+        SELECT n.*, s.nombre as nombre_subcategoria, s.id_subcategoria
+        FROM niveles n
+        JOIN subcategorias s ON n.id_subcategoria = s.id_subcategoria
+        WHERE s.id_categoria = ?
+        ORDER BY s.orden, n.nivel_ordinal, n.orden
+    `).all(idCategoria);
 });
 
+// Obtener progreso del usuario
 ipcMain.handle('data:getProgreso', (event, idUsuario) => {
     const db = getDatabase();
     return db.prepare(
@@ -110,28 +179,128 @@ ipcMain.handle('data:getProgreso', (event, idUsuario) => {
     ).all(idUsuario);
 });
 
+// Marcar nivel como completado
 ipcMain.handle('data:marcarNivelCompletado', (event, { idUsuario, idNivel }) => {
     const db = getDatabase();
     const fecha = new Date().toISOString();
 
-    // Insertar o actualizar el progreso del nivel
-    db.prepare(`
-        INSERT INTO progreso_usuario (id_usuario, id_nivel, completado, fecha_completado)
-        VALUES (?, ?, 1, ?)
-        ON CONFLICT(id_usuario, id_nivel) DO UPDATE SET completado = 1, fecha_completado = ?
-    `).run(idUsuario, idNivel, fecha, fecha);
+    const existente = db.prepare(
+        'SELECT id FROM progreso_usuario WHERE id_usuario = ? AND id_nivel = ?'
+    ).get(idUsuario, idNivel);
 
-    // Recalcular progreso_total del usuario
+    if (existente) {
+        db.prepare('UPDATE progreso_usuario SET completado = 1, fecha_completado = ? WHERE id = ?')
+            .run(fecha, existente.id);
+    } else {
+        db.prepare('INSERT INTO progreso_usuario (id_usuario, id_nivel, completado, fecha_completado) VALUES (?, ?, 1, ?)')
+            .run(idUsuario, idNivel, fecha);
+    }
+
+    // Recalcular progreso total
     const { total } = db.prepare(`
         SELECT ROUND(
-            (COUNT(CASE WHEN pu.completado = 1 THEN 1 END) * 100.0) / COUNT(n.id_nivel), 2
+            (COUNT(CASE WHEN pu.completado = 1 THEN 1 END) * 100.0) / NULLIF(COUNT(n.id_nivel), 0), 2
         ) AS total
         FROM niveles n
+        JOIN subcategorias s ON n.id_subcategoria = s.id_subcategoria
         LEFT JOIN progreso_usuario pu ON n.id_nivel = pu.id_nivel AND pu.id_usuario = ?
     `).get(idUsuario);
 
     db.prepare('UPDATE usuarios SET progreso_total = ? WHERE id_usuario = ?')
-        .run(total, idUsuario);
+        .run(total || 0, idUsuario);
 
-    return { ok: true, progreso_total: total };
+    return { ok: true, progreso_total: total || 0 };
+});
+
+// ── Administración (CRUD) ───────────────────────────────────────────────────
+
+// Obtener todos los niveles
+ipcMain.handle('admin:getTodosLosNiveles', () => {
+    const db = getDatabase();
+    return db.prepare(`
+        SELECT n.*, s.nombre as nombre_subcategoria, c.nombre as nombre_categoria, c.id_categoria
+        FROM niveles n
+        JOIN subcategorias s ON n.id_subcategoria = s.id_subcategoria
+        JOIN categorias c ON s.id_categoria = c.id_categoria
+        ORDER BY c.orden, s.orden, n.nivel_ordinal, n.orden
+    `).all();
+});
+
+// Obtener todas las subcategorías
+ipcMain.handle('admin:getTodasLasSubcategorias', () => {
+    const db = getDatabase();
+    return db.prepare(`
+        SELECT s.*, c.nombre as nombre_categoria
+        FROM subcategorias s
+        JOIN categorias c ON s.id_categoria = c.id_categoria
+        ORDER BY c.orden, s.orden
+    `).all();
+});
+
+// Guardar nivel
+ipcMain.handle('admin:guardarNivel', (event, datos) => {
+    const db = getDatabase();
+    try {
+        if (datos.id_nivel) {
+            db.prepare(`
+                UPDATE niveles SET 
+                id_subcategoria = ?, titulo = ?, descripcion = ?, ruta_archivo = ?, 
+                nivel_ordinal = ?, orden = ?, tiempo_estimado_min = ?
+                WHERE id_nivel = ?
+            `).run(
+                datos.id_subcategoria, datos.titulo, datos.descripcion, 
+                datos.ruta_archivo, datos.nivel_ordinal || 1, 
+                datos.orden || 0, datos.tiempo_estimado_min,
+                datos.id_nivel
+            );
+        } else {
+            db.prepare(`
+                INSERT INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `).run(
+                datos.id_subcategoria, datos.titulo, datos.descripcion, 
+                datos.ruta_archivo, datos.nivel_ordinal || 1, 
+                datos.orden || 0, datos.tiempo_estimado_min
+            );
+        }
+        return { ok: true };
+    } catch (err) {
+        return { ok: false, mensaje: err.message };
+    }
+});
+
+// Eliminar nivel
+ipcMain.handle('admin:eliminarNivel', (event, idNivel) => {
+    const db = getDatabase();
+    try {
+        db.prepare('DELETE FROM niveles WHERE id_nivel = ?').run(idNivel);
+        return { ok: true };
+    } catch (err) {
+        return { ok: false, mensaje: err.message };
+    }
+});
+
+// Actualizar ruta del nivel
+ipcMain.handle('admin:actualizarRutaNivel', (event, { idNivel, rutaArchivo }) => {
+    const db = getDatabase();
+    try {
+        db.prepare('UPDATE niveles SET ruta_archivo = ? WHERE id_nivel = ?').run(rutaArchivo, idNivel);
+        return { ok: true };
+    } catch (err) {
+        return { ok: false, mensaje: err.message };
+    }
+});
+
+// Reporte general
+ipcMain.handle('admin:getReporteGeneral', () => {
+    const db = getDatabase();
+    const stats = {
+        totalUsuarios: db.prepare('SELECT COUNT(*) as count FROM usuarios').get().count,
+        totalNiveles: db.prepare('SELECT COUNT(*) as count FROM niveles').get().count,
+        totalSubcategorias: db.prepare('SELECT COUNT(*) as count FROM subcategorias').get().count,
+        totalCategorias: db.prepare('SELECT COUNT(*) as count FROM categorias').get().count,
+        progresoPromedio: db.prepare('SELECT AVG(progreso_total) as avg FROM usuarios').get().avg || 0,
+        usuariosRecientes: db.prepare('SELECT usuario, progreso_total FROM usuarios ORDER BY id_usuario DESC LIMIT 5').all()
+    };
+    return stats;
 });

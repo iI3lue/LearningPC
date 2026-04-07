@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearningPC - Mis Logros</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .reporte-usuario-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 48px;
+        }
+
+        .perfil-header {
+            background-color: var(--accent-pastel);
+            color: var(--text-color);
+            padding: 48px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .perfil-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .perfil-header p {
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .stats-reporte {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card-logro {
+            background: var(--bg-color);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: border-color 0.2s;
+        }
+
+        .card-logro:hover {
+            border-color: var(--accent-solid);
+        }
+
+        .card-logro .label {
+            color: var(--text-color);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .card-logro .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-solid);
+        }
+
+        .lista-diplomas {
+            background: var(--bg-color);
+            padding: 48px;
+            border: 1px solid var(--border-color);
+        }
+
+        .lista-diplomas h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .item-diploma {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .item-diploma:last-child {
+            border-bottom: none;
+        }
+
+        .diploma-info h4 {
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .diploma-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="navbar">
+        <div id="nav-info">
+            <strong style="text-transform: uppercase; letter-spacing: 1px;">MI REPORTE DE APRENDIZAJE</strong>
+        </div>
+        <div id="nav-controles">
+            <button id="btn-toggle-theme" class="btn-nav">MODO OSCURO</button>
+            <button id="btn-volver" class="btn-nav">VOLVER AL DASHBOARD</button>
+        </div>
+    </header>
+
+    <main class="reporte-usuario-container">
+        <section class="perfil-header">
+            <h1 id="user-name">Usuario</h1>
+            <p>¡Vas por muy buen camino en tu aprendizaje!</p>
+        </section>
+
+        <section class="stats-reporte">
+            <div class="card-logro">
+                <span class="label">PROGRESO TOTAL</span>
+                <div class="value" id="progreso-texto">0%</div>
+            </div>
+            <div class="card-logro">
+                <span class="label">TIEMPO DE PRÁCTICA</span>
+                <div class="value" id="tiempo-practica">2.5 HORAS</div>
+            </div>
+            <div class="card-logro">
+                <span class="label">NIVELES SUPERADOS</span>
+                <div class="value" id="niveles-superados">0</div>
+            </div>
+        </section>
+
+        <section class="lista-diplomas">
+            <h2>HABILIDADES OBTENIDAS</h2>
+            <div id="lista-habilidades">
+                <!-- Se llena dinámicamente -->
+                <div class="item-diploma">
+                    <div class="diploma-info">
+                        <h4>INICIANDO EN EL COMPUTADOR</h4>
+                        <p>COMPLETADO EL 02 DE MARZO, 2026</p>
+                    </div>
+                </div>
+                <div class="item-diploma">
+                    <div class="diploma-info">
+                        <h4>NAVEGACIÓN BÁSICA</h4>
+                        <p>COMPLETADO EL 01 DE MARZO, 2026</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/theme-manager.js"></script>
+    <script src="../js/reporte-usuario.js"></script>
+</body>
+
+</html>

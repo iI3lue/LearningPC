@@ -1,0 +1,819 @@
+/**
+ * simulacion-core.css
+ * Estilos compartidos para todas las simulaciones de Windows 11
+ * Este archivo se carga en todas las simulaciones y contiene los estilos base del entorno
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   RESET Y BASE
+   ═══════════════════════════════════════════════════════════ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #000000;
+    font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    user-select: none;
+}
+
+.desktop {
+    height: calc(100vh - 48px);
+    padding: 0;
+    position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOTONES GENÉRICOS
+   ═══════════════════════════════════════════════════════════ */
+
+.btn-abrir {
+    background: #0067c0;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    margin: 4px;
+    transition: background 0.15s;
+}
+
+.btn-abrir:hover {
+    background: #0078d4;
+}
+
+.btn-abrir:active {
+    background: #005a9e;
+}
+
+.btn-accion {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #404040;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    margin: 4px;
+    transition: all 0.15s;
+}
+
+.btn-accion:hover {
+    background: #383838;
+    border-color: #0078d4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VENTANAS WINDOWS 11 - Estructura base
+   ═══════════════════════════════════════════════════════════ */
+
+.ventana {
+    position: absolute;
+    background: #1f1f1f;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    min-width: 500px;
+    min-height: 350px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transition: box-shadow 0.15s, transform 0.1s;
+}
+
+/* Ventana activa (al frente) */
+.ventana.activa {
+    box-shadow: 0 12px 48px rgba(0,0,0,0.8), 0 0 0 1px #0078d4;
+    z-index: 100 !important;
+}
+
+.ventana.activa .title-bar {
+    background: #2a2a2a;
+}
+
+.ventana.visible {
+    display: flex;
+}
+
+.ventana.maximizada {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: calc(100% - 48px) !important;
+    border-radius: 0;
+}
+
+/* Estados de división de pantalla */
+.ventana.izquierda {
+    top: 0 !important;
+    left: 0 !important;
+    width: 50% !important;
+    height: calc(100% - 48px) !important;
+    border-radius: 0 !important;
+    position: fixed !important;
+}
+
+.ventana.derecha {
+    top: 0 !important;
+    right: 0 !important;
+    width: 50% !important;
+    height: calc(100% - 48px) !important;
+    border-radius: 0 !important;
+    position: fixed !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TITLE BAR - Barra de título de Windows 11
+   ═══════════════════════════════════════════════════════════ */
+
+.title-bar {
+    background: #202020;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    cursor: default;
+}
+
+.title-bar .icono {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-bar .icono img {
+    width: 16px;
+    height: 16px;
+}
+
+.title-bar .titulo {
+    color: #ffffff;
+    font-size: 12px;
+    flex: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WINDOW CONTROLES - Botones minimize/maximize/close
+   ═══════════════════════════════════════════════════════════ */
+
+.window-controls {
+    display: flex;
+    height: 32px;
+}
+
+.window-btn {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.window-btn:hover {
+    background: #3d3d3d;
+}
+
+.window-btn.close:hover {
+    background: #c42b1c;
+}
+
+.window-btn svg {
+    width: 10px;
+    height: 10px;
+    fill: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOOLBAR - Barra de herramientas
+   ═══════════════════════════════════════════════════════════ */
+
+.toolbar {
+    background: #2d2d2d;
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.toolbar-btn {
+    color: #cccccc;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.toolbar-btn:hover {
+    background: #3d3d3d;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 16px;
+    background: #4d4d4d;
+    margin: 0 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ADDRESS BAR - Barra de dirección del navegador
+   ═══════════════════════════════════════════════════════════ */
+
+.address-bar {
+    background: #1a1a1a;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.address-bar .icono-bloqueo {
+    color: #4caf50;
+    font-size: 12px;
+}
+
+.address-bar input {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+    color: #cccccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    flex: 1;
+    font-size: 12px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.address-bar input:focus {
+    border-color: #0078d4;
+    outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VENTANA CONTENT - Contenido de las ventanas
+   ═══════════════════════════════════════════════════════════ */
+
+.ventana-content {
+    flex: 1;
+    background: #1f1f1f;
+    display: flex;
+    overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PANEL LATERAL - Para explorador de archivos
+   ═══════════════════════════════════════════════════════════ */
+
+.panel-lateral {
+    width: 200px;
+    background: #171717;
+    border-right: 1px solid #2d2d2d;
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-seccion {
+    margin-bottom: 8px;
+}
+
+.panel-seccion-titulo {
+    color: #6e6e6e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.panel-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 16px;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.panel-item:hover {
+    background: #2d2d2d;
+}
+
+.panel-item.active {
+    background: #0078d4;
+}
+
+.panel-item .icono {
+    font-size: 14px;
+}
+
+.panel-item .texto {
+    color: #cccccc;
+    font-size: 13px;
+}
+
+.panel-item.active .texto {
+    color: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ÁREA PRINCIPAL - Iconos de carpetas
+   ═══════════════════════════════════════════════════════════ */
+
+.area-principal {
+    flex: 1;
+    padding: 24px;
+}
+
+.biblioteca-carpetas {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.carpeta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 4px;
+}
+
+.carpeta:hover {
+    background: #2d2d2d;
+}
+
+.carpeta .icono {
+    font-size: 64px;
+}
+
+.carpeta .nombre {
+    color: #cccccc;
+    font-size: 13px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVEGADOR - Página de inicio
+   ═══════════════════════════════════════════════════════════ */
+
+.nav-inicio {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.nav-logo {
+    font-size: 72px;
+    margin-bottom: 20px;
+}
+
+.nav-buscar {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+    padding: 10px 20px;
+    border-radius: 24px;
+    width: 500px;
+    color: #cccccc;
+    font-size: 15px;
+    text-align: center;
+}
+
+.nav-buscar:focus {
+    border-color: #0078d4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   STATUS BAR - Barra de estado
+   ═══════════════════════════════════════════════════════════ */
+
+.status-bar {
+    background: #0078d4;
+    padding: 4px 12px;
+    color: #ffffff;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INSTRUCCIONES - Panel de ayuda
+   ═══════════════════════════════════════════════════════════ */
+
+.instrucciones {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f1f1f;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    padding: 10px 16px;
+    text-align: center;
+    z-index: 100;
+    font-size: 11px;
+    min-width: 200px;
+}
+
+.instrucciones h3 {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.instrucciones p {
+    color: #9e9e9e;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.key {
+    background: #333333;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', monospace;
+    border: 1px solid #4d4d4d;
+    color: #60cdff;
+    font-weight: 600;
+    font-size: 10px;
+}
+
+.keys-combo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 3px 0;
+    font-size: 10px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TASKBAR WINDOWS 11 - Barra de tareas
+   ═══════════════════════════════════════════════════════════ */
+
+.taskbar {
+    background: #000000;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-top: 1px solid #333;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.start-button {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.start-button:hover {
+    background: #2d2d2d;
+}
+
+.start-icon {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #00bcf2 0%, #0078d4 50%, #0050a0 100%);
+    border-radius: 4px;
+    position: relative;
+}
+
+.start-icon::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 8px;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-radius: 2px 0 0 0;
+}
+
+.taskbar-icons {
+    display: flex;
+    gap: 2px;
+    margin-left: 8px;
+}
+
+.taskbar-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    position: relative;
+}
+
+.taskbar-icon:hover {
+    background: #2d2d2d;
+}
+
+.taskbar-icon.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: #00bcf2;
+}
+
+.tray {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px;
+}
+
+.tray-icons {
+    display: flex;
+    gap: 2px;
+    margin-right: 8px;
+}
+
+.tray-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.clock {
+    color: #ffffff;
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.clock-hora {
+    font-weight: 400;
+}
+
+.clock-fecha {
+    font-size: 11px;
+    color: #cccccc;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MENSAJE DE PRÁCTICA - Feedback visual
+   ═══════════════════════════════════════════════════════════ */
+
+.practica-mensaje {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 120, 212, 0.25);
+    border: 2px solid #0078d4;
+    border-radius: 8px;
+    padding: 16px 24px;
+    text-align: center;
+    z-index: 200;
+    display: none;
+    min-width: 180px;
+}
+
+.practica-mensaje.visible {
+    display: block;
+}
+
+.practica-mensaje h3 {
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.practica-mensaje p {
+    color: #cccccc;
+    font-size: 11px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR - Estilo Windows 11
+   ═══════════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1f1f1f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3d3d3d;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4d4d4d;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SELECTOR OVERLAY - Pantalla de selección de ventanas
+   ═══════════════════════════════════════════════════════════ */
+
+.selector-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 5000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInSelector 0.15s ease-out;
+}
+
+.selector-overlay.visible {
+    display: flex;
+}
+
+@keyframes fadeInSelector {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.selector-header {
+    background: #1f1f1f;
+    padding: 16px 24px;
+    margin-top: 60px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.selector-header span {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.selector-zonas {
+    display: flex;
+    gap: 8px;
+    margin-top: 40px;
+}
+
+.zona-selector {
+    width: 300px;
+    height: 400px;
+    background: #2d2d2d;
+    border: 2px dashed #555555;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+}
+
+.zona-selector:hover {
+    background: #3d3d3d;
+    border-color: #0078d4;
+}
+
+.zona-selector.drag-over {
+    background: rgba(0, 120, 212, 0.2);
+    border-color: #60cdff;
+    border-style: solid;
+}
+
+.zona-indicador {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.zona-indicador.izquierda {
+    background: linear-gradient(135deg, #0078d4 0%, #0050a0 100%);
+}
+
+.zona-indicador.derecha {
+    background: linear-gradient(135deg, #107c10 0%, #004d00 100%);
+}
+
+.flecha-zona {
+    font-size: 32px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.zona-nombre {
+    color: #cccccc;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.selector-ventanas {
+    display: flex;
+    gap: 24px;
+    margin-top: 40px;
+}
+
+.ventana-mini-selector {
+    background: #1f1f1f;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: grab;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.ventana-mini-selector:hover {
+    background: #2d2d2d;
+    border-color: #0078d4;
+    transform: scale(1.05);
+}
+
+.ventana-mini-selector:active {
+    cursor: grabbing;
+}
+
+.ventana-mini-selector span {
+    color: #cccccc;
+    font-size: 13px;
+}
+
+.selector-cierre {
+    position: absolute;
+    bottom: 40px;
+    background: rgba(45, 45, 45, 0.95);
+    color: #cccccc;
+    padding: 10px 24px;
+    border-radius: 4px;
+    border: 1px solid #404040;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+}
+
+.selector-cierre:hover {
+    background: rgba(60, 60, 60, 0.9);
+    color: #ffffff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST - Mensajes de feedback
+   ═══════════════════════════════════════════════════════════ */
+
+#toast-feedback {
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    background: #1f1f1f;
+    border: 1px solid #3d3d3d;
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: #ffffff;
+    font-size: 13px;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+}

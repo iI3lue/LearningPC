@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearningPC - Gestión de Contenidos</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .gestion-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 32px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .gestion-table th,
+        .gestion-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .gestion-table th {
+            background-color: var(--sidebar-bg);
+            color: var(--text-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-edit {
+            background-color: #f59e0b !important;
+            padding: 6px 12px !important;
+            font-size: 0.75rem !important;
+        }
+
+        .btn-delete {
+            background-color: #dc2626 !important;
+            padding: 6px 12px !important;
+            font-size: 0.75rem !important;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="navbar">
+        <div id="nav-info">
+            <strong style="text-transform: uppercase; letter-spacing: 1px;">ADMINISTRACIÓN DE CONTENIDOS</strong>
+        </div>
+        <div id="nav-controles">
+            <button id="btn-toggle-theme" class="btn-nav">MODO OSCURO</button>
+            <button id="btn-reportes" class="btn-nav">REPORTES</button>
+            <button id="btn-volver" class="btn-nav">VOLVER</button>
+        </div>
+    </header>
+
+    <main id="home-container">
+        <div class="header-actions">
+            <h2>GESTIÓN DE NIVELES</h2>
+            <button id="btn-nuevo" style="background-color: var(--accent-solid);">+ NUEVO NIVEL</button>
+        </div>
+
+        <table class="gestion-table">
+            <thead>
+                <tr>
+                    <th>Orden</th>
+                    <th>Categoría</th>
+                    <th>Título</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-niveles">
+                <!-- Se llena dinámicamente -->
+            </tbody>
+        </table>
+    </main>
+
+    <script src="../js/theme-manager.js"></script>
+    <script src="../js/gestion.js"></script>
+</body>
+
+</html>
