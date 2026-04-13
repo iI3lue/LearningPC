@@ -106,7 +106,7 @@ INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, desc
 INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
     -- Subcategoría: Pantallas divididas (id=1)
     (1, 'Comandos de teclas', 'Aprende los atajos de teclado básicos para dividir pantalla', 'trucos-dividir-pantalla.html', 1, 1, 10),
-    (1, 'Arrastre a bordes', 'Divide ventanas arrastrando a los bordes de la pantalla', NULL, 2, 2, 15),
+    (1, 'Arrastre a bordes', 'Divide ventanas arrastrando a los bordes de la pantalla', 'trucos-arrastre-bordes.html', 2, 2, 15),
     (1, 'Botones de control', 'Usa los botones de la barra de título para dividir', NULL, 3, 3, 10),
     
     -- Subcategoría: Atajos de teclado (id=2)

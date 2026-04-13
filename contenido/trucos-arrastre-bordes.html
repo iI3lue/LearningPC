@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrastre a bordes - Windows</title>
+    <!-- CSS Compartido: estilos base de Windows 11 -->
+    <link rel="stylesheet" href="simulacion-core.css">
+    <!-- CSS Específico: estilos de la simulación -->
+    <link rel="stylesheet" href="trucos-dividir-pantalla.css">
+</head>
+<body>
+    <div class="desktop">
+        
+        <!-- Panel de control inicial -->
+        <div class="control-panel" id="panel-control">
+            <h2>Arrastrar ventanas a los bordes</h2>
+            <p>Windows permite dividir la pantalla arrastrando las ventanas hacia los bordes izquierdo o derecho.</p>
+            <div>
+                <button class="btn-abrir" id="btn-abrir" onclick="abrirVentanaDocumentos()">Abrir Documentos</button>
+            </div>
+            <div style="margin-top: 16px;">
+                <button class="btn-accion" id="btn-reiniciar" onclick="reiniciarSimulacion()" style="display:none;">🔄 Reiniciar</button>
+            </div>
+        </div>
+        
+        <!-- Guías de división (aparecen al arrastrar) -->
+        <div class="guia-zona guia-izquierda" id="guia-izq"></div>
+        <div class="guia-zona guia-derecha" id="guia-der"></div>
+        
+        <!-- Ventana Documentos -->
+        <div class="ventana" id="ventana-documentos">
+            <div class="title-bar" id="title-bar-documentos">
+                <span class="icono">📁</span>
+                <span class="titulo">Documentos</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('documentos')">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarVentana('documentos')">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarVentana('documentos')">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <span class="toolbar-btn">📁 Nuevo</span>
+                <span class="toolbar-btn">📋 Cortar</span>
+                <span class="toolbar-btn">📋 Copiar</span>
+                <span class="toolbar-btn">📋 Pegar</span>
+            </div>
+            <div class="ventana-content">
+                <!-- Lista de archivos -->
+                <div class="file-item">
+                    <span class="icono">📄</span>
+                    <span class="texto">Informe 2024.xlsx</span>
+                </div>
+                <div class="file-item">
+                    <span class="icono">📄</span>
+                    <span class="texto">Presentacion.pptx</span>
+                </div>
+                <div class="file-item">
+                    <span class="icono">📄</span>
+                    <span class="texto">Notas.txt</span>
+                </div>
+                <div class="file-item">
+                    <span class="icono">📁</span>
+                    <span class="texto">Proyectos</span>
+                </div>
+            </div>
+            <div class="status-bar">
+                <span>4 elementos</span>
+                <span>Listo</span>
+            </div>
+        </div>
+        
+        <!-- Instrucciones -->
+        <div class="instrucciones" id="instrucciones" style="display:none;">
+            <h3>Cómo dividir tu pantalla</h3>
+            <p>Arrastá la ventana hacia un borde de la pantalla</p>
+        </div>
+        
+        <!-- Mensaje de práctica -->
+        <div class="practica-mensaje" id="practica-mensaje">
+            <h3>¡Muy bien!</h3>
+            <p>Ahora practicá en tu PC real</p>
+        </div>
+    </div>
+    
+    <!-- Taskbar Windows 11 -->
+    <div class="taskbar">
+        <div class="start-button">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-documentos" onclick="abrirVentanaDocumentos()">📁</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <div class="tray-icon">🔊</div>
+                <div class="tray-icon">📶</div>
+                <div class="tray-icon">🔋</div>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">15/3/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JS Compartido: funciones base -->
+    <script src="simulacion-core.js"></script>
+    
+    <script>
+        // ═══════════════════════════════════════════════════════════
+        // SIMULACIÓN: Arrastrar ventanas a los bordes
+        // ═══════════════════════════════════════════════════════════
+        
+        // Variables locales
+        let arrastrando = false;
+        let offsetX = 0;
+        let offsetY = 0;
+        let intentos = 0;
+        let exito = false;
+        let ventanaAbierta = false;
+        
+        // Elementos
+        const ventana = document.getElementById('ventana-documentos');
+        const guiaIzq = document.getElementById('guia-izq');
+        const guiaDer = document.getElementById('guia-der');
+        
+        // Abrir ventana de documentos
+        function abrirVentanaDocumentos() {
+            abrirVentana('documentos');
+            ventana.style.left = '120px';
+            ventana.style.top = '60px';
+            ventanaAbierta = true;
+            actualizarInterfaz();
+        }
+        
+        // Función callback cuando se cierra una ventana
+        function onVentanaCerrada(tipo) {
+            if (tipo === 'documentos') {
+                ventanaAbierta = false;
+            }
+            actualizarInterfaz();
+        }
+        
+        // Actualizar interfaz según estado
+        function actualizarInterfaz() {
+            const panel = document.getElementById('panel-control');
+            const instrucciones = document.getElementById('instrucciones');
+            const btnReiniciar = document.getElementById('btn-reiniciar');
+            
+            if (ventanaAbierta) {
+                panel.style.display = 'none';
+                instrucciones.style.display = 'block';
+                btnReiniciar.style.display = 'inline-block';
+            } else {
+                panel.style.display = 'block';
+                instrucciones.style.display = 'none';
+                btnReiniciar.style.display = 'none';
+            }
+        }
+        
+        // Iniciar arrastre desde title-bar
+        const titleBar = document.getElementById('title-bar-documentos');
+        titleBar.addEventListener('mousedown', function(e) {
+            if (e.target.closest('.window-btn')) return;
+            iniciarArrastre(e);
+        });
+        
+        function iniciarArrastre(e) {
+            if (exito || !ventanaAbierta) return;
+            console.log('[ARR] Iniciando arrastre');
+            e.preventDefault();
+            
+            const rect = ventana.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            arrastrando = true;
+            ventana.classList.add('activa');
+            bringToFront(ventana);
+            
+            document.addEventListener('mousemove', moverVentana);
+            document.addEventListener('mouseup', soltarVentana);
+        }
+        
+        function moverVentana(e) {
+            if (!arrastrando || exito) return;
+            e.preventDefault();
+            
+            let nuevoX = e.clientX - offsetX;
+            let nuevoY = e.clientY - offsetY;
+            
+            // Limitar movimiento vertical
+            nuevoY = Math.max(0, Math.min(nuevoY, window.innerHeight - 150));
+            
+            ventana.style.left = nuevoX + 'px';
+            ventana.style.top = nuevoY + 'px';
+            
+            // Verificar guías cerca de bordes
+            const anchoPantalla = window.innerWidth;
+            
+            if (nuevoX < 80) {
+                guiaIzq.classList.add('visible');
+                guiaDer.classList.remove('visible');
+            } else if (nuevoX > anchoPantalla - 600) {
+                guiaDer.classList.add('visible');
+                guiaIzq.classList.remove('visible');
+            } else {
+                guiaIzq.classList.remove('visible');
+                guiaDer.classList.remove('visible');
+            }
+        }
+        
+        function soltarVentana() {
+            if (!arrastrando) return;
+            
+            arrastrando = false;
+            document.removeEventListener('mousemove', moverVentana);
+            document.removeEventListener('mouseup', soltarVentana);
+            
+            // Verificar posición
+            const rect = ventana.getBoundingClientRect();
+            const anchoPantalla = window.innerWidth;
+            
+            // Limpiar guías
+            guiaIzq.classList.remove('visible');
+            guiaDer.classList.remove('visible');
+            
+            if (rect.left < 40) {
+                dividirIzquierda();
+            } else if (rect.right > anchoPantalla - 40) {
+                dividirDerecha();
+            } else {
+                // No soltó en zona de división
+                intentos++;
+                if (intentos >= 3) {
+                    mostrarToast('💡 Hint: Arrastrá la ventana hasta el borde de la pantalla');
+                } else {
+                    mostrarToast('Intentá de nuevo: arrastrá hacia un borde');
+                }
+            }
+        }
+        
+        function dividirIzquierda() {
+            exito = true;
+            
+            // Aplicar clase de división izquierda
+            ventana.classList.remove('activa');
+            ventana.classList.add('izquierda');
+            
+            // Estilos directos para posición fixed
+            ventana.style.position = 'fixed';
+            ventana.style.top = '0';
+            ventana.style.left = '0';
+            ventana.style.width = '50%';
+            ventana.style.height = 'calc(100vh - 48px)';
+            
+            mostrarMensajePractica();
+        }
+        
+        function dividirDerecha() {
+            exito = true;
+            
+            // Aplicar clase de división derecha
+            ventana.classList.remove('activa');
+            ventana.classList.add('derecha');
+            
+            // Estilos directos para posición fixed
+            ventana.style.position = 'fixed';
+            ventana.style.top = '0';
+            ventana.style.left = '50%';
+            ventana.style.width = '50%';
+            ventana.style.height = 'calc(100vh - 48px)';
+            
+            mostrarMensajePractica();
+        }
+        
+        function mostrarMensajePractica() {
+            const msg = document.getElementById('practica-mensaje');
+            msg.classList.add('visible');
+            setTimeout(() => {
+                msg.classList.remove('visible');
+            }, 2500);
+        }
+        
+        function reiniciarSimulacion() {
+            exito = false;
+            intentos = 0;
+            
+            // Restaurar ventana
+            ventana.classList.remove('activa', 'izquierda', 'derecha');
+            ventana.style.position = '';
+            ventana.style.top = '';
+            ventana.style.left = '';
+            ventana.style.width = '';
+            ventana.style.height = '';
+            
+            // Ocultar ventanas
+            cerrarVentana('documentos');
+            
+            actualizarInterfaz();
+        }
+        
+        // Cerrar ventana (custom para esta simulación)
+        function cerrarVentana(tipo) {
+            if (tipo === 'documentos') {
+                ventana.classList.remove('visible', 'activa', 'izquierda', 'derecha');
+                const taskbarIcon = document.getElementById('taskbar-documentos');
+                if (taskbarIcon) taskbarIcon.classList.remove('active');
+                onVentanaCerrada('documentos');
+            }
+        }
+        
+        // Inicializar clock al cargar
+        initClock();
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+/**
+ * tru cs-arrastre-bordes.css
+ * Estilos específicos para la simulación de arrastre a bordes
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   PANEL DE CONTROL
+   ═══════════════════════════════════════════════════════════ */
+
+.control-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, #2a2a2a, #1f1f1f);
+    padding: 32px 40px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 16px 64px rgba(0,0,0,0.5);
+    z-index: 200;
+    border: 1px solid #3d3d3d;
+}
+
+.control-panel h2 {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.control-panel p {
+    color: #a0a0a0;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.btn-iniciar {
+    background: linear-gradient(145deg, #0078d4, #0067c0);
+    color: #ffffff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0,120,212,0.3);
+}
+
+.btn-iniciar:hover {
+    background: linear-gradient(145deg, #0086e0, #0078d4);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0,120,212,0.4);
+}
+
+/* Ocultar panel cuando inicia simulación */
+.control-panel.oculto {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+/* ═══════════════════════════════════════════════════
+   GUIAS DE DIVISIÓN
+   ═══════════════════════════════════════════════════ */
+
+.guia-division {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 50;
+}
+
+.guia-izquierda {
+    left: 0;
+    background: linear-gradient(90deg, rgba(0,120,212,0.4) 0%, rgba(0,120,212,0.1) 50%, transparent 100%);
+    border-right: 2px dashed rgba(0,120,212,0.6);
+}
+
+.guia-derecha {
+    right: 0;
+    background: linear-gradient(-90deg, rgba(0,120,212,0.4) 0%, rgba(0,120,212,0.1) 50%, transparent 100%);
+    border-left: 2px dashed rgba(0,120,212,0.6);
+}
+
+.guia-division span {
+    background: rgba(0,120,212,0.9);
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.guia-visible {
+    opacity: 1;
+}
+
+.guia-hover {
+    opacity: 1;
+    background: linear-gradient(90deg, rgba(0,120,212,0.6) 0%, rgba(0,120,212,0.2) 100%) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   VENTANA ARRASTRABLE
+   ═══════════════════════════════════════════════════════════ */
+
+.ventana_arrastrable {
+    position: absolute;
+    width: 420px;
+    height: 320px;
+    cursor: grab;
+    transition: box-shadow 0.15s;
+    z-index: 100;
+}
+
+.ventana_arrastrable:active {
+    cursor: grabbing;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+}
+
+.ventana_arrastrable.en-division-izq {
+    left: 0 !important;
+    top: 0 !important;
+    width: 50% !important;
+    height: 100% !important;
+    border-radius: 0 8px 8px 0;
+    background: #1f1f1f;
+}
+
+.ventana_arrastrable.en-division-der {
+    right: 0 !important;
+    top: 0 !important;
+    width: 50% !important;
+    height: 100% !important;
+    border-radius: 8px 0 0 8px;
+    background: #1f1f1f;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTENIDO DE LA VENTANA
+   ═══════════════════════════════════════════════════════════ */
+
+.contenido-ventana {
+    padding: 16px;
+    flex: 1;
+    background: #252525;
+    overflow-y: auto;
+}
+
+.archivo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: #e0e0e0;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.archivo:hover {
+    background: #333333;
+}
+
+.archivo:nth-child(odd) {
+    background: #2a2a2a;
+}
+
+.archivo:nth-child(odd):hover {
+    background: #383838;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST / FEEDBACK
+   ═══════════════════════════════════════════════════════════ */
+
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(0,120,212,0.95);
+    color: #ffffff;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.exito {
+    background: rgba(16,124,16,0.95);
+}
+
+.toast.error {
+    background: rgba(196,43,28,0.95);
+}

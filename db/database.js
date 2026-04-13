@@ -96,8 +96,6 @@ function aplicarMigraciones() {
                     .run(result.lastInsertRowid, cat.id_categoria);
             }
             
-            // Ahora agregar FK y quitar id_categoria temporal
-            // (En SQLite no se puede eliminar columna fácilmente, así que la dejamos)
             console.log('[DB] Migración de niveles completada.');
         }
         
@@ -145,46 +143,40 @@ function aplicarMigraciones() {
             }
         }
         
-        // 6. Si no hay niveles, insertar datos de ejemplo
-        const countNiveles = db.prepare("SELECT COUNT(*) as total FROM niveles").get();
-        console.log('[DB] Count niveles:', countNiveles.total);
-        if (countNiveles.total === 0) {
-            console.log('[DB] Insertando niveles de ejemplo...');
-            const subcategorias = db.prepare("SELECT id_subcategoria, id_categoria FROM subcategorias").all();
+        // 6. Verificar si los niveles tienen id_subcategoria
+        const nivelSinSub = db.prepare("SELECT COUNT(*) as total FROM niveles WHERE id_subcategoria IS NULL OR id_subcategoria = 0").get();
+        console.log('[DB] Niveles sin subcategoría:', nivelSinSub.total);
+        if (nivelSinSub.total > 0) {
+            console.log('[DB] Corrigiendo niveles sin subcategoría...');
+            // Obtener primera subcategoría por cada categoría
+            const subcats = db.prepare("SELECT id_subcategoria, id_categoria FROM subcategorias").all();
+            const subcatPorCat = {};
+            subcats.forEach(s => { subcatPorCat[s.id_categoria] = s.id_subcategoria; });
             
-            const nivelesEjemplo = [
-                { titulo: 'Introducción', descripcion: 'Conceptos básicos', tiempo: 10 },
-                { titulo: 'Primeros pasos', descripcion: 'Guía de inicio', tiempo: 15 },
-                { titulo: 'Funciones básicas', descripcion: 'Aprende las operaciones fundamentales', tiempo: 20 },
-            ];
-            
-            for (const sub of subcategorias) {
-                nivelesEjemplo.forEach((nivel, idx) => {
-                    db.prepare(
-                        "INSERT INTO niveles (id_subcategoria, titulo, descripcion, nivel_ordinal, orden, tiempo_estimado_min) VALUES (?, ?, ?, ?, ?, ?)"
-                    ).run(sub.id_subcategoria, nivel.titulo, nivel.descripcion, idx + 1, idx + 1, nivel.tiempo);
-                });
-            }
-        } else {
-            // Verificar si los niveles tienen id_subcategoria
-            const nivelSinSub = db.prepare("SELECT COUNT(*) as total FROM niveles WHERE id_subcategoria IS NULL OR id_subcategoria = 0").get();
-            console.log('[DB] Niveles sin subcategoría:', nivelSinSub.total);
-            if (nivelSinSub.total > 0) {
-                console.log('[DB] Corrigiendo niveles sin subcategoría...');
-                // Obtener primera subcategoría por cada categoría
-                const subcats = db.prepare("SELECT id_subcategoria, id_categoria FROM subcategorias").all();
-                const subcatPorCat = {};
-                subcats.forEach(s => { subcatPorCat[s.id_categoria] = s.id_subcategoria; });
-                
-                // Actualizar niveles
-                const nivelesSinSub = db.prepare("SELECT id_nivel, id_categoria FROM niveles WHERE id_subcategoria IS NULL OR id_subcategoria = 0").all();
-                for (const niv of nivelesSinSub) {
-                    const idSub = subcatPorCat[niv.id_categoria];
-                    if (idSub) {
-                        db.prepare("UPDATE niveles SET id_subcategoria = ? WHERE id_nivel = ?").run(idSub, niv.id_nivel);
-                    }
+            // Actualizar niveles
+            const nivelesSinSub = db.prepare("SELECT id_nivel, id_categoria FROM niveles WHERE id_subcategoria IS NULL OR id_subcategoria = 0").all();
+            for (const niv of nivelesSinSub) {
+                const idSub = subcatPorCat[niv.id_categoria];
+                if (idSub) {
+                    db.prepare("UPDATE niveles SET id_subcategoria = ? WHERE id_nivel = ?").run(idSub, niv.id_nivel);
                 }
-                console.log('[DB] Niveles corregidos.');
+            }
+            console.log('[DB] Niveles corregidos.');
+        }
+        
+        // 7. Actualizar rutas de niveles conocidos (migración de datos)
+        // Esto asegura que las simulaciones creadas tengan sus rutas actualizadas
+        const nivelesSinRuta = db.prepare("SELECT id_nivel, titulo FROM niveles WHERE ruta_archivo IS NULL OR ruta_archivo = ''").all();
+        
+        const rutasConocidas = {
+            'Arrastre a bordes': 'trucos-arrastre-bordes.html',
+        };
+        
+        for (const nivel of nivelesSinRuta) {
+            if (rutasConocidas[nivel.titulo]) {
+                db.prepare('UPDATE niveles SET ruta_archivo = ? WHERE id_nivel = ?')
+                    .run(rutasConocidas[nivel.titulo], nivel.id_nivel);
+                console.log('[DB] Ruta actualizada para: ' + nivel.titulo);
             }
         }
         

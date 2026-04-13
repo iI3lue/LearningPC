@@ -784,3 +784,110 @@ body {
     background: #1f1f1f;
     overflow: hidden;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ESTILOS PARA: Arrastre a bordes
+   ═══════════════════════════════════════════════════════════ */
+
+/* Guía de zona de división */
+.guia-zona {
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 50;
+}
+
+.guia-zona.visible {
+    opacity: 1;
+}
+
+.guia-izquierda {
+    left: 0;
+    background: linear-gradient(90deg, rgba(0,120,212,0.35) 0%, rgba(0,120,212,0.08) 60%, transparent 100%);
+    border-right: 2px dashed rgba(0,120,212,0.7);
+}
+
+.guia-derecha {
+    right: 0;
+    background: linear-gradient(-90deg, rgba(0,120,212,0.35) 0%, rgba(0,120,212,0.08) 60%, transparent 100%);
+    border-left: 2px dashed rgba(0,120,212,0.7);
+}
+
+/* Feedback panel */
+.feedback-panel {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,120,212,0.95);
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 200;
+}
+
+.feedback-panel.visible {
+    opacity: 1;
+}
+
+.feedback-panel.exito {
+    background: rgba(16,124,16,0.95);
+}
+
+/* Estilos para ventana arrastrable */
+#ventana-documentos {
+    left: 150px;
+    top: 80px;
+    width: 480px;
+    height: 380px;
+}
+
+#ventana-documentos.dragging {
+    cursor: grabbing;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+}
+
+#ventana-documentos.en-division {
+    box-shadow: none;
+}
+
+/* Archivos en el listado */
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.file-item:hover {
+    background: #333333;
+}
+
+.file-item:nth-child(odd) {
+    background: #2a2a2a;
+}
+
+.file-item:nth-child(odd):hover {
+    background: #383838;
+}
+
+.file-icon {
+    font-size: 18px;
+}
+
+.file-name {
+    color: #e0e0e0;
+    font-size: 13px;
+}
