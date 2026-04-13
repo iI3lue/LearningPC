@@ -80,9 +80,8 @@ INSERT OR IGNORE INTO categorias (id_categoria, nombre, descripcion, icono, orde
 INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, descripcion, icono, orden) VALUES
     -- Trucos Adicionales
     (1, 4, 'Pantallas divididas', 'Aprende a dividir tu pantalla para trabajar con dos ventanas', '🖥️', 1),
-    (2, 4, 'Atajos de teclado', 'Combinaciones de teclas para ser más productivo', '⌨️', 2),
-    (3, 4, 'Explorador de archivos', 'Navegación y organización de archivos', '📁', 3),
-    (4, 4, 'Personalización', 'Personalizar el escritorio y Windows', '🎨', 4),
+    (3, 4, 'Explorador de archivos', 'Navegación y organización de archivos', '📁', 2),
+    (4, 4, 'Personalización', 'Personalizar el escritorio y Windows', '🎨', 3),
     
     -- Navegación en Windows
     (5, 3, 'Escritorio', 'Uso del escritorio y manejador de ventanas', '🖥️', 1),
