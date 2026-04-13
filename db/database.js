@@ -170,6 +170,7 @@ function aplicarMigraciones() {
         
         const rutasConocidas = {
             'Arrastre a bordes': 'trucos-arrastre-bordes.html',
+            'Botones de control': 'trucos-botones-control.html',
         };
         
         for (const nivel of nivelesSinRuta) {

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botones de control - Windows 11</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <link rel="stylesheet" href="trucos-dividir-pantalla.css">
+    <style>
+        .control-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 500px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .control-panel h2 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .control-panel p {
+            color: #9e9e9e;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .btn-abrir {
+            background: #0067c0;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px;
+            transition: background 0.15s;
+        }
+        
+        .btn-abrir:hover {
+            background: #0078d4;
+        }
+        
+        .btn-accion {
+            background: #2d2d2d;
+            color: #ffffff;
+            border: 1px solid #404040;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 4px;
+        }
+        
+        .btn-accion:hover {
+            background: #383838;
+            border-color: #0078d4;
+        }
+        
+        .hint-hover {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .hint-hover p {
+            color: #60cdff;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .hint-hover .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+        }
+        
+        .instrucciones-panel {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .instrucciones-panel h3 {
+            color: #ffffff;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .instrucciones-panel p {
+            color: #9e9e9e;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .instrucciones-panel .key {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #4d4d4d;
+            color: #60cdff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        
+        .layout-popup {
+            position: fixed;
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .layout-popup.visible {
+            display: block;
+        }
+        
+        .layout-grid {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .layout-cell {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            transition: all 0.15s;
+            min-width: 80px;
+        }
+        
+        .layout-cell:hover {
+            background: #0078d4;
+            border-color: #0078d4;
+        }
+        
+        .layout-cell svg {
+            width: 40px;
+            height: 20px;
+            fill: #666;
+        }
+        
+        .layout-cell:hover svg {
+            fill: #fff;
+        }
+        
+        .layout-cell span {
+            color: #999;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        
+        .layout-cell:hover span {
+            color: #fff;
+        }
+        
+        .layout-cell.active {
+            background: #0078d4;
+            border-color: #0078d4;
+        }
+        
+        .layout-cell.active svg {
+            fill: #fff;
+        }
+        
+        .practica-mensaje {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 120, 212, 0.25);
+            border: 2px solid #0078d4;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            z-index: 200;
+            display: none;
+        }
+        
+        .practica-mensaje.visible {
+            display: block;
+        }
+        
+        .practica-mensaje h3 {
+            color: #ffffff;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .practica-mensaje p {
+            color: #cccccc;
+            font-size: 11px;
+            margin: 0;
+        }
+        
+        .practica-mensaje .key {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #60cdff;
+            font-family: 'Consolas', monospace;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-control">
+            <h2>Botones de control para dividir pantalla</h2>
+            <p>Windows 11 permite dividir la pantalla desde el botón de maximizar.<br>Haz click derecho para opciones, click izquierdo para maximizar.</p>
+            <div>
+                <button class="btn-abrir" onclick="abrirVentana('navegador')">Abrir Microsoft Edge</button>
+                <button class="btn-abrir" onclick="abrirVentana('biblioteca')">Abrir Biblioteca</button>
+            </div>
+            <div class="hint-hover">
+                <p><span class="key">🖱️ Der</span> en <span class="key">□</span> = opciones de división</p>
+                <p style="margin-top: 4px;"><span class="key">🖱️ Izq</span> en <span class="key">□</span> = maximizar ventana</p>
+            </div>
+            <div style="margin-top: 16px;">
+                <button class="btn-accion" onclick="restablecer()">🔄 Restablecer</button>
+            </div>
+        </div>
+        
+        <!-- Ventana Navegador (Microsoft Edge) -->
+        <div class="ventana" id="ventana-navegador">
+            <div class="title-bar">
+                <div class="icono">
+                    <svg viewBox="0 0 16 16" fill="#0078d4"><circle cx="8" cy="8" r="7"/></svg>
+                </div>
+                <span class="titulo">Microsoft Edge</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('navegador')">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" id="btn-maximizar-navegador" onclick="maximizarVentana('navegador')" oncontextmenu="mostrarLayoutPopup(event, 'navegador'); return false;">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarVentana('navegador')">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <span class="toolbar-btn">◀</span>
+                <span class="toolbar-btn">▶</span>
+                <span class="toolbar-btn">🔄</span>
+                <div class="toolbar-separator"></div>
+                <span class="toolbar-btn">⭐</span>
+            </div>
+            <div class="address-bar">
+                <span class="icono-bloqueo">🔒</span>
+                <input type="text" value="https://www.bing.com" readonly>
+            </div>
+            <div class="ventana-content">
+                <div class="nav-inicio">
+                    <div class="nav-logo">🔍</div>
+                    <input type="text" class="nav-buscar" placeholder="Buscar en la web">
+                </div>
+            </div>
+            <div class="status-bar">
+                <span>Listo</span>
+                <span>1 elemento</span>
+            </div>
+        </div>
+        
+        <!-- Ventana Biblioteca -->
+        <div class="ventana" id="ventana-biblioteca">
+            <div class="title-bar">
+                <div class="icono">
+                    <span style="font-size: 14px;">📁</span>
+                </div>
+                <span class="titulo">Biblioteca</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('biblioteca')">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" id="btn-maximizar-biblioteca" onclick="maximizarVentana('biblioteca')" oncontextmenu="mostrarLayoutPopup(event, 'biblioteca'); return false;">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarVentana('biblioteca')">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <span class="toolbar-btn">Organizar</span>
+                <span class="toolbar-btn">Incluir en biblioteca</span>
+            </div>
+            <div class="ventana-content">
+                <div class="panel-lateral">
+                    <div class="panel-seccion">
+                        <div class="panel-seccion-titulo">Acceso rápido</div>
+                        <div class="panel-item">
+                            <span class="icono">⭐</span>
+                            <span class="texto">Acceso rápido</span>
+                        </div>
+                        <div class="panel-item">
+                            <span class="icono">☁️</span>
+                            <span class="texto">OneDrive</span>
+                        </div>
+                    </div>
+                    <div class="panel-seccion">
+                        <div class="panel-seccion-titulo">Este equipo</div>
+                        <div class="panel-item active">
+                            <span class="icono">💻</span>
+                            <span class="texto">Este equipo</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="area-principal">
+                    <div class="biblioteca-carpetas">
+                        <div class="carpeta">
+                            <span class="icono">📁</span>
+                            <span class="nombre">Documentos</span>
+                        </div>
+                        <div class="carpeta">
+                            <span class="icono">🎵</span>
+                            <span class="nombre">Música</span>
+                        </div>
+                        <div class="carpeta">
+                            <span class="icono">🖼️</span>
+                            <span class="nombre">Imágenes</span>
+                        </div>
+                        <div class="carpeta">
+                            <span class="icono">🎬</span>
+                            <span class="nombre">Videos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="status-bar">
+                <span>4 elementos</span>
+                <span>Este equipo</span>
+            </div>
+        </div>
+        
+        <!-- Popup de layout (izquierda/derecha estilo Windows 11) -->
+        <div class="layout-popup" id="layout-popup">
+            <div class="layout-grid">
+                <div class="layout-cell" onclick="aplicarLayout('izquierda')" title="Mitad izquierda">
+                    <svg viewBox="0 0 40 20">
+                        <rect x="0" y="0" width="18" height="20" fill="currentColor"/>
+                    </svg>
+                    <span>Izquierda</span>
+                </div>
+                <div class="layout-cell" onclick="aplicarLayout('derecha')" title="Mitad derecha">
+                    <svg viewBox="0 0 40 20">
+                        <rect x="22" y="0" width="18" height="20" fill="currentColor"/>
+                    </svg>
+                    <span>Derecha</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instrucciones cuando las ventanas están abiertas -->
+        <div class="instrucciones-panel" id="instrucciones" style="display: none;">
+            <h3>Click derecho en maximizar para dividir</h3>
+            <p><span class="key">🖱️ Der</span> Click derecho en el botón <span class="key">□</span> para ver opciones</p>
+            <p style="margin-top: 4px;"><span class="key">🖱️ Izq</span> Click izquierdo en <span class="key">□</span> para maximizar</p>
+        </div>
+        
+        <!-- Mensaje de práctica -->
+        <div class="practica-mensaje" id="practica-mensaje">
+            <h3>Practica en tu PC</h3>
+            <p>Click derecho en el botón <span class="key">□</span> para dividir pantalla<br>Click izquierdo para maximizar la ventana</p>
+        </div>
+    </div>
+    
+    <!-- Taskbar Windows 11 -->
+    <div class="taskbar">
+        <div class="start-button">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-navegador" onclick="abrirVentana('navegador')">🔵</div>
+            <div class="taskbar-icon" id="taskbar-biblioteca" onclick="abrirVentana('biblioteca')">📁</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <div class="tray-icon">🔊</div>
+                <div class="tray-icon">📶</div>
+                <div class="tray-icon">🔋</div>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">15/3/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="simulacion-core.js"></script>
+    <script>
+        let navegadorAbierto = false;
+        let bibliotecaAbierta = false;
+        let popupVisible = false;
+        let ventanaActivaLayout = null;
+        let divisionActiva = false;
+        
+        const popup = document.getElementById('layout-popup');
+        
+        function onVentanaAbierta(tipo) {
+            if (tipo === 'navegador') {
+                navegadorAbierto = true;
+            } else if (tipo === 'biblioteca') {
+                bibliotecaAbierta = true;
+            }
+            actualizarPanel();
+        }
+        
+        function onVentanaCerrada(tipo) {
+            if (tipo === 'navegador') {
+                navegadorAbierto = false;
+            } else if (tipo === 'biblioteca') {
+                bibliotecaAbierta = false;
+            }
+            actualizarPanel();
+        }
+        
+        function actualizarPanel() {
+            const panel = document.getElementById('panel-control');
+            const instrucciones = document.getElementById('instrucciones');
+            
+            if (navegadorAbierto || bibliotecaAbierta) {
+                panel.style.display = 'none';
+                if (divisionActiva) {
+                    instrucciones.style.display = 'none';
+                } else {
+                    instrucciones.style.display = 'block';
+                }
+            } else {
+                panel.style.display = 'block';
+                instrucciones.style.display = 'none';
+            }
+        }
+        
+        function mostrarLayoutPopup(event, ventana) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            if (!navegadorAbierto && !bibliotecaAbierta) return;
+            
+            const btn = document.getElementById('btn-maximizar-' + ventana);
+            const rect = btn.getBoundingClientRect();
+            
+            // Posicionar el popup debajo del botón, centrado
+            popup.style.top = (rect.bottom + 8) + 'px';
+            popup.style.left = (rect.left - 20) + 'px';
+            popup.classList.add('visible');
+            popupVisible = true;
+            ventanaActivaLayout = ventana;
+        }
+        
+        function ocultarLayoutPopup() {
+            // Ya no se usa con click derecho
+        }
+        
+        popup.addEventListener('mouseleave', () => {
+            popup.classList.remove('visible');
+            popupVisible = false;
+            ventanaActivaLayout = null;
+        });
+        
+        function aplicarLayout(posicion) {
+            const nav = document.getElementById('ventana-navegador');
+            const bib = document.getElementById('ventana-biblioteca');
+            
+            nav.classList.remove('maximizada', 'izquierda', 'derecha');
+            bib.classList.remove('maximizada', 'izquierda', 'derecha');
+            
+            nav.style.position = '';
+            nav.style.top = '';
+            nav.style.left = '';
+            nav.style.width = '';
+            nav.style.height = '';
+            bib.style.position = '';
+            bib.style.top = '';
+            bib.style.left = '';
+            bib.style.width = '';
+            bib.style.height = '';
+            
+            let ventanaPrincipal, ventanaSecundaria;
+            
+            if (ventanaActivaLayout === 'navegador') {
+                ventanaPrincipal = nav;
+                ventanaSecundaria = bib;
+            } else {
+                ventanaPrincipal = bib;
+                ventanaSecundaria = nav;
+            }
+            
+            switch(posicion) {
+                case 'izquierda':
+                    ventanaPrincipal.style.position = 'fixed';
+                    ventanaPrincipal.style.top = '0';
+                    ventanaPrincipal.style.left = '0';
+                    ventanaPrincipal.style.width = '50%';
+                    ventanaPrincipal.style.height = 'calc(100vh - 48px)';
+                    
+                    ventanaSecundaria.style.position = 'fixed';
+                    ventanaSecundaria.style.top = '0';
+                    ventanaSecundaria.style.left = '50%';
+                    ventanaSecundaria.style.width = '50%';
+                    ventanaSecundaria.style.height = 'calc(100vh - 48px)';
+                    break;
+                    
+                case 'derecha':
+                    ventanaPrincipal.style.position = 'fixed';
+                    ventanaPrincipal.style.top = '0';
+                    ventanaPrincipal.style.left = '50%';
+                    ventanaPrincipal.style.width = '50%';
+                    ventanaPrincipal.style.height = 'calc(100vh - 48px)';
+                    
+                    ventanaSecundaria.style.position = 'fixed';
+                    ventanaSecundaria.style.top = '0';
+                    ventanaSecundaria.style.left = '0';
+                    ventanaSecundaria.style.width = '50%';
+                    ventanaSecundaria.style.height = 'calc(100vh - 48px)';
+                    break;
+            }
+            
+            popup.classList.remove('visible');
+            popupVisible = false;
+            divisionActiva = true;
+            actualizarPanel();
+            
+            mostrarMensajePractica();
+            mostrarToast('¡Pantalla dividida!');
+        }
+        
+        function mostrarMensajePractica() {
+            const msg = document.getElementById('practica-mensaje');
+            msg.classList.add('visible');
+            setTimeout(() => {
+                msg.classList.remove('visible');
+            }, 3000);
+        }
+        
+        function restablecer() {
+            const nav = document.getElementById('ventana-navegador');
+            const bib = document.getElementById('ventana-biblioteca');
+            
+            nav.classList.remove('maximizada', 'izquierda', 'derecha');
+            bib.classList.remove('maximizada', 'izquierda', 'derecha');
+            
+            nav.style.position = 'absolute';
+            nav.style.top = '60px';
+            nav.style.left = '80px';
+            nav.style.width = '500px';
+            nav.style.height = '350px';
+            
+            bib.style.position = 'absolute';
+            bib.style.top = '100px';
+            bib.style.left = '160px';
+            bib.style.width = '500px';
+            bib.style.height = '350px';
+            
+            divisionActiva = false;
+            actualizarPanel();
+        }
+        
+        // Abrir navegador por defecto al cargar
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                abrirVentana('navegador');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
