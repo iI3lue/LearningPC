@@ -98,7 +98,8 @@ INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, desc
     -- Office
     (12, 1, 'Word', 'Procesador de texto', '📝', 1),
     (13, 1, 'Excel', 'Hojas de cálculo', '📊', 2),
-    (14, 1, 'PowerPoint', 'Presentaciones', '📽️', 3);
+    (14, 1, 'PowerPoint', 'Presentaciones', '📽️', 3),
+    (15, 1, 'Atajos de teclado', 'Combinaciones de teclas para ser más productivo', '⌨️', 4);
 
 -- =============================================
 -- Niveles iniciales (Nivel 2: niveles ordinales 1, 2, 3...)
@@ -109,10 +110,10 @@ INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archiv
     (1, 'Arrastre a bordes', 'Divide ventanas arrastrando a los bordes de la pantalla', 'trucos-arrastre-bordes.html', 2, 2, 15),
     (1, 'Botones de control', 'Usa los botones de la barra de título para dividir', NULL, 3, 3, 10),
     
-    -- Subcategoría: Atajos de teclado (id=2)
-    (2, 'Copiar y pegar', 'Los atajos Ctrl+C y Ctrl+V', NULL, 1, 1, 5),
-    (2, 'Deshacer y rehacer', 'Ctrl+Z y Ctrl+Y', NULL, 2, 2, 8),
-    (2, 'Atajos con Win', 'Win+D, Win+E, Win+L y más', NULL, 3, 3, 12),
+    -- Subcategoría: Atajos de teclado (id=15) - ahora en Office
+    (15, 'Copiar y pegar', 'Los atajos Ctrl+C y Ctrl+V', 'atajos-copiar-pegar.html', 1, 1, 5),
+    (15, 'Deshacer y rehacer', 'Ctrl+Z y Ctrl+Y', 'atajos-deshacer-rehacer.html', 2, 2, 8),
+    (15, 'Atajos con Win', 'Win+D, Win+E, Win+L y más', 'atajos-win.html', 3, 3, 12),
     
     -- Subcategoría: Explorador de archivos (id=3)
     (3, 'Abrir explorador', 'Cómo abrir el explorador de archivos', NULL, 1, 1, 5),

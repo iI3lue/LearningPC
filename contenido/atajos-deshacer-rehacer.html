@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deshacer y Rehacer - Atajos de teclado</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #107c10;
+            overflow: hidden;
+        }
+        
+        .desktop {
+            width: 100vw;
+            height: calc(100vh - 48px);
+            position: relative;
+            background: linear-gradient(135deg, #107c10 0%, #0c5f0c 100%);
+        }
+        
+        .control-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 480px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .control-panel h2 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .control-panel p {
+            color: #9e9e9e;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .btn-iniciar {
+            background: #0067c0;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+        
+        .btn-iniciar:hover {
+            background: #0078d4;
+        }
+        
+        .hint-box {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+        }
+        
+        .hint-box h4 {
+            color: #60cdff;
+            font-size: 12px;
+            margin: 0 0 8px 0;
+        }
+        
+        .hint-box p {
+            color: #ccc;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .hint-box .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        
+        .ventana-word {
+            position: absolute;
+            width: 600px;
+            height: 400px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            display: none;
+            overflow: hidden;
+        }
+        
+        .ventana-word.visible {
+            display: block;
+        }
+        
+        .title-bar {
+            background: #f3f3f3;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .title-bar .icono {
+            width: 20px;
+            height: 20px;
+            background: #2b579a;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+        }
+        
+        .title-bar .icono span {
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .title-bar .titulo {
+            flex: 1;
+            color: #333;
+            font-size: 13px;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .window-btn {
+            width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        
+        .window-btn:hover {
+            background: #e5e5e5;
+        }
+        
+        .window-btn.close:hover {
+            background: #e81123;
+        }
+        
+        .window-btn.close:hover span {
+            color: #fff;
+        }
+        
+        .window-btn span {
+            font-size: 10px;
+            color: #333;
+        }
+        
+        .toolbar {
+            background: #fafafa;
+            padding: 6px 12px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .toolbar-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .toolbar-btn:hover {
+            background: #e5e5e5;
+        }
+        
+        .documento-area {
+            padding: 24px;
+            min-height: 280px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .documento-area .linea {
+            padding: 4px 8px;
+            border-radius: 2px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        
+        .documento-area .linea.eliminada {
+            text-decoration: line-through;
+            color: #999;
+            background: #f5f5f5;
+        }
+        
+        .documento-area .linea.eliminada:hover {
+            background: #eee;
+        }
+        
+        .historial-panel {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 12px 16px;
+            width: 220px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .historial-panel.visible {
+            display: block;
+        }
+        
+        .historial-panel h4 {
+            color: #fff;
+            font-size: 12px;
+            margin: 0 0 8px 0;
+            border-bottom: 1px solid #3d3d3d;
+            padding-bottom: 8px;
+        }
+        
+        .historial-panel .historial-item {
+            color: #9e9e9e;
+            font-size: 11px;
+            padding: 4px 0;
+            border-bottom: 1px solid #2d2d2d;
+        }
+        
+        .historial-panel .historial-item.actual {
+            color: #60cdff;
+            font-weight: bold;
+        }
+        
+        .instrucciones {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .instrucciones h3 {
+            color: #ffffff;
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+        
+        .instrucciones p {
+            color: #9e9e9e;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .instrucciones .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #60cdff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        
+        .instrucciones .key.combo {
+            background: #0078d4;
+            border-color: #0078d4;
+            color: #fff;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 12px 20px;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .toast.visible {
+            display: block;
+        }
+        
+        .toast.exito {
+            border-color: #107c10;
+        }
+        
+        .toast.exito .toast-mensaje {
+            color: #6ccb5f;
+        }
+        
+        .toast-mensaje {
+            color: #fff;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        .btn-reiniciar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2d2d2d;
+            color: #fff;
+            border: 1px solid #404040;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .btn-reiniciar.visible {
+            display: block;
+        }
+        
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #202020;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            z-index: 200;
+        }
+        
+        .start-button {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .start-button:hover {
+            background: #383838;
+        }
+        
+        .start-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #00a4ef 0%, #0050a0 100%);
+            border-radius: 3px;
+        }
+        
+        .taskbar-icons {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            padding-left: 8px;
+        }
+        
+        .taskbar-icon {
+            height: 40px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #fff;
+        }
+        
+        .taskbar-icon:hover {
+            background: #383838;
+        }
+        
+        .taskbar-icon.active {
+            background: #383838;
+            border-bottom: 2px solid #0078d4;
+        }
+        
+        .taskbar-icon .icono {
+            width: 16px;
+            height: 16px;
+            background: #2b579a;
+            border-radius: 2px;
+        }
+        
+        .tray {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-right: 12px;
+        }
+        
+        .tray-icons {
+            display: flex;
+            gap: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .clock {
+            text-align: right;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .clock-hora {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-inicio">
+            <h2>Atajos: Deshacer y Rehacer</h2>
+            <p>Aprende a corregir errores fácilmente:<br><span class="key">Ctrl+Z</span> para deshacer y <span class="key">Ctrl+Y</span> para rehacer.</p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
+            <div class="hint-box">
+                <h4>🔄 ¿Para qué sirve?</h4>
+                <p><span class="key">Ctrl+Z</span> deshace la última acción</p>
+                <p><span class="key">Ctrl+Y</span> rehace una acción deshecha</p>
+                <p>¡Puedes deshacer varios pasos!</p>
+            </div>
+        </div>
+        
+        <div class="ventana-word" id="ventana-word">
+            <div class="title-bar">
+                <div class="icono"><span>W</span></div>
+                <span class="titulo">Documento1 - Word</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarWord()">
+                        <svg viewBox="0 0 10 1" width="10" height="10"><rect width="10" height="1" fill="#333"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarWord()">
+                        <svg viewBox="0 0 10 10" width="10" height="10"><rect width="10" height="10" fill="none" stroke="#333" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarWord()">
+                        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="0" y1="0" x2="10" y2="10" stroke="#333" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#333" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <span class="toolbar-btn">Archivo</span>
+                <span class="toolbar-btn">Editar</span>
+                <span class="toolbar-btn">Ver</span>
+            </div>
+            <div class="documento-area" id="documento">
+                <div class="linea" id="linea-0">Querido amigo/a:</div>
+                <div class="linea" id="linea-1">Este es un documento con algunas líneas.</div>
+                <div class="linea" id="linea-2">Voy a eliminar algunas para practicar.</div>
+                <div class="linea" id="linea-3">Puedes deshacer y rehacer.</div>
+                <div class="linea" id="linea-4">¡ Pruébalo !</div>
+            </div>
+        </div>
+        
+        <div class="historial-panel" id="historial-panel">
+            <h4>Historial de acciones</h4>
+            <div id="historial-lista"></div>
+        </div>
+        
+        <div class="instrucciones" id="instrucciones" style="display: none;">
+            <h3>Paso a paso</h3>
+            <p id="instruccion-texto">Haz click en los botones para eliminar líneas del documento</p>
+        </div>
+        
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
+        
+        <div class="toast" id="toast">
+            <span class="toast-mensaje" id="toast-mensaje">✓ ¡Copiado!</span>
+        </div>
+    </div>
+    
+    <div class="taskbar">
+        <div class="start-button">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-word" onclick="focusWord()">
+                <div class="icono"></div>
+                <span>Word</span>
+            </div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <span>🔊</span>
+                <span>📶</span>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div>15/4/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let wordVisible = false;
+        let historial = [];
+        let historialIndex = -1;
+        let estado = 'inicio';
+        
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            document.getElementById('ventana-word').classList.add('visible');
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('historial-panel').classList.add('visible');
+            document.getElementById('taskbar-word').classList.add('active');
+            wordVisible = true;
+            
+            actualizarHistorial();
+            estado = 'esperando-eliminar';
+            actualizarInstrucciones();
+        }
+        
+        // Eliminar línea (simula acción del usuario)
+        function eliminarLinea(indice) {
+            const linea = document.getElementById('linea-' + indice);
+            if (linea && !linea.classList.contains('eliminada')) {
+                linea.classList.add('eliminada');
+                
+                // Agregar al historial
+                historial = historial.slice(0, historialIndex + 1);
+                historial.push({ tipo: 'eliminar', indice: indice, texto: linea.textContent });
+                historialIndex = historial.length - 1;
+                
+                actualizarHistorial();
+                actualizarInstrucciones();
+            }
+        }
+        
+        // Capturar atajos de teclado
+        document.addEventListener('keydown', function(e) {
+            if (!wordVisible) return;
+            
+            // Ctrl+Z = Deshacer
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                if (historialIndex >= 0) {
+                    const accion = historial[historialIndex];
+                    if (accion.tipo === 'eliminar') {
+                        const linea = document.getElementById('linea-' + accion.indice);
+                        linea.classList.remove('eliminada');
+                    }
+                    historialIndex--;
+                    actualizarHistorial();
+                    mostrarToast('↩️ Deshacer');
+                    actualizarInstrucciones();
+                }
+            }
+            
+            // Ctrl+Y = Rehacer
+            if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                if (historialIndex < historial.length - 1) {
+                    historialIndex++;
+                    const accion = historial[historialIndex];
+                    if (accion.tipo === 'eliminar') {
+                        const linea = document.getElementById('linea-' + accion.indice);
+                        linea.classList.add('eliminada');
+                    }
+                    actualizarHistorial();
+                    mostrarToast('↪️ Rehacer');
+                    actualizarInstrucciones();
+                }
+            }
+        });
+        
+        function actualizarHistorial() {
+            const lista = document.getElementById('historial-lista');
+            lista.innerHTML = '';
+            
+            // Mostrar todas las acciones
+            historial.forEach((accion, i) => {
+                const item = document.createElement('div');
+                item.className = 'historial-item' + (i === historialIndex ? ' actual' : '');
+                item.textContent = (i + 1) + '. ' + (accion.tipo === 'eliminar' ? 'Eliminar: ' + accion.texto.substring(0, 15) + '...' : '');
+                lista.appendChild(item);
+            });
+            
+            // Estado actual
+            if (historialIndex < 0) {
+                const item = document.createElement('div');
+                item.className = 'historial-item actual';
+                item.textContent = 'Estado actual (sin cambios)';
+                lista.appendChild(item);
+            }
+            
+            // Verificar si completamos el ejercicio
+            const todasEliminadas = [0,1,2,3,4].every(i => {
+                const l = document.getElementById('linea-' + i);
+                return l.classList.contains('eliminada');
+            });
+            
+            if (todasEliminadas && historialIndex === historial.length - 1) {
+                estado = 'completado';
+                document.getElementById('btn-reiniciar').classList.add('visible');
+                actualizarInstrucciones();
+            }
+        }
+        
+        function actualizarInstrucciones() {
+            const instr = document.getElementById('instruccion-texto');
+            switch(estado) {
+                case 'esperando-eliminar':
+                    instr.innerHTML = 'Haz click en los botones para eliminar líneas, luego usa <span class="key combo">Ctrl+Z</span> para deshacer';
+                    break;
+                case 'completado':
+                    instr.textContent = '🎉 ¡Felicidades! Has completado la práctica de deshacer/rehacer';
+                    break;
+                default:
+                    if (historialIndex >= 0) {
+                        instr.innerHTML = 'Ahora prueba <span class="key combo">Ctrl+Y</span> para rehacer';
+                    } else {
+                        instr.textContent = 'Usa los botones para eliminar más líneas';
+                    }
+            }
+        }
+        
+        function mostrarToast(mensaje, tipo) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            toastMensaje.textContent = mensaje;
+            toast.className = 'toast visible ' + (tipo || '');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2000);
+        }
+        
+        function cerrarWord() {
+            document.getElementById('ventana-word').classList.remove('visible');
+            document.getElementById('taskbar-word').classList.remove('active');
+            wordVisible = false;
+        }
+        
+        function minimizarWord() {
+            document.getElementById('ventana-word').classList.remove('visible');
+            wordVisible = false;
+        }
+        
+        function maximizarWord() {
+            const win = document.getElementById('ventana-word');
+            if (win.style.width === '100%') {
+                win.style.width = '600px';
+                win.style.height = '400px';
+                win.style.top = '60px';
+                win.style.left = '80px';
+            } else {
+                win.style.width = '100%';
+                win.style.height = 'calc(100vh - 48px)';
+                win.style.top = '0';
+                win.style.left = '0';
+            }
+        }
+        
+        function focusWord() {
+            document.getElementById('ventana-word').classList.add('visible');
+            wordVisible = true;
+            document.getElementById('taskbar-word').classList.add('active');
+        }
+        
+        function reiniciarSimulacion() {
+            location.reload();
+        }
+        
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-hora').textContent = 
+                now.getHours().toString().padStart(2, '0') + ':' + 
+                now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>

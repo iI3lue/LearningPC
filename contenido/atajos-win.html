@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atajos con Win - Atajos de teclado</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #107c10;
+            overflow: hidden;
+        }
+        
+        .desktop {
+            width: 100vw;
+            height: calc(100vh - 48px);
+            position: relative;
+            background: linear-gradient(135deg, #107c10 0%, #0c5f0c 100%);
+        }
+        
+        .control-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 520px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .control-panel h2 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .control-panel p {
+            color: #9e9e9e;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .btn-iniciar {
+            background: #0067c0;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+        
+        .btn-iniciar:hover {
+            background: #0078d4;
+        }
+        
+        .hint-box {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+        }
+        
+        .hint-box h4 {
+            color: #60cdff;
+            font-size: 12px;
+            margin: 0 0 8px 0;
+        }
+        
+        .hint-box p {
+            color: #ccc;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .hint-box .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        
+        /* Atajos disponibles */
+        .atajos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .atajo-card {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .atajo-card:hover {
+            border-color: #0078d4;
+            background: #383838;
+        }
+        
+        .atajo-card.completado {
+            border-color: #107c10;
+            background: #1a3d1a;
+        }
+        
+        .atajo-card .combo {
+            color: #60cdff;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .atajo-card .desc {
+            color: #9e9e9e;
+            font-size: 11px;
+        }
+        
+        .atajo-card .check {
+            color: #6ccb5f;
+            font-size: 16px;
+            display: none;
+        }
+        
+        .atajo-card.completado .check {
+            display: inline;
+        }
+        
+        /* Start Menu */
+        .start-menu {
+            position: fixed;
+            bottom: 48px;
+            left: 0;
+            width: 600px;
+            height: 500px;
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px 8px 0 0;
+            display: none;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .start-menu.visible {
+            display: block;
+            animation: slideUp 0.2s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        
+        .start-menu .search-bar {
+            padding: 16px;
+            background: #2d2d2d;
+        }
+        
+        .start-menu .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .start-menu .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            padding: 24px;
+        }
+        
+        .start-menu .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        
+        .start-menu .app-icon:hover {
+            background: #383838;
+        }
+        
+        .start-menu .app-icon .icon {
+            width: 40px;
+            height: 40px;
+            background: #0078d4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        
+        .start-menu .app-icon .nombre {
+            color: #fff;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        /* Escritorio */
+        .escritorio-virtual {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 48px);
+            background: #1a1a1a;
+            display: none;
+            z-index: 50;
+        }
+        
+        .escritorio-virtual.visible {
+            display: block;
+        }
+        
+        .escritorio-virtual .desktop-icons {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .escritorio-virtual .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80px;
+        }
+        
+        .escritorio-virtual .desktop-icon .icono {
+            font-size: 40px;
+        }
+        
+        .escritorio-virtual .desktop-icon .nombre {
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        /* Explorador */
+        .explorador-ventana {
+            position: absolute;
+            width: 700px;
+            height: 450px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            display: none;
+            overflow: hidden;
+        }
+        
+        .explorador-ventana.visible {
+            display: block;
+        }
+        
+        .explorador-ventana .title-bar {
+            background: #f3f3f3;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .explorador-ventana .title-bar .icono {
+            font-size: 16px;
+            margin-right: 8px;
+        }
+        
+        .explorador-ventana .title-bar .titulo {
+            flex: 1;
+            color: #333;
+            font-size: 13px;
+        }
+        
+        .explorador-ventana .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .explorador-ventana .window-btn {
+            width: 28px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        
+        .explorador-ventana .window-btn:hover {
+            background: #e5e5e5;
+        }
+        
+        .explorador-ventana .window-btn.close:hover {
+            background: #e81123;
+        }
+        
+        .explorador-ventana .window-btn.close:hover svg {
+            stroke: #fff;
+        }
+        
+        .explorador-ventana .ventana-content {
+            display: flex;
+            height: calc(100% - 40px);
+        }
+        
+        .explorador-ventana .panel-lateral {
+            width: 180px;
+            background: #f5f5f5;
+            padding: 12px;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .explorador-ventana .panel-item {
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .explorador-ventana .panel-item:hover {
+            background: #e5e5e5;
+        }
+        
+        .explorador-ventana .panel-item.active {
+            background: #0078d4;
+            color: #fff;
+        }
+        
+        .explorador-ventana .area-principal {
+            flex: 1;
+            padding: 12px;
+        }
+        
+        .explorador-ventana .carpeta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .explorador-ventana .carpeta:hover {
+            background: #f0f0f0;
+        }
+        
+        .explorador-ventana .carpeta .icono {
+            font-size: 24px;
+        }
+        
+        /* Bloqueo de pantalla */
+        .pantalla-bloqueada {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: none;
+            z-index: 150;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pantalla-bloqueada.visible {
+            display: flex;
+        }
+        
+        .pantalla-bloqueada .avatar {
+            width: 80px;
+            height: 80px;
+            background: #0078d4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .pantalla-bloqueada .avatar span {
+            font-size: 40px;
+            color: #fff;
+        }
+        
+        .pantalla-bloqueada .usuario {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .pantalla-bloqueada .mensaje {
+            color: #9e9e9e;
+            font-size: 14px;
+        }
+        
+        .pantalla-bloqueada .hint {
+            color: #60cdff;
+            font-size: 12px;
+            margin-top: 24px;
+        }
+        
+        /* Instrucciones */
+        .instrucciones {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .instrucciones h3 {
+            color: #ffffff;
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+        
+        .instrucciones p {
+            color: #9e9e9e;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .instrucciones .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #60cdff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        
+        .instrucciones .key.combo {
+            background: #0078d4;
+            border-color: #0078d4;
+            color: #fff;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 12px 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .toast.visible {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .toast.exito {
+            border-color: #107c10;
+        }
+        
+        .toast-mensaje {
+            color: #fff;
+            font-size: 13px;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        .btn-reiniciar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2d2d2d;
+            color: #fff;
+            border: 1px solid #404040;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .btn-reiniciar.visible {
+            display: block;
+        }
+        
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #202020;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            z-index: 200;
+        }
+        
+        .start-button {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .start-button:hover {
+            background: #383838;
+        }
+        
+        .start-button.active {
+            background: #383838;
+        }
+        
+        .start-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #00a4ef 0%, #0050a0 100%);
+            border-radius: 3px;
+        }
+        
+        .taskbar-icons {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            padding-left: 8px;
+        }
+        
+        .taskbar-icon {
+            height: 40px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #fff;
+        }
+        
+        .taskbar-icon:hover {
+            background: #383838;
+        }
+        
+        .taskbar-icon.active {
+            background: #383838;
+            border-bottom: 2px solid #0078d4;
+        }
+        
+        .tray {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-right: 12px;
+        }
+        
+        .tray-icons {
+            display: flex;
+            gap: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .clock {
+            text-align: right;
+            color: #fff;
+            font-size: 12px;
+        }
+        
+        .clock-hora {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Panel de control inicial -->
+        <div class="control-panel" id="panel-inicio">
+            <h2>Atajos con la tecla Windows</h2>
+            <p>Aprende los atajos más útiles con la tecla Win:<br><span class="key">Win+D</span>, <span class="key">Win+E</span>, <span class="key">Win+L</span></p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
+            <div class="hint-box">
+                <h4>🪟 ¿Para qué sirve?</h4>
+                <p><span class="key">Win+D</span> = Mostrar escritorio</p>
+                <p><span class="key">Win+E</span> = Abrir Explorador</p>
+                <p><span class="key">Win+L</span> = Bloquear PC</p>
+            </div>
+        </div>
+        
+        <!-- Grid de atajos -->
+        <div class="atajos-grid" id="atajos-grid" style="display: none;">
+            <div class="atajo-card" id="atajo-win-d" onclick="probarAtajo('win-d')">
+                <div class="combo">Win + D</div>
+                <div class="desc">Mostrar escritorio</div>
+                <div class="check">✓</div>
+            </div>
+            <div class="atajo-card" id="atajo-win-e" onclick="probarAtajo('win-e')">
+                <div class="combo">Win + E</div>
+                <div class="desc">Abrir Explorador</div>
+                <div class="check">✓</div>
+            </div>
+            <div class="atajo-card" id="atajo-win-l" onclick="probarAtajo('win-l')">
+                <div class="combo">Win + L</div>
+                <div class="desc">Bloquear PC</div>
+                <div class="check">✓</div>
+            </div>
+        </div>
+        
+        <!-- Start Menu -->
+        <div class="start-menu" id="start-menu">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Buscar aplicaciones, archivos y configuración">
+            </div>
+            <div class="apps-grid">
+                <div class="app-icon"><div class="icon">📧</div><span class="nombre">Correo</span></div>
+                <div class="app-icon"><div class="icon">🌐</div><span class="nombre">Edge</span></div>
+                <div class="app-icon"><div class="icon">📅</div><span class="nombre">Calendario</span></div>
+                <div class="app-icon"><div class="icon">📝</div><span class="nombre">Word</span></div>
+                <div class="app-icon"><div class="icon">📊</div><span class="nombre">Excel</span></div>
+                <div class="app-icon"><div class="icon">⚙️</div><span class="nombre">Config</span></div>
+            </div>
+        </div>
+        
+        <!-- Escritorio virtual -->
+        <div class="escritorio-virtual" id="escritorio-virtual">
+            <div class="desktop-icons">
+                <div class="desktop-icon">
+                    <span class="icono">📁</span>
+                    <span class="nombre">Este equipo</span>
+                </div>
+                <div class="desktop-icon">
+                    <span class="icono">🗑️</span>
+                    <span class="nombre">Papelera</span>
+                </div>
+                <div class="desktop-icon">
+                    <span class="icono">📄</span>
+                    <span class="nombre">Documentos</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Explorador -->
+        <div class="explorador-ventana" id="explorador-ventana">
+            <div class="title-bar">
+                <span class="icono">📁</span>
+                <span class="titulo">Explorador de archivos</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="cerrarExplorador()">
+                        <svg viewBox="0 0 10 1" width="10" height="10"><rect width="10" height="1" fill="#333"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarExplorador()">
+                        <svg viewBox="0 0 10 10" width="10" height="10"><rect width="10" height="10" fill="none" stroke="#333" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarExplorador()">
+                        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="0" y1="0" x2="10" y2="10" stroke="#333" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#333" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="ventana-content">
+                <div class="panel-lateral">
+                    <div class="panel-item active">⭐ Acceso rápido</div>
+                    <div class="panel-item">📁 Este equipo</div>
+                    <div class="panel-item">☁️ OneDrive</div>
+                    <div class="panel-item">📄 Documentos</div>
+                </div>
+                <div class="area-principal">
+                    <div class="carpeta"><span class="icono">📁</span> Documentos</div>
+                    <div class="carpeta"><span class="icono">📁</span> Imágenes</div>
+                    <div class="carpeta"><span class="icono">📁</span> Descargas</div>
+                    <div class="carpeta"><span class="icono">📁</span> Escritorio</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pantalla bloqueada -->
+        <div class="pantalla-bloqueada" id="pantalla-bloqueada">
+            <div class="avatar"><span>👤</span></div>
+            <div class="usuario">Usuario</div>
+            <div class="mensaje">Haz clic para desbloquear</div>
+            <div class="hint">Presiona cualquier tecla o haz clic para continuar</div>
+        </div>
+        
+        <!-- Instrucciones -->
+        <div class="instrucciones" id="instrucciones" style="display: none;">
+            <h3>Paso a paso</h3>
+            <p id="instruccion-texto">Presiona los atajos de teclado para practicar</p>
+        </div>
+        
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
+        
+        <div class="toast" id="toast">
+            <span class="toast-mensaje" id="toast-mensaje">✓ ¡Copiado!</span>
+        </div>
+    </div>
+    
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button" id="start-button" onclick="toggleStartMenu()">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-edge">🌐 Edge</div>
+            <div class="taskbar-icon" id="taskbar-explorador" onclick="abrirExplorador()">📁 Explorador</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <span>🔊</span>
+                <span>📶</span>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div>15/4/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let atajosCompletados = {
+            'win-d': false,
+            'win-e': false,
+            'win-l': false
+        };
+        
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            document.getElementById('atajos-grid').style.display = 'grid';
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('start-button').classList.add('active');
+            actualizarInstrucciones();
+        }
+        
+        // Capturar atajos de teclado
+        document.addEventListener('keydown', function(e) {
+            // Win + D = Mostrar escritorio
+            if (e.key === 'd' && e.winKey) {
+                e.preventDefault();
+                completarAtajo('win-d');
+                mostrarEscritorio();
+            }
+            
+            // Win + E = Abrir Explorador
+            if (e.key === 'e' && e.winKey) {
+                e.preventDefault();
+                completarAtajo('win-e');
+                abrirExplorador();
+            }
+            
+            // Win + L = Bloquear PC
+            if (e.key === 'l' && e.winKey) {
+                e.preventDefault();
+                completarAtajo('win-l');
+                bloquearPC();
+            }
+            
+            // Escape = Cerrar menús
+            if (e.key === 'Escape') {
+                cerrarStartMenu();
+                desbloquearPC();
+            }
+        });
+        
+        // Simular Win key
+        let winKeyPresionada = false;
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Meta') {
+                winKeyPresionada = true;
+                e.preventDefault();
+            }
+            // Agregar propiedad winKey al evento
+            if (winKeyPresionada) {
+                const event = new KeyboardEvent('keydown', {
+                    key: e.key,
+                    code: e.code,
+                    bubbles: true
+                });
+                event.winKey = true;
+                document.dispatchEvent(event);
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'Meta') {
+                winKeyPresionada = false;
+            }
+        });
+        
+        function completarAtajo(atajo) {
+            if (!atajosCompletados[atajo]) {
+                atajosCompletados[atajo] = true;
+                document.getElementById('atajo-' + atajo).classList.add('completado');
+                mostrarToast('✓ ¡Atajo practicado!', 'exito');
+                verificarCompletado();
+            }
+        }
+        
+        function probarAtajo(atajo) {
+            // Guía visual
+            switch(atajo) {
+                case 'win-d':
+                    mostrarToast('Presiona Win + D en tu teclado');
+                    break;
+                case 'win-e':
+                    mostrarToast('Presiona Win + E en tu teclado');
+                    break;
+                case 'win-l':
+                    mostrarToast('Presiona Win + L en tu teclado');
+                    break;
+            }
+        }
+        
+        function mostrarEscritorio() {
+            document.getElementById('escritorio-virtual').classList.add('visible');
+            cerrarStartMenu();
+            setTimeout(() => {
+                document.getElementById('escritorio-virtual').classList.remove('visible');
+            }, 1500);
+        }
+        
+        function toggleStartMenu() {
+            const menu = document.getElementById('start-menu');
+            menu.classList.toggle('visible');
+        }
+        
+        function cerrarStartMenu() {
+            document.getElementById('start-menu').classList.remove('visible');
+        }
+        
+        function abrirExplorador() {
+            document.getElementById('explorador-ventana').classList.add('visible');
+            document.getElementById('taskbar-explorador').classList.add('active');
+            cerrarStartMenu();
+        }
+        
+        function cerrarExplorador() {
+            document.getElementById('explorador-ventana').classList.remove('visible');
+            document.getElementById('taskbar-explorador').classList.remove('active');
+        }
+        
+        function maximizarExplorador() {
+            const exp = document.getElementById('explorador-ventana');
+            if (exp.style.width === '100%') {
+                exp.style.width = '700px';
+                exp.style.height = '450px';
+                exp.style.top = '60px';
+                exp.style.left = '80px';
+            } else {
+                exp.style.width = '100%';
+                exp.style.height = 'calc(100vh - 48px)';
+                exp.style.top = '0';
+                exp.style.left = '0';
+            }
+        }
+        
+        function bloquearPC() {
+            document.getElementById('pantalla-bloqueada').classList.add('visible');
+        }
+        
+        function desbloquearPC() {
+            document.getElementById('pantalla-bloqueada').classList.remove('visible');
+        }
+        
+        // Click para desbloquear
+        document.getElementById('pantalla-bloqueada').addEventListener('click', function() {
+            desbloquearPC();
+        });
+        
+        function verificarCompletado() {
+            const todos = Object.values(atajosCompletados).every(v => v === true);
+            if (todos) {
+                document.getElementById('btn-reiniciar').classList.add('visible');
+                actualizarInstrucciones();
+            }
+        }
+        
+        function actualizarInstrucciones() {
+            const instr = document.getElementById('instruccion-texto');
+            const todos = Object.values(atajosCompletados).every(v => v === true);
+            if (todos) {
+                instr.textContent = '🎉 ¡Felicidades! Has practicado los 3 atajos';
+            } else {
+                instr.innerHTML = 'Presiona <span class="key combo">Win+D</span>, <span class="key combo">Win+E</span>, o <span class="key combo">Win+L</span>';
+            }
+        }
+        
+        function mostrarToast(mensaje, tipo) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            toastMensaje.textContent = mensaje;
+            toast.className = 'toast visible ' + (tipo || '');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2000);
+        }
+        
+        function reiniciarSimulacion() {
+            location.reload();
+        }
+        
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-hora').textContent = 
+                now.getHours().toString().padStart(2, '0') + ':' + 
+                now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>

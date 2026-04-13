@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copiar y pegar - Atajos de teclado</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0078d4;
+            overflow: hidden;
+        }
+
+        .desktop {
+            width: 100vw;
+            height: calc(100vh - 48px);
+            position: relative;
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 50%, #004377 100%);
+        }
+
+        /* Panel de control inicial */
+        .control-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 480px;
+            margin: 40px auto;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .control-panel h2 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .control-panel p {
+            color: #9e9e9e;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-iniciar {
+            background: #0067c0;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+
+        .btn-iniciar:hover {
+            background: #0078d4;
+        }
+
+        .hint-box {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+        }
+
+        .hint-box h4 {
+            color: #60cdff;
+            font-size: 12px;
+            margin: 0 0 8px 0;
+        }
+
+        .hint-box p {
+            color: #ccc;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .hint-box .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+
+        /* Ventana Word 365 */
+        .ventana-word {
+            position: absolute;
+            width: 800px;
+            height: 560px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .ventana-word.visible {
+            display: flex;
+        }
+
+        /* Quick Access Toolbar */
+        .qat {
+            background: #fafafa;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid #e0e0e0;
+            height: 32px;
+        }
+
+        .qat-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .qat-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .qat-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #444;
+        }
+
+        .qat-separator {
+            width: 1px;
+            height: 20px;
+            background: #ddd;
+            margin: 0 8px;
+        }
+
+        /* Ribbon */
+        .ribbon {
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .ribbon-tabs {
+            display: flex;
+            background: #f3f3f3;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .ribbon-tab {
+            padding: 8px 16px;
+            font-size: 12px;
+            color: #444;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: all 0.15s;
+        }
+
+        .ribbon-tab:hover {
+            background: #e5e5e5;
+        }
+
+        .ribbon-tab.active {
+            background: #fff;
+            color: #0078d4;
+            border-bottom: 2px solid #0078d4;
+            font-weight: 600;
+        }
+
+        .ribbon-content {
+            display: none;
+            padding: 8px 12px;
+            min-height: 80px;
+            background: #fff;
+        }
+
+        .ribbon-content.active {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .ribbon-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ribbon-group-title {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+        }
+
+        .ribbon-group-items {
+            display: flex;
+            gap: 2px;
+        }
+
+        .ribbon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .ribbon-btn:hover {
+            background: #e5e5e5;
+            border-color: #ccc;
+        }
+
+        .ribbon-btn.active {
+            background: #e5f3ff;
+            border-color: #0078d4;
+        }
+
+        .ribbon-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #444;
+        }
+
+        .ribbon-btn:hover svg {
+            fill: #0078d4;
+        }
+
+        .ribbon-btn.large {
+            width: auto;
+            padding: 0 12px;
+            gap: 4px;
+        }
+
+        .ribbon-btn.large span {
+            font-size: 11px;
+            color: #444;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: #fff;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            height: 32px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .title-bar .app-icon {
+            width: 24px;
+            height: 24px;
+            margin: 0 8px 0 12px;
+            background: #2b579a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-bar .app-icon span {
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .title-bar .doc-name {
+            flex: 1;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .window-controls {
+            display: flex;
+            height: 32px;
+        }
+
+        .window-btn {
+            width: 46px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: background 0.15s;
+        }
+
+        .window-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .window-btn.close:hover {
+            background: #e81123;
+        }
+
+        .window-btn.close:hover svg {
+            stroke: #fff;
+        }
+
+        .window-btn svg {
+            width: 10px;
+            height: 10px;
+            fill: none;
+            stroke: #333;
+            stroke-width: 1;
+        }
+
+        /* Document Area */
+        .document-area {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+        }
+
+        .document-page {
+            width: 100%;
+            max-width: 650px;
+            min-height: 400px;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 48px 56px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 11pt;
+            line-height: 1.8;
+            color: #000;
+            cursor: text;
+        }
+
+        .document-page:focus {
+            outline: none;
+            border-color: #0078d4;
+        }
+
+        .document-page p {
+            margin: 0 0 8px 0;
+            padding: 2px 4px;
+            border-radius: 2px;
+            min-height: 20px;
+            transition: background 0.1s;
+        }
+
+        .document-page p:hover {
+            background: #f8f8f8;
+        }
+
+        /* Selection highlight - cuando el usuario selecciona texto */
+        .document-page ::selection {
+            background: #0078d4;
+            color: #fff;
+        }
+
+        /* Cursor parpadeante */
+        .document-page:focus {
+            caret-color: #0078d4;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #f3f3f3;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+            height: 24px;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .zoom-btn {
+            width: 20px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .zoom-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .zoom-value {
+            min-width: 36px;
+            text-align: center;
+        }
+
+        /* Portapapeles indicator */
+        .portapapeles {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .portapapeles.visible {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .portapapeles .icono {
+            font-size: 20px;
+        }
+
+        .portapapeles .info {
+            color: #ccc;
+            font-size: 11px;
+        }
+
+        .portapapeles .info strong {
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* Instrucciones */
+        .instrucciones {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .instrucciones h3 {
+            color: #ffffff;
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+
+        .instrucciones p {
+            color: #9e9e9e;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+
+        .instrucciones .key {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #60cdff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+
+        .instrucciones .key.combo {
+            background: #0078d4;
+            border-color: #0078d4;
+            color: #fff;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 12px 20px;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .toast.visible {
+            display: block;
+        }
+
+        .toast.exito {
+            border-color: #107c10;
+        }
+
+        .toast.exito .toast-mensaje {
+            color: #6ccb5f;
+        }
+
+        .toast-mensaje {
+            color: #fff;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* Botón reiniciar */
+        .btn-reiniciar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2d2d2d;
+            color: #fff;
+            border: 1px solid #404040;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+            z-index: 100;
+        }
+
+        .btn-reiniciar.visible {
+            display: block;
+        }
+
+        .btn-reiniciar:hover {
+            background: #383838;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: #202020;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            z-index: 200;
+        }
+
+        .start-button {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .start-button:hover {
+            background: #383838;
+        }
+
+        .start-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #00a4ef 0%, #0050a0 100%);
+            border-radius: 3px;
+        }
+
+        .taskbar-icons {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            padding-left: 8px;
+        }
+
+        .taskbar-icon {
+            height: 40px;
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .taskbar-icon:hover {
+            background: #383838;
+        }
+
+        .taskbar-icon.active {
+            background: #383838;
+            border-bottom: 2px solid #0078d4;
+        }
+
+        .taskbar-icon .icono {
+            width: 16px;
+            height: 16px;
+            background: #2b579a;
+            border-radius: 2px;
+        }
+
+        .tray {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-right: 12px;
+        }
+
+        .tray-icons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tray-icon {
+            width: 28px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .tray-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .clock {
+            text-align: right;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .clock-hora {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Panel de control inicial -->
+        <div class="control-panel" id="panel-inicio">
+            <h2>Atajos: Copiar y Pegar</h2>
+            <p>Aprende a usar los atajos de teclado más útiles:<br><span class="key">Ctrl+C</span> para copiar y <span class="key">Ctrl+V</span> para pegar.</p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
+            <div class="hint-box">
+                <h4>📋 ¿Para qué sirve?</h4>
+                <p><span class="key">Ctrl+C</span> copia el texto seleccionado</p>
+                <p><span class="key">Ctrl+V</span> pega el texto copiado</p>
+                <p>¡Son los atajos más usados en Windows!</p>
+            </div>
+        </div>
+
+        <!-- Ventana Word 365 -->
+        <div class="ventana-word" id="ventana-word">
+            <!-- Title Bar (arriba del todo en Word 365) -->
+            <div class="title-bar">
+                <div class="app-icon"><span>W</span></div>
+                <span class="doc-name">Documento1 - Word</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarWord()">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarWord()">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarWord()">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10"/><line x1="10" y1="0" x2="0" y2="10"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Access Toolbar -->
+            <div class="qat">
+                <div class="qat-btn" title="Guardar (Ctrl+G)">
+                    <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                </div>
+                <div class="qat-btn" title="Deshacer (Ctrl+Z)">
+                    <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                </div>
+                <div class="qat-btn" title="Rehacer (Ctrl+Y)">
+                    <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                </div>
+            </div>
+
+            <!-- Ribbon -->
+            <div class="ribbon">
+                <div class="ribbon-tabs">
+                    <button class="ribbon-tab active" onclick="cambiarPestana('inicio')">Inicio</button>
+                    <button class="ribbon-tab" onclick="cambiarPestana('insertar')">Insertar</button>
+                    <button class="ribbon-tab" onclick="cambiarPestana('diseno')">Diseño</button>
+                    <button class="ribbon-tab" onclick="cambiarPestana('revision')">Revisión</button>
+                    <button class="ribbon-tab" onclick="cambiarPestana('ver')">Ver</button>
+                </div>
+
+                <!-- Pestaña Inicio -->
+                <div class="ribbon-content active" id="ribbon-inicio">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Copiar (Ctrl+C)" onclick="copiarBoton()">
+                                <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Pegar (Ctrl+V)" onclick="pegarBoton()">
+                                <svg viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Cortar (Ctrl+X)">
+                                <svg viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Portapapeles</div>
+                    </div>
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Negrita (Ctrl+N)">
+                                <svg viewBox="0 0 24 24"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Cursiva (Ctrl+K)">
+                                <svg viewBox="0 0 24 24"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Subrayado (Ctrl+S)">
+                                <svg viewBox="0 0 24 24"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Fuente</div>
+                    </div>
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn large" title="Alinear a la izquierda">
+                                <svg viewBox="0 0 24 24"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
+                            </div>
+                            <div class="ribbon-btn large" title="Centrar">
+                                <svg viewBox="0 0 24 24"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
+                            </div>
+                            <div class="ribbon-btn large" title="Alinear a la derecha">
+                                <svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Párrafo</div>
+                    </div>
+                </div>
+
+                <!-- Pestaña Insertar -->
+                <div class="ribbon-content" id="ribbon-insertar">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Tabla">
+                                <svg viewBox="0 0 24 24"><path d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h15v14zM3 5H1v16c0 1.1.9 2 2 2h16v-2H3V5z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Imagen">
+                                <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Formas">
+                                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Ilustraciones</div>
+                    </div>
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Encabezado">
+                                <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Pie de página">
+                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Texto</div>
+                    </div>
+                </div>
+
+                <!-- Pestaña Diseño -->
+                <div class="ribbon-content" id="ribbon-diseno">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Temas">
+                                <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Tema</div>
+                    </div>
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Espaciado">
+                                <svg viewBox="0 0 24 24"><path d="M20 12V4h-4v8H4v4h16v-4h-4v8h-4v-8H8v4H4v-4h4v-8h8z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Sangría">
+                                <svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V5H3v2z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Párrafo</div>
+                    </div>
+                </div>
+
+                <!-- Pestaña Revisión -->
+                <div class="ribbon-content" id="ribbon-revision">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Ortografía">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Contador de palabras">
+                                <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Revisión</div>
+                    </div>
+                </div>
+
+                <!-- Pestaña Ver -->
+                <div class="ribbon-content" id="ribbon-ver">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Diseño de impresión">
+                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Modo de lectura">
+                                <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 7h6v2H9zm0 4h6v2H9zm0 4h4v2H9z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Vistas</div>
+                    </div>
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" title="Regla">
+                                <svg viewBox="0 0 24 24"><path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h10v2H4v-2zm0 4h16v2H4v-2z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" title="Líneas de cuadrícula">
+                                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Mostrar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Area -->
+            <div class="document-area">
+                <div class="document-page" id="documento" contenteditable="true">
+                    <p>Querido amigo/a:</p>
+                    <p>Hoy te escribo para contarte sobre los amazing atajos de teclado.</p>
+                    <p>Son rapidísimos y te save mucho tiempo.</p>
+                    <p>¡Pruébalos y verás!</p>
+                    <p>Saludos cordiales.</p>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span class="status-item">Página 1 de 1</span>
+                    <span class="status-item">Español</span>
+                </div>
+                <div class="status-right">
+                    <span class="status-item">📐</span>
+                    <div class="zoom-controls">
+                        <div class="zoom-btn">−</div>
+                        <span class="zoom-value">100%</span>
+                        <div class="zoom-btn">+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portapapeles -->
+        <div class="portapapeles" id="portapapeles">
+            <span class="icono">📋</span>
+            <span class="info">Portapapeles: <strong id="contenido-portapapeles">vacío</strong></span>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="instrucciones" id="instrucciones" style="display: none;">
+            <h3>Paso a paso</h3>
+            <p id="instruccion-texto">Selecciona un texto del documento con el mouse</p>
+        </div>
+
+        <!-- Botón reiniciar -->
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
+
+        <!-- Toast -->
+        <div class="toast" id="toast">
+            <span class="toast-mensaje" id="toast-mensaje">✓ ¡Copiado!</span>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-word" onclick="focusWord()">
+                <div class="icono"></div>
+                <span>Word</span>
+            </div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <div class="tray-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="#fff"/>
+                    </svg>
+                </div>
+                <div class="tray-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z" fill="#fff"/>
+                    </svg>
+                </div>
+                <div class="tray-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4zM13 18h-2v-2h2v2zm0-4h-2V9h2v5z" fill="#fff"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div>15/4/2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let portapapeles = '';
+        let estado = 'inicio';
+        let wordVisible = false;
+        let textoSeleccionadoActual = '';
+        let primeraVez = true;
+
+        // ========== SELECCIÓN NATIVA DEL NAVEGADOR ==========
+        
+        // Escuchar cambios en la selección (cuando el usuario selecciona texto)
+        document.addEventListener('selectionchange', function() {
+            if (!wordVisible) return;
+            
+            const selection = window.getSelection();
+            const texto = selection.toString().trim();
+            
+            // Detectar si hay selección de texto
+            if (texto.length > 0) {
+                textoSeleccionadoActual = texto;
+                
+                // Actualizar portapapeles visual con lo seleccionado
+                const portapapelesEl = document.getElementById('portapapeles');
+                if (!portapapelesEl.classList.contains('visible')) {
+                    portapapelesEl.classList.add('visible');
+                }
+                document.getElementById('contenido-portapapeles').textContent = 
+                    texto.length > 20 ? texto.substring(0, 20) + '...' : texto;
+                
+                // Si es la primera vez que selecciona algo, pasar al siguiente paso
+                if (estado === 'esperando-seleccion' && primeraVez) {
+                    estado = 'esperando-copiar';
+                    mostrarToast('✓ ¡Texto seleccionado! Presiona Ctrl+C para copiar', 'exito');
+                    actualizarInstrucciones();
+                    primeraVez = false;
+                }
+            } else {
+                textoSeleccionadoActual = '';
+            }
+        });
+
+        // ========== CAMBIAR PESTAÑA DEL RIBBON ==========
+        function cambiarPestana(pestana) {
+            document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.ribbon-content').forEach(c => c.classList.remove('active'));
+            
+            const pestanas = ['inicio', 'insertar', 'diseno', 'revision', 'ver'];
+            const indice = pestanas.indexOf(pestana) + 1;
+            document.querySelector(`.ribbon-tab:nth-child(${indice})`).classList.add('active');
+            document.getElementById('ribbon-' + pestana).classList.add('active');
+        }
+
+        // ========== BOTONES DEL RIBBON ==========
+        function copiarBoton() {
+            const selection = window.getSelection();
+            const texto = selection.toString().trim();
+            
+            if (texto.length > 0) {
+                portapapeles = texto;
+                document.getElementById('contenido-portapapeles').textContent = 
+                    portapapeles.length > 20 ? portapapeles.substring(0, 20) + '...' : portapapeles;
+                estado = 'esperando-pegar';
+                mostrarToast('✓ ¡Copiado al portapapeles!', 'exito');
+                actualizarInstrucciones();
+            } else {
+                mostrarToast('Seleccioná texto primero con el mouse');
+            }
+        }
+
+        function pegarBoton() {
+            if (portapapeles) {
+                const selection = window.getSelection();
+                
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    
+                    // Eliminar selección actual si existe
+                    range.deleteContents();
+                    
+                    // Insertar texto en la posición del cursor
+                    const textNode = document.createTextNode(portapapeles + ' ');
+                    range.insertNode(textNode);
+                    
+                    // Mover el cursor después del texto插入ado
+                    range.setStartAfter(textNode);
+                    range.setEndAfter(textNode);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    
+                    // Actualizar portapapeles visual
+                    document.getElementById('contenido-portapapeles').textContent = portapapeles;
+                    
+                    estado = 'completado';
+                    document.getElementById('btn-reiniciar').classList.add('visible');
+                    mostrarToast('🎉 ¡Perfecto! Has pegado el texto', 'exito');
+                    actualizarInstrucciones();
+                }
+            } else {
+                mostrarToast('No hay nada en el portapapeles');
+            }
+        }
+
+        // ========== INICIAR SIMULACIÓN ==========
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            document.getElementById('ventana-word').classList.add('visible');
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('taskbar-word').classList.add('active');
+            wordVisible = true;
+
+            estado = 'esperando-seleccion';
+            actualizarInstrucciones();
+
+            // Enfocar el documento
+            document.getElementById('documento').focus();
+        }
+
+        // ========== ATAJOS DE TECLADO ==========
+        document.addEventListener('keydown', function(e) {
+            if (!wordVisible) return;
+
+            // Ctrl+C = Copiar
+            if (e.ctrlKey && e.key === 'c') {
+                const selection = window.getSelection();
+                const texto = selection.toString().trim();
+                
+                if (texto.length > 0) {
+                    e.preventDefault();
+                    portapapeles = texto;
+                    document.getElementById('contenido-portapapeles').textContent = 
+                        portapapeles.length > 20 ? portapapeles.substring(0, 20) + '...' : portapapeles;
+                    estado = 'esperando-pegar';
+                    mostrarToast('✓ ¡Copiado al portapapeles!', 'exito');
+                    actualizarInstrucciones();
+                } else {
+                    e.preventDefault();
+                    mostrarToast('Seleccioná texto primero con el mouse');
+                }
+            }
+
+            // Ctrl+V = Pegar en posición exacta
+            if (e.ctrlKey && e.key === 'v') {
+                e.preventDefault();
+                
+                if (portapapeles) {
+                    const selection = window.getSelection();
+                    
+                    if (selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        
+                        // Eliminar cualquier texto seleccionado actualmente
+                        range.deleteContents();
+                        
+                        // Insertar texto en la posición del cursor
+                        const textNode = document.createTextNode(portapapeles + ' ');
+                        range.insertNode(textNode);
+                        
+                        // Mover el cursor después del texto插入ado
+                        range.setStartAfter(textNode);
+                        range.setEndAfter(textNode);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                        
+                        // Actualizar UI
+                        document.getElementById('contenido-portapapeles').textContent = portapapeles;
+                        mostrarToast('✓ Pegado en la posición del cursor', 'exito');
+                        
+                        // Verificar si completó
+                        if (estado === 'esperando-pegar') {
+                            estado = 'completado';
+                            document.getElementById('btn-reiniciar').classList.add('visible');
+                            actualizarInstrucciones();
+                        }
+                    } else {
+                        // Si no hay cursor visible, pegar al final
+                        const doc = document.getElementById('documento');
+                        const nuevoP = document.createElement('p');
+                        nuevoP.textContent = portapapeles;
+                        doc.appendChild(nuevoP);
+                        mostrarToast('✓ Pegado al final del documento', 'exito');
+                        
+                        if (estado === 'esperando-pegar') {
+                            estado = 'completado';
+                            document.getElementById('btn-reiniciar').classList.add('visible');
+                            actualizarInstrucciones();
+                        }
+                    }
+                } else {
+                    mostrarToast('No hay nada en el portapapeles');
+                }
+            }
+
+            // Ctrl+Z = Deshacer
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                // En contenteditable, el navegador maneja deshacer naturalmente
+                // Pero podemos mostrar un mensaje
+                if (estado === 'completado') {
+                    document.execCommand('undo');
+                    estado = 'esperando-pegar';
+                    mostrarToast('↩️ Deshacer');
+                    actualizarInstrucciones();
+                }
+            }
+        });
+
+        // ========== MOSTRAR TOAST ==========
+        function mostrarToast(mensaje, tipo) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            toastMensaje.textContent = mensaje;
+            toast.className = 'toast visible ' + (tipo || '');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // ========== ACTUALIZAR INSTRUCCIONES ==========
+        function actualizarInstrucciones() {
+            const instr = document.getElementById('instruccion-texto');
+            switch(estado) {
+                case 'esperando-seleccion':
+                    instr.innerHTML = 'Selecciona un texto del documento con el mouse <span class="key">(click y arrastrar)</span>';
+                    break;
+                case 'esperando-copiar':
+                    instr.innerHTML = 'Presiona <span class="key combo">Ctrl+C</span> para copiar el texto seleccionado';
+                    break;
+                case 'esperando-pegar':
+                    instr.innerHTML = 'Presiona <span class="key combo">Ctrl+V</span> para pegar donde está el cursor';
+                    break;
+                case 'completado':
+                    instr.textContent = '🎉 ¡Felicidades! Has completado la práctica';
+                    break;
+            }
+        }
+
+        // ========== CONTROLES DE VENTANA ==========
+        function cerrarWord() {
+            document.getElementById('ventana-word').classList.remove('visible');
+            document.getElementById('taskbar-word').classList.remove('active');
+            wordVisible = false;
+        }
+
+        function minimizarWord() {
+            document.getElementById('ventana-word').classList.remove('visible');
+            wordVisible = false;
+        }
+
+        function maximizarWord() {
+            const win = document.getElementById('ventana-word');
+            if (win.style.width === '100%') {
+                win.style.width = '800px';
+                win.style.height = '560px';
+                win.style.top = '40px';
+                win.style.left = '50%';
+                win.style.transform = 'translateX(-50%)';
+            } else {
+                win.style.width = '100%';
+                win.style.height = 'calc(100vh - 48px)';
+                win.style.top = '0';
+                win.style.left = '0';
+                win.style.transform = 'none';
+            }
+        }
+
+        function focusWord() {
+            document.getElementById('ventana-word').classList.add('visible');
+            wordVisible = true;
+            document.getElementById('taskbar-word').classList.add('active');
+            document.getElementById('documento').focus();
+        }
+
+        // ========== REINICIAR ==========
+        function reiniciarSimulacion() {
+            location.reload();
+        }
+
+        // ========== RELOJ ==========
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-hora').textContent = 
+                now.getHours().toString().padStart(2, '0') + ':' + 
+                now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>

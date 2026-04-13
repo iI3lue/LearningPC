@@ -174,6 +174,9 @@ function aplicarMigraciones() {
             'Abrir explorador': 'explorador-abrir.html',
             'Navegar carpetas': 'explorador-navegar.html',
             'Crear y organizar': 'explorador-organizar.html',
+            'Copiar y pegar': 'atajos-copiar-pegar.html',
+            'Deshacer y rehacer': 'atajos-deshacer-rehacer.html',
+            'Atajos con Win': 'atajos-win.html',
         };
         
         for (const nivel of nivelesSinRuta) {
