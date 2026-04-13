@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear y organizar - Explorador de archivos Windows 11</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <link rel="stylesheet" href="trucos-dividir-pantalla.css">
+    <style>
+        .control-panel {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 520px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .control-panel h2 { color: #fff; font-size: 20px; margin-bottom: 8px; }
+        .control-panel p { color: #9e9e9e; font-size: 14px; margin-bottom: 20px; }
+        
+        .btn-iniciar {
+            background: #0067c0;
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        
+        .btn-iniciar:hover { background: #0078d4; }
+        
+        .toolbar-btn-crear {
+            background: #2d2d2d;
+            color: #ccc;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .toolbar-btn-crear:hover { background: #383838; color: #fff; }
+        
+        .tutorial-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1a1a1a;
+            border: 1px solid #0078d4;
+            border-radius: 8px;
+            padding: 24px;
+            width: 400px;
+            z-index: 150;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            display: none;
+        }
+        
+        .tutorial-panel.visible { display: block; }
+        
+        .tutorial-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tutorial-header .icono { font-size: 28px; }
+        .tutorial-header h3 { color: #fff; font-size: 16px; margin: 0; }
+        
+        .tutorial-progress { margin-bottom: 16px; }
+        .tutorial-progress .label { color: #888; font-size: 12px; margin-bottom: 6px; }
+        
+        .tutorial-progress .steps { display: flex; gap: 6px; }
+        
+        .tutorial-progress .step-dot {
+            width: 24px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+        }
+        
+        .tutorial-progress .step-dot.completed { background: #107c10; }
+        .tutorial-progress .step-dot.current { background: #0078d4; }
+        
+        .tutorial-content { margin-bottom: 20px; }
+        .tutorial-content h4 { color: #fff; font-size: 14px; margin: 0 0 8px 0; }
+        .tutorial-content p { color: #aaa; font-size: 13px; margin: 0; line-height: 1.5; }
+        
+        .tutorial-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        
+        .tutorial-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .tutorial-btn.continuar {
+            background: #0078d4;
+            color: #fff;
+            border: none;
+        }
+        
+        .tutorial-btn.continuar:hover { background: #1084d8; }
+        .tutorial-btn.continuar:disabled { background: #333; color: #666; cursor: default; }
+        
+        .tutorial-btn.reiniciar {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+        }
+        
+        .tutorial-btn.reiniciar:hover { background: #333; color: #fff; }
+        
+        .carpeta, .carpeta-editable {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 90px;
+        }
+        
+        .carpeta:hover, .carpeta-editable:hover { background: #2d2d2d; }
+        .carpeta .icono, .carpeta-editable .icono { font-size: 40px; margin-bottom: 4px; }
+        .carpeta .nombre, .carpeta-editable .nombre { color: #ccc; font-size: 12px; text-align: center; }
+        
+        .carpeta-editable input {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 4px;
+            text-align: center;
+            border-radius: 3px;
+            width: 80px;
+        }
+        
+        .archivo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 90px;
+        }
+        
+        .archivo:hover { background: #2d2d2d; }
+        .archivo .icono { font-size: 32px; margin-bottom: 4px; }
+        .archivo .nombre { color: #ccc; font-size: 11px; text-align: center; }
+        
+        .context-menu {
+            position: fixed;
+            background: #252525;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            padding: 4px 0;
+            min-width: 160px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            z-index: 300;
+            display: none;
+        }
+        
+        .context-menu.visible { display: block; }
+        
+        .context-menu-item {
+            padding: 8px 16px;
+            color: #ccc;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .context-menu-item:hover { background: #0078d4; color: #fff; }
+        .context-menu-item.danger:hover { background: #c42b1c; }
+        .context-menu-separator { height: 1px; background: #3d3d3d; margin: 4px 0; }
+        
+        .info-popup {
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(31, 31, 31, 0.97);
+            border: 2px solid #0078d4;
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+            z-index: 200;
+            max-width: 380px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        
+        .info-popup.visible {
+            display: flex;
+            animation: popIn 0.2s ease-out;
+        }
+        
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .info-popup .info-icon { font-size: 20px; flex-shrink: 0; }
+        .info-popup .info-content h4 { color: #60cdff; font-size: 13px; margin: 0 0 4px 0; }
+        .info-popup .info-content p { color: #ccc; font-size: 12px; margin: 0; }
+        
+        .success-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(16, 124, 16, 0.95);
+            border: 2px solid #107c10;
+            border-radius: 12px;
+            padding: 32px 48px;
+            text-align: center;
+            z-index: 250;
+            display: none;
+        }
+        
+        .success-panel.visible { display: block; }
+        .success-panel .icono { font-size: 48px; margin-bottom: 16px; }
+        .success-panel h3 { color: #fff; font-size: 20px; margin: 0 0 8px 0; }
+        .success-panel p { color: #ccc; font-size: 14px; margin: 0; }
+        
+        .instrucciones-panel {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 10px 16px;
+            z-index: 100;
+        }
+        
+        .instrucciones-panel p { color: #9e9e9e; font-size: 12px; margin: 0; }
+        
+        .toolbar-breadcrumbs {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #2d2d2d;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #3d3d3d;
+        }
+        
+        .breadcrumb-current { color: #fff; font-size: 12px; }
+        
+        .drag-over, .carpeta.drag-over, .carpeta-editable.drag-over {
+            background: rgba(0, 120, 212, 0.3) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-control">
+            <h2>Crear y organizar archivos</h2>
+            <p>Aprende a crear carpetas, renombrar archivos, mover elementos y mantener tu explorador organizado.</p>
+            <button class="btn-iniciar" onclick="iniciarTutorial()">🚀 Iniciar tutorial</button>
+        </div>
+        
+        <!-- Ventana del Explorador -->
+        <div class="ventana" id="ventana-explorador" style="display: none; width: 700px; height: 450px; left: 50px; top: 30px;">
+            <div class="title-bar">
+                <div class="icono"><span style="font-size: 14px;">📁</span></div>
+                <span class="titulo">Explorador de archivos</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('explorador')">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarVentana('explorador')">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarVentana('explorador')">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="toolbar">
+                <span class="toolbar-btn">◀</span>
+                <span class="toolbar-btn">▶</span>
+                <span class="toolbar-btn">🔄</span>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-btn-crear" onclick="crearCarpeta()">📁 Nueva carpeta</button>
+                <span class="toolbar-btn">Organizar</span>
+                <span class="toolbar-btn">Cambiar vista</span>
+                <div class="toolbar-breadcrumbs">
+                    <span class="breadcrumb-current">Documentos</span>
+                </div>
+            </div>
+            
+            <div class="ventana-content">
+                <div class="panel-lateral">
+                    <div class="panel-seccion">
+                        <div class="panel-seccion-titulo">Acceso rápido</div>
+                        <div class="panel-item"><span class="icono">⭐</span><span class="texto">Acceso rápido</span></div>
+                        <div class="panel-item active"><span class="icono">📁</span><span class="texto">Documentos</span></div>
+                    </div>
+                </div>
+                <div class="area-principal" id="area-principal" style="overflow-y: auto; overflow-x: hidden;"></div>
+            </div>
+            
+            <div class="status-bar">
+                <span id="status-elementos">4 elementos</span>
+                <span>Documentos</span>
+            </div>
+        </div>
+        
+        <!-- Tutorial Panel -->
+        <div class="tutorial-panel" id="tutorial-panel">
+            <div class="tutorial-header">
+                <span class="icono">📁</span>
+                <h3 id="tutorial-titulo">Tutorial: Crear y organizar</h3>
+            </div>
+            <div class="tutorial-progress">
+                <div class="label">Paso <span id="step-num">1</span> de <span id="step-total">5</span></div>
+                <div class="steps" id="step-dots"></div>
+            </div>
+            <div class="tutorial-content">
+                <h4 id="tutorial-accion">Crea una nueva carpeta</h4>
+                <p id="tutorial-instruccion">Haz click en el botón "Nueva carpeta" en la barra de herramientas de arriba.</p>
+            </div>
+            <div class="tutorial-actions">
+                <button class="tutorial-btn reiniciar" onclick="reiniciarTutorial()">Reiniciar</button>
+                <button class="tutorial-btn continuar" id="btn-continuar" onclick="siguientePaso()" disabled>Continuar</button>
+            </div>
+        </div>
+        
+        <!-- Menú contextual -->
+        <div class="context-menu" id="context-menu">
+            <div class="context-menu-item" onclick="accionMenu('abrir')">📂 Abrir</div>
+            <div class="context-menu-item" onclick="accionMenu('renombrar')">✏️ Renombrar</div>
+            <div class="context-menu-separator"></div>
+            <div class="context-menu-item" onclick="accionMenu('eliminar')">🗑️ Eliminar</div>
+        </div>
+        
+        <!-- Info Popup -->
+        <div class="info-popup" id="info-popup">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <h4 id="info-titulo">¡Bien!</h4>
+                <p id="info-mensaje">Mensaje...</p>
+            </div>
+        </div>
+        
+        <!-- Success Panel -->
+        <div class="success-panel" id="success-panel">
+            <div class="icono">🎉</div>
+            <h3>¡Felicidades!</h3>
+            <p>Has aprendido a crear carpetas, renombrar, mover y organizar tus archivos.</p>
+        </div>
+        
+        <div class="instrucciones-panel" id="instrucciones" style="display: none;">
+            <p>Sigue las instrucciones del panel de tutorial</p>
+        </div>
+    </div>
+    
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-explorador">📁</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <div class="tray-icon">🔊</div>
+                <div class="tray-icon">📶</div>
+                <div class="tray-icon">🔋</div>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">15/3/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="simulacion-core.js"></script>
+    <script>
+        const contenidoInicial = `
+            <div class="carpeta" data-nombre="Trabajo">
+                <span class="icono">📁</span>
+                <span class="nombre">Trabajo</span>
+            </div>
+            <div class="carpeta" data-nombre="Personal">
+                <span class="icono">📁</span>
+                <span class="nombre">Personal</span>
+            </div>
+            <div class="carpeta" data-nombre="Mis Documentos" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)" oncontextmenu="mostrarMenu(event, 'Mis Documentos')">
+                <span class="icono">📁</span>
+                <span class="nombre">Mis Documentos</span>
+            </div>
+            <div class="carpeta" data-nombre="Proyectos" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)" oncontextmenu="mostrarMenu(event, 'Proyectos')">
+                <span class="icono">📁</span>
+                <span class="nombre">Proyectos</span>
+            </div>
+            <div class="archivo" data-nombre="informe.docx" draggable="true" ondragstart="handleDragStart(event)" oncontextmenu="mostrarMenu(event, 'informe.docx')">
+                <span class="icono">📝</span>
+                <span class="nombre">informe.docx</span>
+            </div>
+            <div class="archivo" data-nombre="proyecto.pdf" oncontextmenu="mostrarMenu(event, 'proyecto.pdf')">
+                <span class="icono">📕</span>
+                <span class="nombre">proyecto.pdf</span>
+            </div>
+        `;
+        
+        const pasos = [
+            { titulo: "Crea una nueva carpeta", instruccion: "Haz click en el botón 'Nueva carpeta' en la barra de herramientas.", accion: "crear_carpeta", completado: false },
+            { titulo: "Renombra la carpeta", instruccion: "Haz click derecho sobre 'Nueva carpeta' y selecciona 'Renombrar'. Llámala 'Mis Documentos'.", accion: "renombrar", completado: false },
+            { titulo: "Mueve un archivo", instruccion: "Arrastra 'informe.docx' hacia la carpeta 'Mis Documentos'.", accion: "mover", completado: false },
+            { titulo: "Crea otra carpeta", instruccion: "Crea otra carpeta llamada 'Proyectos'.", accion: "crear_segunda", completado: false },
+            { titulo: "Elimina un archivo", instruccion: "Haz click derecho sobre 'proyecto.pdf' y selecciona 'Eliminar'.", accion: "eliminar", completado: false }
+        ];
+        
+        let pasoActual = 0;
+        let infoTimeout = null;
+        let elementoSeleccionado = null;
+        let draggingItem = null;
+        
+        const tutorialPanel = document.getElementById('tutorial-panel');
+        const infoPopup = document.getElementById('info-popup');
+        const successPanel = document.getElementById('success-panel');
+        const contextMenu = document.getElementById('context-menu');
+        const areaPrincipal = document.getElementById('area-principal');
+        
+        function iniciarTutorial() {
+            document.getElementById('panel-control').style.display = 'none';
+            areaPrincipal.innerHTML = contenidoInicial;
+            
+            const ventana = document.getElementById('ventana-explorador');
+            ventana.style.display = 'flex';
+            bringToFront(ventana);
+            document.getElementById('taskbar-explorador').classList.add('active');
+            document.getElementById('instrucciones').style.display = 'block';
+            tutorialPanel.classList.add('visible');
+            actualizarTutorial();
+        }
+        
+        function actualizarTutorial() {
+            const paso = pasos[pasoActual];
+            document.getElementById('tutorial-titulo').textContent = 'Tutorial: Crear y organizar';
+            document.getElementById('step-num').textContent = pasoActual + 1;
+            document.getElementById('step-total').textContent = pasos.length;
+            document.getElementById('tutorial-accion').textContent = paso.titulo;
+            document.getElementById('tutorial-instruccion').textContent = paso.instruccion;
+            document.getElementById('btn-continuar').disabled = !paso.completado;
+            
+            const dotsContainer = document.getElementById('step-dots');
+            dotsContainer.innerHTML = '';
+            pasos.forEach((p, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'step-dot';
+                if (p.completado) dot.classList.add('completed');
+                else if (i === pasoActual) dot.classList.add('current');
+                dotsContainer.appendChild(dot);
+            });
+        }
+        
+        function marcarCompletado() {
+            if (!pasos[pasoActual].completado) {
+                pasos[pasoActual].completado = true;
+                document.getElementById('btn-continuar').disabled = false;
+            }
+        }
+        
+        function siguientePaso() {
+            if (pasoActual < pasos.length - 1) {
+                pasoActual++;
+                actualizarTutorial();
+            } else {
+                tutorialPanel.classList.remove('visible');
+                successPanel.classList.add('visible');
+                setTimeout(() => reiniciarTutorial(), 5000);
+            }
+        }
+        
+        function reiniciarTutorial() {
+            pasoActual = 0;
+            pasos.forEach(p => p.completado = false);
+            successPanel.classList.remove('visible');
+            document.getElementById('ventana-explorador').style.display = 'none';
+            document.getElementById('panel-control').style.display = 'block';
+            document.getElementById('instrucciones').style.display = 'none';
+            document.getElementById('taskbar-explorador').classList.remove('active');
+        }
+        
+        // Drag & Drop
+        function handleDragStart(e) {
+            if (pasos[pasoActual].accion === 'mover' && !pasos[pasoActual].completado) {
+                draggingItem = e.target;
+                e.dataTransfer.setData('text/plain', e.target.dataset.nombre);
+                e.target.style.opacity = '0.5';
+            } else {
+                e.preventDefault();
+            }
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (pasos[pasoActual].accion === 'mover' && !pasos[pasoActual].completado) {
+                e.currentTarget.classList.add('drag-over');
+            }
+        }
+        
+        function handleDragLeave(e) {
+            if (e.currentTarget) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            const target = e.currentTarget;
+            if (target) {
+                target.classList.remove('drag-over');
+            }
+            
+            if (draggingItem && pasos[pasoActual].accion === 'mover' && !pasos[pasoActual].completado) {
+                const nombreArchivo = draggingItem.dataset.nombre;
+                const nombreCarpeta = target ? target.dataset.nombre : '';
+                
+                if (nombreArchivo === 'informe.docx' && nombreCarpeta === 'Mis Documentos') {
+                    draggingItem.remove();
+                    mostrarInfo('¡Archivo movido!', 'Arrastrar es la forma más rápida de organizar.');
+                    setTimeout(marcarCompletado, 500);
+                }
+            }
+            
+            draggingItem = null;
+            areaPrincipal.querySelectorAll('.carpeta, .archivo').forEach(el => el.style.opacity = '1');
+        }
+        
+        // Crear carpeta
+        function crearCarpeta() {
+            if (pasos[pasoActual].accion !== 'crear_carpeta' && pasos[pasoActual].accion !== 'crear_segunda') {
+                mostrarInfo('Próximo paso', 'Sigue las instrucciones del tutorial.');
+                return;
+            }
+            
+            const nuevaCarpeta = document.createElement('div');
+            nuevaCarpeta.className = 'carpeta-editable';
+            nuevaCarpeta.dataset.nombre = 'Nueva carpeta';
+            nuevaCarpeta.draggable = true;
+            nuevaCarpeta.ondragstart = handleDragStart;
+            nuevaCarpeta.ondragover = handleDragOver;
+            nuevaCarpeta.ondragleave = handleDragLeave;
+            nuevaCarpeta.ondrop = handleDrop;
+            nuevaCarpeta.oncontextmenu = (e) => mostrarMenu(e, 'Nueva carpeta');
+            nuevaCarpeta.innerHTML = '<span class="icono">📁</span><span class="nombre">Nueva carpeta</span>';
+            nuevaCarpeta.onclick = () => iniciarRenombrar(nuevaCarpeta);
+            
+            areaPrincipal.appendChild(nuevaCarpeta);
+            
+            mostrarInfo('¡Carpeta creada!', 'Las carpetas te ayudan a organizar.');
+            
+            if (pasos[pasoActual].accion === 'crear_carpeta') {
+                setTimeout(marcarCompletado, 300);
+            } else {
+                setTimeout(() => iniciarRenombrar(nuevaCarpeta), 500);
+            }
+        }
+        
+        function iniciarRenombrar(elemento) {
+            const nombreSpan = elemento.querySelector('.nombre');
+            const nombreActual = nombreSpan.textContent;
+            nombreSpan.style.display = 'none';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = nombreActual;
+            elemento.appendChild(input);
+            input.focus();
+            input.select();
+            
+            input.oninput = () => {
+                if (!pasos[pasoActual].completado) {
+                    const nuevo = input.value.trim();
+                    if (nuevo && nuevo !== nombreActual) {
+                        nombreSpan.textContent = nuevo;
+                        elemento.dataset.nombre = nuevo;
+                        mostrarInfo('¡Renombrado!', 'El nombre se ha actualizado.');
+                        setTimeout(marcarCompletado, 300);
+                    }
+                }
+            };
+            
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    const nuevo = input.value.trim();
+                    if (nuevo) {
+                        nombreSpan.textContent = nuevo;
+                        elemento.dataset.nombre = nuevo;
+                        nombreSpan.style.display = 'block';
+                        input.remove();
+                        if (!pasos[pasoActual].completado) setTimeout(marcarCompletado, 300);
+                    }
+                }
+            };
+            
+            input.onblur = () => {
+                const nuevo = input.value.trim();
+                if (nuevo) {
+                    nombreSpan.textContent = nuevo;
+                    elemento.dataset.nombre = nuevo;
+                }
+                nombreSpan.style.display = 'block';
+                input.remove();
+            };
+        }
+        
+        function mostrarMenu(event, nombre) {
+            event.preventDefault();
+            elementoSeleccionado = nombre;
+            contextMenu.style.left = event.clientX + 'px';
+            contextMenu.style.top = event.clientY + 'px';
+            contextMenu.classList.add('visible');
+            
+            document.onclick = (e) => {
+                if (!e.target.closest('.context-menu')) {
+                    contextMenu.classList.remove('visible');
+                }
+            };
+        }
+        
+        function accionMenu(accion) {
+            contextMenu.classList.remove('visible');
+            
+            if (accion === 'renombrar' && pasos[pasoActual].accion === 'renombrar') {
+                const carpeta = areaPrincipal.querySelector('.carpeta-editable');
+                if (carpeta) iniciarRenombrar(carpeta);
+            } else if (accion === 'eliminar') {
+                if (pasos[pasoActual].accion === 'eliminar' && !pasos[pasoActual].completado) {
+                    const archivos = areaPrincipal.querySelectorAll('.archivo');
+                    archivos.forEach(archivo => {
+                        if (archivo.dataset.nombre === elementoSeleccionado) {
+                            archivo.remove();
+                        }
+                    });
+                    mostrarInfo('¡Eliminado!', 'El elemento se ha eliminado.');
+                    setTimeout(marcarCompletado, 500);
+                } else {
+                    mostrarInfo('Próximo paso', 'Sigue las instrucciones del tutorial.');
+                }
+            }
+        }
+        
+        function mostrarInfo(titulo, mensaje) {
+            document.getElementById('info-titulo').textContent = titulo;
+            document.getElementById('info-mensaje').textContent = mensaje;
+            infoPopup.classList.add('visible');
+            if (infoTimeout) clearTimeout(infoTimeout);
+            infoTimeout = setTimeout(() => infoPopup.classList.remove('visible'), 4000);
+        }
+        
+        function onVentanaCerrada(tipo) {
+            if (tipo === 'explorador') reiniciarTutorial();
+        }
+    </script>
+</body>
+</html>

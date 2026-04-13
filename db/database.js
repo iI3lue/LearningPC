@@ -173,6 +173,7 @@ function aplicarMigraciones() {
             'Botones de control': 'trucos-botones-control.html',
             'Abrir explorador': 'explorador-abrir.html',
             'Navegar carpetas': 'explorador-navegar.html',
+            'Crear y organizar': 'explorador-organizar.html',
         };
         
         for (const nivel of nivelesSinRuta) {
