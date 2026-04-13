@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navegar carpetas - Explorador de archivos Windows 11</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <link rel="stylesheet" href="trucos-dividir-pantalla.css">
+    <style>
+        /* Estilos específicos para el Explorador */
+        
+        /* Panel de control inicial */
+        .control-panel {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 520px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .control-panel h2 {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .control-panel p {
+            color: #9e9e9e;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .hint-box {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            border-radius: 6px;
+            padding: 14px;
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        
+        .hint-box p {
+            color: #ccc;
+            font-size: 13px;
+            margin: 6px 0;
+        }
+        
+        .hint-box .key {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+        }
+        
+        /* Pestañas del Explorador - Estilo Windows 11 */
+        .explorador-tabs {
+            display: flex;
+            background: #1a1a1a;
+            padding: 4px 8px 0;
+            gap: 2px;
+            border-bottom: 1px solid #2a2a2a;
+            min-height: 34px;
+            align-items: flex-end;
+        }
+        
+        .explorador-tab {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: #2a2a2a;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            gap: 8px;
+            max-width: 200px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            transition: background 0.15s;
+            position: relative;
+        }
+        
+        .explorador-tab:hover {
+            background: #383838;
+        }
+        
+        .explorador-tab.active {
+            background: #1f1f1f;
+            border-color: #3d3d3d;
+        }
+        
+        .explorador-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0078d4;
+        }
+        
+        .explorador-tab .icono {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .explorador-tab .titulo {
+            color: #bbb;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 130px;
+        }
+        
+        .explorador-tab.active .titulo {
+            color: #fff;
+        }
+        
+        .explorador-tab .cerrar {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            color: #777;
+            font-size: 13px;
+            font-weight: bold;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 0.15s, background 0.15s;
+        }
+        
+        .explorador-tab:hover .cerrar {
+            opacity: 1;
+        }
+        
+        .explorador-tab .cerrar:hover {
+            background: #3d3d3d;
+            color: #fff;
+        }
+        
+        .nueva-pestana-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: #777;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            transition: background 0.15s, color 0.15s;
+        }
+        
+        .nueva-pestana-btn:hover {
+            background: #333;
+            color: #fff;
+        }
+        
+        /* Toolbar de navegación - Estilo Windows 11 */
+        .explorador-toolbar {
+            background: #252525;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .nav-btn {
+            width: 32px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            background: #3d3d3d;
+            color: #fff;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+        
+        .nav-btn:not(:disabled):active {
+            background: #444;
+        }
+        
+        .toolbar-sep {
+            width: 1px;
+            height: 20px;
+            background: #444;
+            margin: 0 6px;
+            flex-shrink: 0;
+        }
+        
+        /* Barra de dirección (Breadcrumbs) */
+        .address-bar {
+            background: #1a1a1a;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        
+        .breadcrumbs {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #2d2d2d;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid #3d3d3d;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        
+        .breadcrumbs:hover {
+            background: #333;
+            border-color: #0078d4;
+        }
+        
+        .breadcrumb {
+            color: #888;
+            font-size: 12px;
+            white-space: nowrap;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: color 0.15s, background 0.15s;
+        }
+        
+        .breadcrumb:hover {
+            color: #60cdff;
+            background: rgba(96, 205, 255, 0.1);
+        }
+        
+        .breadcrumb.sep {
+            color: #555;
+            padding: 0 2px;
+        }
+        
+        .breadcrumb.sep:hover {
+            color: #555;
+            background: transparent;
+        }
+        
+        .breadcrumb.current {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .breadcrumb.current:hover {
+            color: #fff;
+            background: transparent;
+        }
+        
+        /* Contenido del explorador */
+        .explorador-content {
+            flex: 1;
+            display: flex;
+            background: #1f1f1f;
+            overflow: hidden;
+        }
+        
+        /* Panel lateral */
+        .panel-lateral {
+            width: 200px;
+            background: #171717;
+            border-right: 1px solid #2d2d2d;
+            padding: 8px 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .panel-seccion {
+            margin-bottom: 12px;
+        }
+        
+        .panel-seccion-titulo {
+            color: #6e6e6e;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .panel-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 16px;
+            cursor: pointer;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+        
+        .panel-item:hover {
+            background: #2d2d2d;
+        }
+        
+        .panel-item.active {
+            background: #0078d4;
+        }
+        
+        .panel-item .icono {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .panel-item .texto {
+            color: #ccc;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .panel-item.active .texto {
+            color: #fff;
+        }
+        
+        /* Área principal */
+        .area-principal {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 8px;
+            overflow-y: auto;
+        }
+        
+        .carpeta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 90px;
+            transition: background 0.15s;
+        }
+        
+        .carpeta:hover {
+            background: #2d2d2d;
+        }
+        
+        .carpeta .icono {
+            font-size: 40px;
+            margin-bottom: 4px;
+        }
+        
+        .carpeta .nombre {
+            color: #ccc;
+            font-size: 12px;
+            text-align: center;
+            word-break: break-word;
+        }
+        
+        .archivo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 90px;
+            transition: background 0.15s;
+        }
+        
+        .archivo:hover {
+            background: #2d2d2d;
+        }
+        
+        .archivo .icono {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+        
+        .archivo .nombre {
+            color: #ccc;
+            font-size: 11px;
+            text-align: center;
+            word-break: break-word;
+        }
+        
+        /* Info Popup */
+        .info-popup {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(31, 31, 31, 0.97);
+            border: 2px solid #0078d4;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: none;
+            align-items: flex-start;
+            gap: 12px;
+            z-index: 200;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        
+        .info-popup.visible {
+            display: flex;
+            animation: popIn 0.2s ease-out;
+        }
+        
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .info-popup .info-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        
+        .info-popup .info-content h4 {
+            color: #60cdff;
+            font-size: 13px;
+            margin: 0 0 6px 0;
+        }
+        
+        .info-popup .info-content p {
+            color: #ccc;
+            font-size: 12px;
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        /* Instrucciones */
+        .instrucciones-panel {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px 20px;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .instrucciones-panel h3 {
+            color: #fff;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .instrucciones-panel p {
+            color: #9e9e9e;
+            font-size: 11px;
+            margin: 0;
+        }
+        
+        .instrucciones-panel .key {
+            background: #333;
+            padding: 1px 4px;
+            border-radius: 2px;
+            color: #60cdff;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-control">
+            <h2>Navegar entre carpetas</h2>
+            <p>El Explorador de archivos tiene herramientas para moverte fácilmente entre carpetas.</p>
+            <div class="hint-box">
+                <p><span class="key">◀</span> Atrás - <span class="key">▶</span> Adelante: Navega por tu historial</p>
+                <p><span class="key">⬆️</span> Subir nivel: Sube una carpeta</p>
+                <p><span class="key">🔄</span> Recargar: Actualiza el contenido</p>
+                <p><span class="key">+</span> Pestañas: Abre varias carpetas a la vez</p>
+            </div>
+            <button class="btn-abrir" onclick="iniciarSimulacion()" style="padding: 10px 24px; font-size: 14px;">🚀 Iniciar práctica</button>
+        </div>
+        
+        <!-- Ventana del Explorador -->
+        <div class="ventana" id="ventana-explorador" style="display: none;">
+            <!-- Title Bar -->
+            <div class="title-bar">
+                <div class="icono">
+                    <span style="font-size: 14px;">📁</span>
+                </div>
+                <span class="titulo">Explorador de archivos</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('explorador')">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarVentana('explorador')">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarVentana('explorador')">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pestañas -->
+            <div class="explorador-tabs" id="explorador-tabs">
+                <div class="explorador-tab active" onclick="cambiarPestana(0)">
+                    <span class="icono">💻</span>
+                    <span class="titulo">Este equipo</span>
+                    <span class="cerrar" onclick="cerrarPestana(event, 0)">×</span>
+                </div>
+                <button class="nueva-pestana-btn" onclick="nuevaPestana()" title="Nueva pestaña">+</button>
+            </div>
+            
+            <!-- Toolbar de navegación -->
+            <div class="explorador-toolbar">
+                <button class="nav-btn" id="btn-atras" onclick="navegarAtras()" title="Atrás">◀</button>
+                <button class="nav-btn" id="btn-adelante" onclick="navegarAdelante()" title="Adelante">▶</button>
+                <button class="nav-btn" onclick="recargarContenido()" title="Recargar">🔄</button>
+                <button class="nav-btn" onclick="subirNivel()" title="Directorio anterior">⬆️</button>
+                <div class="toolbar-sep"></div>
+                <button class="nav-btn" onclick="nuevaPestana()" title="Nueva pestaña">+</button>
+            </div>
+            
+            <!-- Barra de dirección -->
+            <div class="address-bar">
+                <div class="breadcrumbs" id="breadcrumbs" onclick="mostrarInfoBarraDireccion()">
+                    <span class="breadcrumb current">Este equipo</span>
+                </div>
+            </div>
+            
+            <!-- Contenido del explorador -->
+            <div class="explorador-content">
+                <div class="panel-lateral">
+                    <div class="panel-seccion">
+                        <div class="panel-seccion-titulo">Acceso rápido</div>
+                        <div class="panel-item" onclick="navegarA('Acceso rápido')">
+                            <span class="icono">⭐</span>
+                            <span class="texto">Acceso rápido</span>
+                        </div>
+                        <div class="panel-item" onclick="navegarA('Descargas')">
+                            <span class="icono">⬇️</span>
+                            <span class="texto">Descargas</span>
+                        </div>
+                    </div>
+                    <div class="panel-seccion">
+                        <div class="panel-seccion-titulo">Este equipo</div>
+                        <div class="panel-item active" id="panel-discos" onclick="navegarA('Disco local (C:)')">
+                            <span class="icono">💾</span>
+                            <span class="texto">Disco local (C:)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="area-principal" id="area-principal">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <span id="status-elementos">0 elementos</span>
+                <span id="status-ruta">Este equipo</span>
+            </div>
+        </div>
+        
+        <!-- Popup informativo -->
+        <div class="info-popup" id="info-popup">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <h4 id="info-titulo">¡Bien!</h4>
+                <p id="info-mensaje">Mensaje...</p>
+            </div>
+        </div>
+        
+        <!-- Instrucciones -->
+        <div class="instrucciones-panel" id="instrucciones" style="display: none;">
+            <h3>Usa los botones de navegación</h3>
+            <p><span class="key">◀</span> Atrás | <span class="key">▶</span> Adelante | <span class="key">⬆️</span> Subir | <span class="key">🔄</span> Recargar | <span class="key">+</span> Nueva pestaña</p>
+        </div>
+    </div>
+    
+    <!-- Taskbar Windows 11 -->
+    <div class="taskbar">
+        <div class="start-button">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-explorador" onclick="iniciarSimulacion()">📁</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <div class="tray-icon">🔊</div>
+                <div class="tray-icon">📶</div>
+                <div class="tray-icon">🔋</div>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">15/3/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="simulacion-core.js"></script>
+    <script>
+        // Estructura de carpetas simulada
+        const estructura = {
+            'Este equipo': {
+                icon: '💻',
+                carpetas: [
+                    { nombre: 'Disco local (C:)', icon: '💾' }
+                ],
+                archivos: []
+            },
+            'Disco local (C:)': {
+                icon: '💾',
+                carpetas: [
+                    { nombre: 'Usuarios', icon: '👤' },
+                    { nombre: 'Archivos de programa', icon: '📁' },
+                    { nombre: 'Windows', icon: '🪟' }
+                ],
+                archivos: []
+            },
+            'Usuarios': {
+                icon: '👤',
+                carpetas: [
+                    { nombre: 'Public', icon: '👥' },
+                    { nombre: 'Usuario', icon: '👤' }
+                ],
+                archivos: []
+            },
+            'Usuario': {
+                icon: '👤',
+                carpetas: [
+                    { nombre: 'Documentos', icon: '📁' },
+                    { nombre: 'Imágenes', icon: '🖼️' },
+                    { nombre: 'Música', icon: '🎵' },
+                    { nombre: 'Videos', icon: '🎬' },
+                    { nombre: 'Descargas', icon: '⬇️' }
+                ],
+                archivos: [
+                    { nombre: 'nota.txt', icon: '📄' }
+                ]
+            },
+            'Documentos': {
+                icon: '📁',
+                carpetas: [
+                    { nombre: 'Trabajo', icon: '📁' },
+                    { nombre: 'Personal', icon: '📁' }
+                ],
+                archivos: [
+                    { nombre: 'informe.docx', icon: '📝' },
+                    { nombre: 'proyecto.pdf', icon: '📕' }
+                ]
+            },
+            'Imágenes': {
+                icon: '🖼️',
+                carpetas: [],
+                archivos: [
+                    { nombre: 'foto1.jpg', icon: '🖼️' },
+                    { nombre: 'foto2.png', icon: '🖼️' },
+                    { nombre: 'captura.png', icon: '🖼️' }
+                ]
+            },
+            'Música': {
+                icon: '🎵',
+                carpetas: [],
+                archivos: [
+                    { nombre: 'cancion1.mp3', icon: '🎵' },
+                    { nombre: 'album.mp3', icon: '🎵' }
+                ]
+            },
+            'Videos': {
+                icon: '🎬',
+                carpetas: [],
+                archivos: [
+                    { nombre: 'video.mp4', icon: '🎬' }
+                ]
+            },
+            'Descargas': {
+                icon: '⬇️',
+                carpetas: [],
+                archivos: [
+                    { nombre: 'archivo.zip', icon: '📦' }
+                ]
+            },
+            'Trabajo': {
+                icon: '📁',
+                carpetas: [],
+                archivos: [
+                    { nombre: 'informe_mensual.docx', icon: '📝' },
+                    { nombre: 'presentacion.pptx', icon: '📽️' }
+                ]
+            },
+            'Personal': {
+                icon: '📁',
+                carpetas: [],
+                archivos: [
+                    { nombre: 'recetas.txt', icon: '📄' },
+                    { nombre: 'diario.pdf', icon: '📕' }
+                ]
+            },
+            'Archivos de programa': {
+                icon: '📁',
+                carpetas: [
+                    { nombre: 'Microsoft', icon: '📁' },
+                    { nombre: 'Google', icon: '📁' }
+                ],
+                archivos: []
+            },
+            'Windows': {
+                icon: '🪟',
+                carpetas: [
+                    { nombre: 'System32', icon: '📁' },
+                    { nombre: 'Fonts', icon: '📁' }
+                ],
+                archivos: []
+            },
+            'Public': {
+                icon: '👥',
+                carpetas: [
+                    { nombre: 'Documentos', icon: '📁' }
+                ],
+                archivos: []
+            },
+            'Acceso rápido': {
+                icon: '⭐',
+                carpetas: [
+                    { nombre: 'Descargas', icon: '⬇️' }
+                ],
+                archivos: []
+            }
+        };
+        
+        // Rutas padre para subir nivel
+        const rutasPadre = {
+            'Disco local (C:)': 'Este equipo',
+            'Usuarios': 'Disco local (C:)',
+            'Usuario': 'Usuarios',
+            'Documentos': 'Usuario',
+            'Imágenes': 'Usuario',
+            'Música': 'Usuario',
+            'Videos': 'Usuario',
+            'Descargas': 'Usuario',
+            'Trabajo': 'Documentos',
+            'Personal': 'Documentos',
+            'Archivos de programa': 'Disco local (C:)',
+            'Windows': 'Disco local (C:)',
+            'Public': 'Usuarios',
+            'Documentos': 'Public'
+        };
+        
+        // Variables de estado
+        let simulacionIniciada = false;
+        let historialAtras = [];
+        let historialAdelante = [];
+        let rutaActual = 'Este equipo';
+        let infoTimeout = null;
+        let pestañas = [{ ruta: 'Este equipo', titulo: 'Este equipo' }];
+        let pestañaActiva = 0;
+        
+        const infoPopup = document.getElementById('info-popup');
+        
+        function iniciarSimulacion() {
+            simulacionIniciada = true;
+            document.getElementById('panel-control').style.display = 'none';
+            const ventana = document.getElementById('ventana-explorador');
+            ventana.style.display = 'flex';
+            ventana.style.left = '80px';
+            ventana.style.top = '40px';
+            bringToFront(ventana);
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('taskbar-explorador').classList.add('active');
+            actualizarContenido();
+            actualizarBotones();
+            actualizarBreadcrumbs();
+            actualizarEstado();
+            actualizarPestañas();
+        }
+        
+        function navegarA(ruta) {
+            if (!estructura[ruta]) return;
+            if (ruta !== rutaActual) {
+                historialAtras.push(rutaActual);
+                historialAdelante = [];
+            }
+            rutaActual = ruta;
+            pestañas[pestañaActiva].ruta = ruta;
+            pestañas[pestañaActiva].titulo = ruta;
+            actualizarContenido();
+            actualizarBotones();
+            actualizarBreadcrumbs();
+            actualizarEstado();
+            actualizarPestañas();
+            actualizarPanelLateral();
+        }
+        
+        function actualizarContenido() {
+            const area = document.getElementById('area-principal');
+            const datos = estructura[rutaActual];
+            if (!datos) {
+                area.innerHTML = '<p style="color:#666;padding:20px;">Carpeta vacía</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            // Carpetas
+            if (datos.carpetas && datos.carpetas.length > 0) {
+                datos.carpetas.forEach(c => {
+                    html += `<div class="carpeta" onclick="navegarA('${c.nombre}')">
+                        <span class="icono">${c.icon}</span>
+                        <span class="nombre">${c.nombre}</span>
+                    </div>`;
+                });
+            }
+            
+            // Archivos
+            if (datos.archivos && datos.archivos.length > 0) {
+                datos.archivos.forEach(a => {
+                    html += `<div class="archivo" onclick="mostrarInfoArchivo('${a.nombre}')">
+                        <span class="icono">${a.icon}</span>
+                        <span class="nombre">${a.nombre}</span>
+                    </div>`;
+                });
+            }
+            
+            if (!html) {
+                html = '<p style="color:#666;padding:20px;">Carpeta vacía</p>';
+            }
+            
+            area.innerHTML = html;
+        }
+        
+        function actualizarBotones() {
+            const btnAtras = document.getElementById('btn-atras');
+            const btnAdelante = document.getElementById('btn-adelante');
+            if (btnAtras) btnAtras.disabled = historialAtras.length === 0;
+            if (btnAdelante) btnAdelante.disabled = historialAdelante.length === 0;
+        }
+        
+        function actualizarBreadcrumbs() {
+            const container = document.getElementById('breadcrumbs');
+            const path = obtenerRuta();
+            let html = '';
+            path.forEach((parte, i) => {
+                if (i > 0) html += '<span class="breadcrumb sep">></span>';
+                const esActual = i === path.length - 1;
+                html += `<span class="breadcrumb ${esActual ? 'current' : ''}" onclick="navegarA('${parte}')">${parte}</span>`;
+            });
+            container.innerHTML = html;
+        }
+        
+        function obtenerRuta() {
+            const path = [rutaActual];
+            let actual = rutaActual;
+            while (rutasPadre[actual]) {
+                actual = rutasPadre[actual];
+                path.unshift(actual);
+            }
+            return path;
+        }
+        
+        function actualizarEstado() {
+            const datos = estructura[rutaActual];
+            let count = 0;
+            if (datos) {
+                count = (datos.carpetas?.length || 0) + (datos.archivos?.length || 0);
+            }
+            document.getElementById('status-elementos').textContent = count + ' elementos';
+            document.getElementById('status-ruta').textContent = obtenerRuta().join(' > ');
+        }
+        
+        function actualizarPanelLateral() {
+            document.querySelectorAll('.panel-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const panelDiscos = document.getElementById('panel-discos');
+            if (rutaActual === 'Este equipo') {
+                panelDiscos.classList.add('active');
+            }
+        }
+        
+        // Navegación
+        function navegarAtras() {
+            if (historialAtras.length > 0) {
+                historialAdelante.push(rutaActual);
+                rutaActual = historialAtras.pop();
+                pestañas[pestañaActiva].ruta = rutaActual;
+                pestañas[pestañaActiva].titulo = rutaActual;
+                actualizarContenido();
+                actualizarBotones();
+                actualizarBreadcrumbs();
+                actualizarEstado();
+                actualizarPestañas();
+                mostrarInfo('¡Has vuelto!', 'Navegaste hacia atrás en tu historial.');
+            }
+        }
+        
+        function navegarAdelante() {
+            if (historialAdelante.length > 0) {
+                historialAtras.push(rutaActual);
+                rutaActual = historialAdelante.pop();
+                pestañas[pestañaActiva].ruta = rutaActual;
+                pestañas[pestañaActiva].titulo = rutaActual;
+                actualizarContenido();
+                actualizarBotones();
+                actualizarBreadcrumbs();
+                actualizarEstado();
+                actualizarPestañas();
+                mostrarInfo('¡Adelante!', 'Navegaste hacia adelante en tu historial.');
+            }
+        }
+        
+        function recargarContenido() {
+            actualizarContenido();
+            mostrarInfo('¡Actualizado!', 'El contenido de la carpeta se ha recargado.');
+        }
+        
+        function subirNivel() {
+            const padre = rutasPadre[rutaActual];
+            if (padre) {
+                historialAtras.push(rutaActual);
+                historialAdelante = [];
+                rutaActual = padre;
+                pestañas[pestañaActiva].ruta = rutaActual;
+                pestañas[pestañaActiva].titulo = rutaActual;
+                actualizarContenido();
+                actualizarBotones();
+                actualizarBreadcrumbs();
+                actualizarEstado();
+                actualizarPestañas();
+                mostrarInfo('¡Subiste de nivel!', 'Ahora estás en la carpeta padre.');
+            }
+        }
+        
+        // Sistema de pestañas
+        function nuevaPestana() {
+            pestañas.push({ ruta: 'Este equipo', titulo: 'Este equipo' });
+            pestañaActiva = pestañas.length - 1;
+            rutaActual = 'Este equipo';
+            actualizarContenido();
+            actualizarBotones();
+            actualizarBreadcrumbs();
+            actualizarEstado();
+            actualizarPestañas();
+            mostrarInfo('¡Nueva pestaña!', 'Has creado una nueva pestaña. Cada pestaña puede mostrar una ubicación diferente.');
+        }
+        
+        function cambiarPestana(index) {
+            if (index >= 0 && index < pestañas.length) {
+                pestañaActiva = index;
+                rutaActual = pestañas[index].ruta;
+                actualizarContenido();
+                actualizarBotones();
+                actualizarBreadcrumbs();
+                actualizarEstado();
+                actualizarPestañas();
+            }
+        }
+        
+        function cerrarPestana(event, index) {
+            event.stopPropagation();
+            if (pestañas.length === 1) {
+                cerrarVentana('explorador');
+                return;
+            }
+            pestañas.splice(index, 1);
+            if (pestañaActiva >= pestañas.length) {
+                pestañaActiva = pestañas.length - 1;
+            }
+            rutaActual = pestañas[pestañaActiva].ruta;
+            actualizarContenido();
+            actualizarBotones();
+            actualizarBreadcrumbs();
+            actualizarEstado();
+            actualizarPestañas();
+        }
+        
+        function actualizarPestañas() {
+            const container = document.getElementById('explorador-tabs');
+            const btnNueva = container.querySelector('.nueva-pestana-btn');
+            
+            // Limpiar tabs existentes
+            Array.from(container.children).forEach(child => {
+                if (!child.classList.contains('nueva-pestana-btn')) {
+                    child.remove();
+                }
+            });
+            
+            // Crear tabs
+            pestañas.forEach((tab, i) => {
+                const datos = estructura[tab.ruta] || { icon: '📁' };
+                const tabEl = document.createElement('div');
+                tabEl.className = 'explorador-tab' + (i === pestañaActiva ? ' active' : '');
+                tabEl.onclick = () => cambiarPestana(i);
+                tabEl.innerHTML = `
+                    <span class="icono">${datos.icon}</span>
+                    <span class="titulo">${tab.titulo}</span>
+                    <span class="cerrar" onclick="cerrarPestana(event, ${i})">×</span>
+                `;
+                container.insertBefore(tabEl, btnNueva);
+            });
+        }
+        
+        // Popups informativos
+        function mostrarInfo(titulo, mensaje) {
+            document.getElementById('info-titulo').textContent = titulo;
+            document.getElementById('info-mensaje').textContent = mensaje;
+            infoPopup.classList.add('visible');
+            if (infoTimeout) clearTimeout(infoTimeout);
+            infoTimeout = setTimeout(() => {
+                infoPopup.classList.remove('visible');
+            }, 4000);
+        }
+        
+        function mostrarInfoBarraDireccion() {
+            mostrarInfo('Barra de dirección', 'Aquí ves la ruta de la carpeta actual. Haz clic en cualquier nombre para ir directamente a esa carpeta.');
+        }
+        
+        function mostrarInfoArchivo(nombre) {
+            mostrarInfo('Archivo: ' + nombre, 'Has seleccionado un archivo. En Windows real, puedes hacer click derecho para ver más opciones.');
+        }
+        
+        // Callback para cerrar ventana
+        function onVentanaCerrada(tipo) {
+            if (tipo === 'explorador') {
+                simulacionIniciada = false;
+                document.getElementById('ventana-explorador').style.display = 'none';
+                document.getElementById('panel-control').style.display = 'block';
+                document.getElementById('instrucciones').style.display = 'none';
+                document.getElementById('taskbar-explorador').classList.remove('active');
+                // Resetear estado
+                historialAtras = [];
+                historialAdelante = [];
+                rutaActual = 'Este equipo';
+                pestañas = [{ ruta: 'Este equipo', titulo: 'Este equipo' }];
+                pestañaActiva = 0;
+            }
+        }
+    </script>
+</body>
+</html>

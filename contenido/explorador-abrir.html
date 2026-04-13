@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abrir Explorador de archivos - Windows 11</title>
+    <link rel="stylesheet" href="simulacion-core.css">
+    <link rel="stylesheet" href="trucos-dividir-pantalla.css">
+    <style>
+        .control-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 480px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        
+        .control-panel h2 {
+            color: #ffffff;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .control-panel p {
+            color: #9e9e9e;
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .btn-abrir {
+            background: #0067c0;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 4px;
+            transition: background 0.15s;
+        }
+        
+        .btn-abrir:hover {
+            background: #0078d4;
+        }
+        
+        .btn-accion {
+            background: #2d2d2d;
+            color: #ffffff;
+            border: 1px solid #404040;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin: 4px;
+        }
+        
+        .btn-accion:hover {
+            background: #383838;
+            border-color: #0078d4;
+        }
+        
+        .hint-box {
+            background: #2d2d2d;
+            border: 1px solid #0078d4;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            text-align: left;
+        }
+        
+        .hint-box h4 {
+            color: #60cdff;
+            font-size: 12px;
+            margin: 0 0 8px 0;
+        }
+        
+        .hint-box p {
+            color: #ccc;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .hint-box .key {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            color: #fff;
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+        }
+        
+        .desktop-icon {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            width: 80px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .desktop-icon .icono {
+            font-size: 40px;
+            margin-bottom: 4px;
+        }
+        
+        .desktop-icon .nombre {
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .desktop-icon[data-tipo="este-equipo"] {
+            top: 100px;
+            left: 20px;
+        }
+        
+        .desktop-icon[data-tipo="papelera"] {
+            top: 200px;
+            left: 20px;
+        }
+        
+        /* Start Menu */
+        .start-menu {
+            position: fixed;
+            bottom: 48px;
+            left: 0;
+            width: 600px;
+            height: 500px;
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px 8px 0 0;
+            display: none;
+            z-index: 100;
+            overflow: hidden;
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+        }
+        
+        .start-menu.visible {
+            display: block;
+        }
+        
+        .start-menu-header {
+            padding: 16px 20px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .start-menu-search {
+            flex: 1;
+            background: #3d3d3d;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .start-menu-content {
+            display: flex;
+            padding: 16px;
+            gap: 24px;
+        }
+        
+        .start-menu-apps {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .start-menu-app {
+            width: 80px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .start-menu-app:hover {
+            background: #2d2d2d;
+        }
+        
+        .start-menu-app .icono {
+            font-size: 32px;
+            margin-bottom: 4px;
+        }
+        
+        .start-menu-app .nombre {
+            color: #ccc;
+            font-size: 11px;
+            text-align: center;
+        }
+        
+        .start-menu-app[data-app="explorador"] {
+            background: #0078d4;
+            padding: 12px;
+        }
+        
+        .start-menu-app[data-app="explorador"]:hover {
+            background: #1084d8;
+        }
+        
+        .start-menu-app[data-app="explorador"] .icono {
+            font-size: 28px;
+        }
+        
+        .start-menu-app[data-app="explorador"] .nombre {
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        /* Info Popup */
+        .info-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(31, 31, 31, 0.97);
+            border: 2px solid #0078d4;
+            border-radius: 8px;
+            padding: 20px 24px;
+            display: none;
+            align-items: center;
+            gap: 16px;
+            z-index: 200;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        
+        .info-popup.visible {
+            display: flex;
+            animation: popIn 0.2s ease-out;
+        }
+        
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .info-popup .info-icon {
+            font-size: 32px;
+        }
+        
+        .info-popup .info-content h4 {
+            color: #60cdff;
+            font-size: 14px;
+            margin: 0 0 8px 0;
+        }
+        
+        .info-popup .info-content p {
+            color: #ccc;
+            font-size: 13px;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        /* Explorador Window */
+        .explorador-content {
+            flex: 1;
+            display: flex;
+        }
+        
+        .explorador-panel {
+            width: 200px;
+            background: #171717;
+            border-right: 1px solid #2d2d2d;
+            padding: 12px 0;
+        }
+        
+        .explorador-seccion {
+            margin-bottom: 12px;
+        }
+        
+        .explorador-seccion-titulo {
+            color: #6e6e6e;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 16px;
+            text-transform: uppercase;
+        }
+        
+        .explorador-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 16px;
+            cursor: pointer;
+            gap: 8px;
+        }
+        
+        .explorador-item:hover {
+            background: #2d2d2d;
+        }
+        
+        .explorador-item.active {
+            background: #0078d4;
+        }
+        
+        .explorador-item .icono {
+            font-size: 14px;
+        }
+        
+        .explorador-item .texto {
+            color: #ccc;
+            font-size: 13px;
+        }
+        
+        .explorador-item.active .texto {
+            color: #fff;
+        }
+        
+        .explorador-area {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-content: flex-start;
+        }
+        
+        .explorador-carpeta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 90px;
+        }
+        
+        .explorador-carpeta:hover {
+            background: #2d2d2d;
+        }
+        
+        .explorador-carpeta .icono {
+            font-size: 48px;
+        }
+        
+        .explorador-carpeta .nombre {
+            color: #ccc;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 4px;
+        }
+        
+        .explorador-archivo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 90px;
+        }
+        
+        .explorador-archivo:hover {
+            background: #2d2d2d;
+        }
+        
+        .explorador-archivo .icono {
+            font-size: 36px;
+        }
+        
+        .explorador-archivo .nombre {
+            color: #ccc;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 4px;
+            word-break: break-word;
+        }
+        
+        .instrucciones-panel {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 16px 24px;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .instrucciones-panel h3 {
+            color: #ffffff;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .instrucciones-panel p {
+            color: #9e9e9e;
+            font-size: 12px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-control">
+            <h2>Cómo abrir el Explorador de archivos</h2>
+            <p>Windows 11 ofrece varias formas de abrir el Explorador de archivos.<br>Practica cada método:</p>
+            <div class="hint-box">
+                <h4>Métodos para abrir:</h4>
+                <p>1. <span class="key">🖱️ Click</span> en icono del Explorador en la barra de tareas</p>
+                <p>2. <span class="key">🖱️ Click</span> en el botón Inicio, luego busca "Explorador"</p>
+                <p>3. <span class="key">🖱️ Click</span> en "Este equipo" del escritorio</p>
+            </div>
+        </div>
+        
+        <!-- Iconos del escritorio -->
+        <div class="desktop-icon" id="icono-este-equipo" data-tipo="este-equipo" onclick="abrirExplorador('este-equipo')">
+            <span class="icono">💻</span>
+            <span class="nombre">Este equipo</span>
+        </div>
+        
+        <div class="desktop-icon" id="icono-papelera" data-tipo="papelera" onclick="mostrarInfo('papelera')">
+            <span class="icono">🗑️</span>
+            <span class="nombre">Papelera de<br>reciclaje</span>
+        </div>
+        
+        <!-- Menú Inicio -->
+        <div class="start-menu" id="start-menu">
+            <div class="start-menu-header">
+                <input type="text" class="start-menu-search" placeholder="Buscar aplicaciones, archivos y configuración">
+            </div>
+            <div class="start-menu-content">
+                <div class="start-menu-apps">
+                    <div class="start-menu-app" data-app="explorador" onclick="abrirExplorador('inicio')">
+                        <span class="icono">📁</span>
+                        <span class="nombre">Explorador de<br>archivos</span>
+                    </div>
+                    <div class="start-menu-app" onclick="mostrarInfo(' Edge')">
+                        <span class="icono">🌐</span>
+                        <span class="nombre">Microsoft<br>Edge</span>
+                    </div>
+                    <div class="start-menu-app" onclick="mostrarInfo(' Bloc de notas')">
+                        <span class="icono">📝</span>
+                        <span class="nombre">Bloc de<br>notas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ventana del Explorador -->
+        <div class="ventana" id="ventana-explorador">
+            <div class="title-bar">
+                <div class="icono">
+                    <span style="font-size: 14px;">📁</span>
+                </div>
+                <span class="titulo">Explorador de archivos</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('explorador')">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarVentana('explorador')">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarVentana('explorador')">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <span class="toolbar-btn">◀</span>
+                <span class="toolbar-btn">▶</span>
+                <span class="toolbar-btn">🔄</span>
+                <div class="toolbar-separator"></div>
+                <span class="toolbar-btn">Organizar</span>
+                <span class="toolbar-btn">Nueva carpeta</span>
+            </div>
+            <div class="explorador-content">
+                <div class="explorador-panel">
+                    <div class="explorador-seccion">
+                        <div class="explorador-seccion-titulo">Acceso rápido</div>
+                        <div class="explorador-item active">
+                            <span class="icono">⭐</span>
+                            <span class="texto">Acceso rápido</span>
+                        </div>
+                        <div class="explorador-item">
+                            <span class="icono">☁️</span>
+                            <span class="texto">OneDrive</span>
+                        </div>
+                        <div class="explorador-item">
+                            <span class="icono">⬇️</span>
+                            <span class="texto">Descargas</span>
+                        </div>
+                    </div>
+                    <div class="explorador-seccion">
+                        <div class="explorador-seccion-titulo">Este equipo</div>
+                        <div class="explorador-item">
+                            <span class="icono">💾</span>
+                            <span class="texto">Disco local (C:)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="explorador-area">
+                    <div class="explorador-carpeta">
+                        <span class="icono">📁</span>
+                        <span class="nombre">Documentos</span>
+                    </div>
+                    <div class="explorador-carpeta">
+                        <span class="icono">🎵</span>
+                        <span class="nombre">Música</span>
+                    </div>
+                    <div class="explorador-carpeta">
+                        <span class="icono">🖼️</span>
+                        <span class="nombre">Imágenes</span>
+                    </div>
+                    <div class="explorador-carpeta">
+                        <span class="icono">🎬</span>
+                        <span class="nombre">Videos</span>
+                    </div>
+                    <div class="explorador-carpeta">
+                        <span class="icono">⬇️</span>
+                        <span class="nombre">Descargas</span>
+                    </div>
+                    <!-- Archivos simulados -->
+                    <div class="explorador-archivo">
+                        <span class="icono">📄</span>
+                        <span class="nombre">informe.docx</span>
+                    </div>
+                    <div class="explorador-archivo">
+                        <span class="icono">📕</span>
+                        <span class="nombre">manual.pdf</span>
+                    </div>
+                    <div class="explorador-archivo">
+                        <span class="icono">🖼️</span>
+                        <span class="nombre">foto.jpg</span>
+                    </div>
+                    <div class="explorador-archivo">
+                        <span class="icono">🎵</span>
+                        <span class="nombre">cancion.mp3</span>
+                    </div>
+                </div>
+            </div>
+            <div class="status-bar">
+                <span>9 elementos</span>
+                <span>Este equipo</span>
+            </div>
+        </div>
+        
+        <!-- Popup informativo -->
+        <div class="info-popup" id="info-popup">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <h4 id="info-titulo">¡Bien!</h4>
+                <p id="info-mensaje">Mensaje...</p>
+            </div>
+        </div>
+        
+        <!-- Instrucciones cuando está abierto -->
+        <div class="instrucciones-panel" id="instrucciones" style="display: none;">
+            <h3>Explorador de archivos abierto</h3>
+            <p>Puedes ver tus carpetas y archivos. ¡Practica los otros métodos!</p>
+        </div>
+    </div>
+    
+    <!-- Taskbar Windows 11 -->
+    <div class="taskbar">
+        <div class="start-button" onclick="toggleStartMenu()">
+            <div class="start-icon"></div>
+        </div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-explorador" onclick="abrirExplorador('taskbar')">📁</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">
+                <div class="tray-icon">🔊</div>
+                <div class="tray-icon">📶</div>
+                <div class="tray-icon">🔋</div>
+            </div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">15/3/2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="simulacion-core.js"></script>
+    <script>
+        let exploradorAbierto = false;
+        let startMenuAbierto = false;
+        let infoTimeout = null;
+        
+        const startMenu = document.getElementById('start-menu');
+        const infoPopup = document.getElementById('info-popup');
+        
+        function toggleStartMenu() {
+            startMenuAbierto = !startMenuAbierto;
+            if (startMenuAbierto) {
+                startMenu.classList.add('visible');
+            } else {
+                startMenu.classList.remove('visible');
+            }
+        }
+        
+        function abrirExplorador(origen) {
+            // Cerrar menú inicio si está abierto
+            if (startMenuAbierto) {
+                startMenuAbierto = false;
+                startMenu.classList.remove('visible');
+            }
+            
+            // Abrir ventana del explorador
+            const ventana = document.getElementById('ventana-explorador');
+            ventana.classList.add('visible');
+            
+            // Posicionar ventana
+            ventana.style.left = '100px';
+            ventana.style.top = '60px';
+            
+            // Traer al frente
+            bringToFront(ventana);
+            
+            // Actualizar taskbar
+            const taskbarIcon = document.getElementById('taskbar-explorador');
+            taskbarIcon.classList.add('active');
+            
+            exploradorAbierto = true;
+            
+            // Ocultar panel de control
+            document.getElementById('panel-control').style.display = 'none';
+            
+            // Mostrar popup informativo según origen
+            let mensaje = '';
+            switch(origen) {
+                case 'taskbar':
+                    mensaje = '¡Bien! Has abierto el Explorador desde la barra de tareas. Es la forma más rápida de acceder a tus archivos. El icono se encuentra siempre visible en la barra inferior.';
+                    break;
+                case 'inicio':
+                    mensaje = '¡Desde el menú Inicio también puedes acceder al Explorador! Observa cómo se abre la ventana. Busca el icono de carpeta en la lista de aplicaciones.';
+                    break;
+                case 'este-equipo':
+                    mensaje = '¡Este equipo muestra todos los discos y dispositivos de almacenamiento conectados a tu computadora! Puedes acceder rápidamente a tus archivos desde el escritorio.';
+                    break;
+                default:
+                    mensaje = '¡Has abierto el Explorador de archivos! Desde aquí puedes gestionar todas tus carpetas y archivos.';
+            }
+            
+            mostrarInfo(mensaje);
+            actualizarPanel();
+        }
+        
+        function mostrarInfo(mensajeOtipo) {
+            const titulo = document.getElementById('info-titulo');
+            const texto = document.getElementById('info-mensaje');
+            
+            // Determinar contenido
+            if (typeof mensajeOtipo === 'string') {
+                // Es un mensaje directo
+                titulo.textContent = '¡Bien!';
+                texto.textContent = mensajeOtipo;
+            } else {
+                // Es un evento - mostrar mensaje genérico
+                titulo.textContent = '¡Próximamente!';
+                texto.textContent = 'Esta función te llevará a más contenido. ¡Sigue practicando los métodos para abrir el Explorador!';
+            }
+            
+            // Mostrar popup
+            infoPopup.classList.add('visible');
+            
+            // Ocultar después de 4 segundos
+            if (infoTimeout) clearTimeout(infoTimeout);
+            infoTimeout = setTimeout(() => {
+                infoPopup.classList.remove('visible');
+            }, 4000);
+        }
+        
+        function actualizarPanel() {
+            const instrucciones = document.getElementById('instrucciones');
+            if (exploradorAbierto) {
+                instrucciones.style.display = 'block';
+            } else {
+                instrucciones.style.display = 'none';
+            }
+        }
+        
+        function onVentanaCerrada(tipo) {
+            if (tipo === 'explorador') {
+                exploradorAbierto = false;
+                document.getElementById('taskbar-explorador').classList.remove('active');
+                document.getElementById('panel-control').style.display = 'block';
+                actualizarPanel();
+            }
+        }
+        
+        // Cerrar menú inicio al hacer click en desktop
+        document.querySelector('.desktop').addEventListener('click', function(e) {
+            if (startMenuAbierto && !e.target.closest('.start-button') && !e.target.closest('.start-menu')) {
+                startMenuAbierto = false;
+                startMenu.classList.remove('visible');
+            }
+        });
+    </script>
+</body>
+</html>
