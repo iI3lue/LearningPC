@@ -738,7 +738,15 @@ button:active {
     padding-bottom: 0;
 }
 
-.logo { font-size: 24px; }
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent-solid);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 32px;
+}
 .logo-text { font-weight: 600; font-size: 18px; }
 
 .sidebar-profile {
@@ -749,6 +757,17 @@ button:active {
     background: var(--bg-color);
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: var(--elevation-1);
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+/* Legacy compatibility */
+.profile-section {
+    text-align: center;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    margin-bottom: 24px;
 }
 
 .profile-avatar {
@@ -762,6 +781,14 @@ button:active {
     justify-content: center;
     font-weight: 600;
     font-size: 20px;
+    margin: 0 auto 12px;
+}
+
+/* Legacy - larger avatar */
+.profile-avatar.large {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
 }
 
 .profile-info {
@@ -784,10 +811,59 @@ button:active {
     width: fit-content;
 }
 
+/* Legacy - para profile-section (compatibilidad) */
+.profile-section .profile-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.profile-section .profile-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+}
+
 .badge-experto { background: #FEF3C7; color: #D97706; }
 .badge-avanzado { background: #DBEAFE; color: #2563EB; }
 .badge-intermedio { background: #D1FAE5; color: #059669; }
 .badge-principiante { background: var(--accent-pastel); color: var(--accent-solid); }
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--bg-color);
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent-solid);
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-top: 4px;
+}
+
+/* Nav Menu */
+.nav-menu {
+    margin-top: auto;
+}
 
 [data-theme="dark"] .badge-experto { background: #78350F; color: #FCD34D; }
 [data-theme="dark"] .badge-avanzado { background: #1E3A5F; color: #60A5FA; }
@@ -892,6 +968,37 @@ button:active {
 .header-actions {
     display: flex;
     gap: 8px;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.header-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-color);
+    transition: background var(--duration-fast) var(--ease-fluent),
+                border-color var(--duration-fast) var(--ease-fluent),
+                transform var(--duration-fast) var(--ease-fluent);
+}
+
+.header-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent-solid);
+    transform: translateY(-1px);
+}
+
+.header-btn:active {
+    transform: translateY(0);
 }
 
 .btn-icon {
