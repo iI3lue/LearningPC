@@ -304,7 +304,7 @@
                                         <div style="font-size: 12px; opacity: 0.7;">${nivel.descripcion || ''} ${tiempo}</div>
                                         ${estaCompletado ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: #dcfce7; color: #15803d; border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
                                     </div>
-                                    <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" style="padding: 8px 16px; background: var(--accent-solid); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
+                                    <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" data-idsub="${sub.id_subcategoria}" style="padding: 8px 16px; background: var(--accent-solid); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
                                 </div>
                             `;
                         });
@@ -322,11 +322,13 @@
                     const id = e.target.dataset.id;
                     const ruta = decodeURIComponent(e.target.dataset.ruta);
                     const titulo = decodeURIComponent(e.target.dataset.titulo);
+                    const idSub = e.target.dataset.idsub;
                     
                     if (ruta && ruta !== 'null' && ruta !== '') {
                         sessionStorage.setItem('simulacion_id', id);
                         sessionStorage.setItem('simulacion_ruta', ruta);
                         sessionStorage.setItem('simulacion_titulo', titulo);
+                        sessionStorage.setItem('simulacion_id_subcategoria', idSub);
                         window.api.irA('simulacion');
                     } else {
                         alert('Esta lección aún no tiene contenido disponible.');

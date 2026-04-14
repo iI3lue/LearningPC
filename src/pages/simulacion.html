@@ -13,27 +13,40 @@
             background: #000;
             height: 100vh;
             overflow: hidden;
+            font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
         }
-        #simulacion-container {
-            width: 100%;
-            height: calc(100vh - 60px);
-            border: none;
-        }
+
         .simulacion-toolbar {
             background: #1a1a1a;
-            height: 60px;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 16px;
             border-bottom: 1px solid #333;
+            gap: 16px;
         }
-        .simulacion-toolbar h2 {
-            color: #fff;
-            font-size: 16px;
-            font-weight: 500;
-            margin: 0;
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+
+        .toolbar-center {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .btn-simulacion {
             background: #0078d4;
             color: #fff;
@@ -41,19 +54,163 @@
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s, opacity 0.15s;
         }
+
         .btn-simulacion:hover {
             background: #1084d8;
         }
+
+        .btn-simulacion:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-simulacion:disabled:hover {
+            background: #0078d4;
+        }
+
         .btn-volver {
             background: #333;
+            font-size: 12px;
+            padding: 8px 12px;
         }
+
         .btn-volver:hover {
             background: #444;
         }
-    </style>
-    <style>
+
+        .btn-anterior, .btn-siguiente {
+            background: #2d2d2d;
+            padding: 8px 12px;
+            font-size: 16px;
+        }
+
+        .btn-anterior:hover, .btn-siguiente:hover {
+            background: #3d3d3d;
+        }
+
+        .level-indicator {
+            background: #252525;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #ccc;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .level-indicator strong {
+            color: #60cdff;
+        }
+
+        /* Dropdown de niveles */
+        .nivel-dropdown {
+            position: relative;
+        }
+
+        .btn-nivel-menu {
+            background: #2d2d2d;
+            padding: 8px 12px;
+            font-size: 14px;
+            min-width: 32px;
+        }
+
+        .btn-nivel-menu:hover {
+            background: #3d3d3d;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 8px;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .dropdown-menu.visible {
+            display: block;
+            animation: fadeIn 0.15s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            color: #ccc;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.1s;
+        }
+
+        .dropdown-item:hover {
+            background: #3d3d3d;
+        }
+
+        .dropdown-item.active {
+            background: #0078d4;
+            color: #fff;
+        }
+
+        .dropdown-item.completado::before {
+            content: '✓';
+            color: #6ccb5f;
+            font-size: 12px;
+        }
+
+        .dropdown-item .nivel-num {
+            background: #444;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .dropdown-item.active .nivel-num {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Título del nivel */
+        #titulo-nivel {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #simulacion-container {
+            width: 100%;
+            height: calc(100vh - 56px);
+            border: none;
+        }
+
+        /* Feedback toast */
         #feedback-toast {
             position: fixed;
             bottom: 80px;
@@ -71,64 +228,383 @@
             pointer-events: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+
         #feedback-toast.visible {
             opacity: 1;
+        }
+
+        #feedback-toast.exito {
+            background: rgba(16, 124, 16, 0.95);
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(0,0,0,0.7);
+            color: #888;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .keyboard-hint kbd {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #aaa;
+            font-family: monospace;
         }
     </style>
 </head>
 
 <body>
     <div class="simulacion-toolbar">
-        <h2 id="titulo-nivel">Cargando simulación...</h2>
-        <div>
-            <button class="btn-simulacion btn-volver" id="btn-volver">← Volver</button>
-            <button class="btn-simulacion" id="btn-completar">✓ Completar Nivel</button>
+        <!-- Izquierda: Volver -->
+        <div class="toolbar-left">
+            <button class="btn-simulacion btn-volver" id="btn-volver" title="Volver al menú">
+                ← Volver
+            </button>
+            <h2 id="titulo-nivel">Cargando...</h2>
+        </div>
+
+        <!-- Centro: Navegación de niveles -->
+        <div class="toolbar-center">
+            <button class="btn-simulacion btn-anterior" id="btn-anterior" title="Nivel anterior">
+                ←
+            </button>
+            
+            <div class="level-indicator">
+                Nivel <strong id="nivel-actual">1</strong> de <span id="nivel-total">3</span>
+            </div>
+            
+            <button class="btn-simulacion btn-siguiente" id="btn-siguiente" title="Siguiente nivel">
+                →
+            </button>
+
+            <div class="nivel-dropdown">
+                <button class="btn-simulacion btn-nivel-menu" id="btn-nivel-menu" title="Ver todos los niveles">
+                    ☰
+                </button>
+                <div class="dropdown-menu" id="dropdown-niveles">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Derecha: Completar y Home -->
+        <div class="toolbar-right">
+            <button class="btn-simulacion" id="btn-completar">
+                ✓ Completar
+            </button>
         </div>
     </div>
+
     <iframe id="simulacion-container" src=""></iframe>
     <div id="feedback-toast"></div>
 
+    <div class="keyboard-hint">
+        <span><kbd>←</kbd> <kbd>→</kbd> Navegar</span>
+        <span><kbd>Esc</kbd> Salir</span>
+    </div>
+
     <script>
-        const idNivel = sessionStorage.getItem('simulacion_id');
-        const rutaArchivo = sessionStorage.getItem('simulacion_ruta');
-        const titulo = sessionStorage.getItem('simulacion_titulo');
+        // Datos del nivel actual
+        let idNivel = sessionStorage.getItem('simulacion_id');
+        let rutaArchivo = sessionStorage.getItem('simulacion_ruta');
+        let titulo = sessionStorage.getItem('simulacion_titulo');
+        let idSubcategoria = sessionStorage.getItem('simulacion_id_subcategoria');
 
-        document.getElementById('titulo-nivel').textContent = titulo || 'Simulación';
+        // Datos de niveles
+        let niveles = [];
+        let nivelActualIndex = 0;
 
-        // Cargar la simulación
+        // Elementos del DOM
+        const tituloEl = document.getElementById('titulo-nivel');
+        const nivelActualEl = document.getElementById('nivel-actual');
+        const nivelTotalEl = document.getElementById('nivel-total');
+        const btnAnterior = document.getElementById('btn-anterior');
+        const btnSiguiente = document.getElementById('btn-siguiente');
+        const btnMenu = document.getElementById('btn-nivel-menu');
+        const dropdown = document.getElementById('dropdown-niveles');
         const iframe = document.getElementById('simulacion-container');
-        
-        if (rutaArchivo) {
-            console.log('[SIMULACION] Cargando:', rutaArchivo);
-            iframe.src = rutaArchivo;
+        const toast = document.getElementById('feedback-toast');
+
+        // Inicializar
+        async function init() {
+            console.log('=== INICIO SIMULACION ===');
+            console.log('idNivel:', idNivel);
+            console.log('rutaArchivo:', rutaArchivo);
+            console.log('titulo:', titulo);
+            console.log('idSubcategoria:', idSubcategoria);
             
-            iframe.addEventListener('loaderror', (e) => {
-                console.log('[SIMULACION] Error al cargar:', e);
-            });
-        } else {
-            console.log('[SIMULACION] No hay ruta de archivo');
+            tituloEl.textContent = titulo || 'Simulación';
+            
+            if (!idSubcategoria) {
+                console.log('MODO LEGACY: No hay idSubcategoria, usando rutaArchivo directamente');
+                // Forzar modo legacy
+                niveles = [];
+                cargarSimulacion();
+                return;
+            }
+
+            await cargarNiveles();
         }
 
-        document.getElementById('btn-volver').addEventListener('click', () => {
+        async function cargarNiveles() {
+            try {
+                console.log('Cargando niveles para subcategoria:', idSubcategoria);
+                const nivelesData = await window.api.getNivelesPorSubcategoria(parseInt(idSubcategoria));
+                
+                console.log('Datos recibidos - tipo:', typeof nivelesData);
+                console.log('Datos recibidos:', nivelesData);
+                
+                if (!nivelesData) {
+                    console.log('API devolvió null, usando modo legacy');
+                    niveles = [];
+                    cargarSimulacion();
+                    return;
+                }
+                
+                if (Array.isArray(nivelesData)) {
+                    niveles = nivelesData;
+                } else if (nivelesData.niveles) {
+                    niveles = nivelesData.niveles;
+                } else {
+                    console.log('Formato inesperado, usando modo legacy');
+                    niveles = [];
+                }
+                
+                console.log('Niveles asignados:', niveles.length);
+                
+                if (niveles.length > 0) {
+                    // Log de cada nivel
+                    niveles.forEach((n, i) => {
+                        console.log(`Nivel ${i+1}: id=${n.id_nivel}, titulo=${n.titulo}, ruta=${n.ruta_archivo}`);
+                    });
+                    
+                    nivelActualIndex = niveles.findIndex(n => n.id_nivel == idNivel);
+                    console.log('Index del nivel actual:', nivelActualIndex);
+                    
+                    if (nivelActualIndex === -1) nivelActualIndex = 0;
+
+                    actualizarUI();
+                    cargarSimulacion();
+                    generarDropdown();
+                } else {
+                    console.log('Array vacío, modo legacy');
+                    cargarSimulacion();
+                }
+            } catch (err) {
+                console.error('ERROR:', err);
+                niveles = [];
+                cargarSimulacion();
+            }
+        }
+
+function actualizarUI() {
+            const total = niveles.length;
+            nivelActualEl.textContent = nivelActualIndex + 1;
+            nivelTotalEl.textContent = total;
+
+            // Actualizar botones
+            btnAnterior.disabled = nivelActualIndex === 0;
+            btnSiguiente.disabled = nivelActualIndex === total - 1;
+            
+            // Si es el último nivel, cambiar texto del botón siguiente
+            if (nivelActualIndex === total - 1) {
+                btnSiguiente.textContent = '✓';
+                btnSiguiente.title = '¡Has completado todos los niveles!';
+            } else {
+                btnSiguiente.textContent = '→';
+                btnSiguiente.title = 'Siguiente nivel';
+            }
+        }
+
+        function cargarSimulacion() {
+            console.log('=== CARGAR SIMULACION ===');
+            
+            // Determinar qué nivel usar
+            let nivel = null;
+            let ruta = '';
+            let tit = '';
+            
+            if (niveles.length > 0 && nivelActualIndex < niveles.length) {
+                nivel = niveles[nivelActualIndex];
+                ruta = nivel.ruta_archivo || '';
+                tit = nivel.titulo || '';
+                console.log('Usando nivel del array:', nivel);
+            } else {
+                // Modo legacy desde sessionStorage
+                ruta = rutaArchivo || '';
+                tit = titulo || '';
+                console.log('Modo legacy - ruta:', ruta, 'titulo:', tit);
+            }
+            
+            console.log('Ruta final:', ruta);
+            
+            if (ruta && ruta !== 'null' && ruta !== '') {
+                tituloEl.textContent = tit;
+                // Si la ruta ya tiene ../../contenido/, no duplicar
+                const rutaCompleta = ruta.startsWith('../../contenido/') 
+                    ? ruta 
+                    : '../../contenido/' + ruta;
+                console.log('Iframe src:', rutaCompleta);
+                iframe.src = rutaCompleta;
+            } else {
+                tituloEl.textContent = '⚠️ Simulación no disponible';
+                console.log('NO HAY RUTA - mostrando mensaje');
+            }
+        }
+
+        function generarDropdown() {
+            console.log('[SIMULACION] Generando dropdown con', niveles.length, 'niveles');
+            dropdown.innerHTML = '';
+            
+            niveles.forEach((nivel, index) => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item' + (index === nivelActualIndex ? ' active' : '');
+                item.innerHTML = `<span class="nivel-num">${index + 1}</span> ${nivel.titulo}`;
+                item.onclick = () => {
+                    console.log('[SIMULACION] Click en nivel:', index, nivel.titulo);
+                    irANivel(index);
+                };
+                dropdown.appendChild(item);
+            });
+        }
+
+        function irANivel(index) {
+            if (index < 0 || index >= niveles.length) {
+                console.log('[SIMULACION] Índice fuera de rango:', index);
+                return;
+            }
+            
+            console.log('[SIMULACION] Ir a nivel:', index);
+            nivelActualIndex = index;
+            const nivel = niveles[index];
+            
+            // Actualizar sessionStorage
+            sessionStorage.setItem('simulacion_id', nivel.id_nivel);
+            sessionStorage.setItem('simulacion_ruta', nivel.ruta_archivo);
+            sessionStorage.setItem('simulacion_titulo', nivel.titulo);
+            
+            // Recargar variables locales
+            idNivel = nivel.id_nivel;
+            rutaArchivo = nivel.ruta_archivo;
+            titulo = nivel.titulo;
+            
+            actualizarUI();
+            cargarSimulacion();
+            generarDropdown();
+            
+            mostrarToast('Nivel ' + (index + 1) + ': ' + nivel.titulo);
+            cerrarDropdown();
+        }
+
+        function nivelAnterior() {
+            console.log('[SIMULACION] nivelAnterior - actual:', nivelActualIndex);
+            if (nivelActualIndex > 0) {
+                irANivel(nivelActualIndex - 1);
+            }
+        }
+
+        function nivelSiguiente() {
+            console.log('[SIMULACION] nivelSiguiente - actual:', nivelActualIndex, 'total:', niveles.length);
+            if (nivelActualIndex < niveles.length - 1) {
+                irANivel(nivelActualIndex + 1);
+            } else {
+                mostrarToast('¡Has completado todos los niveles!', 'exito');
+            }
+        }
+
+        function toggleDropdown() {
+            dropdown.classList.toggle('visible');
+        }
+
+        function cerrarDropdown() {
+            dropdown.classList.remove('visible');
+        }
+
+        function mostrarToast(mensaje, tipo = '') {
+            toast.textContent = mensaje;
+            toast.className = 'visible' + (tipo ? ' ' + tipo : '');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2500);
+        }
+
+        // Event Listeners con debugging
+        document.getElementById('btn-volver').onclick = () => {
+            console.log('[SIMULACION] Botón volver clickeado');
             sessionStorage.removeItem('simulacion_id');
             sessionStorage.removeItem('simulacion_ruta');
             sessionStorage.removeItem('simulacion_titulo');
+            sessionStorage.removeItem('simulacion_id_subcategoria');
             window.api.irA('home');
+        };
+
+        // Agregar event listeners con debugging
+        btnAnterior.onclick = () => {
+            console.log('[SIMULACION] Click btn-anterior');
+            nivelAnterior();
+        };
+        btnSiguiente.onclick = () => {
+            console.log('[SIMULACION] Click btn-siguiente');
+            nivelSiguiente();
+        };
+        btnMenu.onclick = () => {
+            console.log('[SIMULACION] Click btn-menu');
+            toggleDropdown();
+        };
+
+        // Cerrar dropdown al hacer click fuera
+        document.addEventListener('click', (e) => {
+            if (!btnMenu.contains(e.target) && !dropdown.contains(e.target)) {
+                cerrarDropdown();
+            }
         });
 
-        document.getElementById('btn-completar').addEventListener('click', async () => {
+        // Completar nivel
+        document.getElementById('btn-completar').onclick = async () => {
             const usuario = JSON.parse(sessionStorage.getItem('usuario'));
             if (usuario && idNivel) {
                 const resultado = await window.api.marcarNivelCompletado(usuario.id_usuario, parseInt(idNivel));
                 if (resultado.ok) {
-                    alert('¡Nivel completado! Progreso: ' + resultado.progreso_total + '%');
-                    sessionStorage.removeItem('simulacion_id');
-                    sessionStorage.removeItem('simulacion_ruta');
-                    sessionStorage.removeItem('simulacion_titulo');
-                    window.api.irA('home');
+                    mostrarToast('¡Nivel completado! Progreso: ' + resultado.progreso_total + '%', 'exito');
+                    
+                    //auto-navegar al siguiente nivel
+                    setTimeout(() => {
+                        if (nivelActualIndex < niveles.length - 1) {
+                            nivelSiguiente();
+                        } else {
+                            // Fin de la subcategoría
+                            sessionStorage.removeItem('simulacion_id');
+                            sessionStorage.removeItem('simulacion_ruta');
+                            sessionStorage.removeItem('simulacion_titulo');
+                            sessionStorage.removeItem('simulacion_id_subcategoria');
+                            window.api.irA('home');
+                        }
+                    }, 1500);
                 }
             }
+        };
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                nivelAnterior();
+            } else if (e.key === 'ArrowRight') {
+                nivelSiguiente();
+            } else if (e.key === 'Escape') {
+                document.getElementById('btn-volver').click();
+            }
         });
+
+        // Iniciar
+        init();
     </script>
 </body>
 
