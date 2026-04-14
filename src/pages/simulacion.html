@@ -210,31 +210,17 @@
             border: none;
         }
 
-        /* Feedback toast */
+        /* Feedback toast - usando clases de styles.css */
         #feedback-toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 120, 212, 0.95);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: 'Segoe UI', sans-serif;
-            z-index: 9999;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            /* Ahora usa las clases .toast-notification de styles.css */
         }
 
         #feedback-toast.visible {
-            opacity: 1;
+            /* Animación manejada por .toast-notification.visible */
         }
 
         #feedback-toast.exito {
-            background: rgba(16, 124, 16, 0.95);
+            /* Color manejado por .toast-notification.success */
         }
 
         /* Keyboard hint */
@@ -304,7 +290,14 @@
     </div>
 
     <iframe id="simulacion-container" src=""></iframe>
-    <div id="feedback-toast"></div>
+    
+    <!-- Toast Notification - usando clases de styles.css -->
+    <div id="feedback-toast" class="toast-notification">
+        <svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <span class="toast-message" id="toast-message"></span>
+    </div>
 
     <div class="keyboard-hint">
         <span><kbd>←</kbd> <kbd>→</kbd> Navegar</span>
@@ -529,8 +522,34 @@ function actualizarUI() {
         }
 
         function mostrarToast(mensaje, tipo = '') {
-            toast.textContent = mensaje;
-            toast.className = 'visible' + (tipo ? ' ' + tipo : '');
+            const toast = document.getElementById('feedback-toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = toast.querySelector('.toast-icon');
+            
+            toastMessage.textContent = mensaje;
+            
+            // Remover clases anteriores
+            toast.classList.remove('toast-notification', 'success', 'error', 'info', 'visible');
+            
+            // Agregar clase base y tipo
+            toast.classList.add('toast-notification');
+            if (tipo === 'exito') {
+                toast.classList.add('success');
+                toastIcon.innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>';
+            } else if (tipo === 'error') {
+                toast.classList.add('error');
+                toastIcon.innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>';
+            } else {
+                toast.classList.add('info');
+                toastIcon.innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>';
+            }
+            
+            // Mostrar
+            requestAnimationFrame(() => {
+                toast.classList.add('visible');
+            });
+            
+            // Ocultar después de 2.5s
             setTimeout(() => {
                 toast.classList.remove('visible');
             }, 2500);
