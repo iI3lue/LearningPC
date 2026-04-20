@@ -3,60 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu primer programa - LearningPC</title>
-    <link rel="stylesheet" href="../../src/css/styles.css">
+    <title>Tu Primer Programa - LearningPC</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <link rel="stylesheet" href="../../trucos-dividir-pantalla.css">
     <style>
-        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
-        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
-        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; margin-bottom: 15px; line-height: 1.6; }
-        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        .line-numbers { background: #2d2d2d; color: #858585; padding: 10px 5px; text-align: right; font-family: monospace; font-size: 14px; line-height: 1.5; user-select: none; }
-        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; font-size: 14px; line-height: 1.5; resize: none; outline: none; }
-        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: transform 0.2s, box-shadow 0.2s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: var(--elevation-2); }
-        .btn-primary { background: var(--accent-solid); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-color); }
-        .output-panel { background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        .output-header { background: #2d2d2d; color: #858585; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-clear { background: transparent; border: none; color: #858585; cursor: pointer; }
-        .code-output { color: #10b981; font-family: monospace; font-size: 14px; padding: 15px; margin: 0; min-height: 200px; max-height: 300px; overflow: auto; white-space: pre-wrap; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; }
-        .feedback.success { background: #d1fae5; color: #065f46; }
-        .feedback.error { background: #fee2e2; color: #991b1b; }
-        .feedback.warning { background: #fef3c7; color: #92400e; }
-        .feedback.info { background: #dbeafe; color: #1e40af; }
+        .intro-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 28px 36px;
+            max-width: 600px;
+            margin: 30px auto;
+            text-align: center;
+        }
+        
+        .intro-panel h2 { color: #47A1EB; font-size: 22px; margin-bottom: 16px; }
+        .intro-panel .subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
+        .intro-panel p { color: #aaa; font-size: 13px; line-height: 1.7; margin-bottom: 12px; text-align: left; }
+        
+        .intro-panel .info-box {
+            background: #252526;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+        }
+        
+        .intro-panel .info-box h3 { color: #60cdff; font-size: 14px; margin-bottom: 10px; }
+        .intro-panel .info-box ul { margin: 0; padding-left: 18px; }
+        .intro-panel .info-box li { color: #ccc; font-size: 13px; margin-bottom: 6px; }
+        
+        .intro-panel code { 
+            background: #1e1e1e; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            color: #22c55e; 
+            font-family: 'Consolas', monospace; 
+        }
+        
+        .intro-panel strong { color: #fff; }
+
+        .btn-comenzar {
+            background: #0067c0;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn-comenzar:hover { background: #0078d4; }
+
+        .vscode-window {
+            width: 800px;
+            height: 520px;
+            background: #1e1e1e;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+        }
+
+        .vscode-window.visible {
+            display: flex !important;
+        }
+
+        .ventana.visible {
+            display: flex !important;
+        }
+
+        /* Tour Popup */
+        .tour-popup {
+            position: fixed;
+            background: #323233;
+            border: 1px solid #454545;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 320px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 400;
+            display: none;
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tour-popup .tour-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tour-popup .tour-icon { font-size: 24px; }
+
+        .tour-popup .tour-title {
+            color: #60cdff;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .tour-popup .tour-step {
+            background: #0078d4;
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .tour-popup .tour-content {
+            color: #cccccc;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .tour-popup .tour-content code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #f472b6;
+            font-family: 'Consolas', monospace;
+        }
+
+        .tour-popup .tour-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .tour-popup .tour-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+        }
+
+        .tour-popup .tour-btn.next {
+            background: #0078d4;
+            color: white;
+        }
+
+        .tour-popup .tour-btn.next:hover { background: #1084d8; }
+
+        .tour-popup .tour-btn.skip {
+            background: transparent;
+            color: #888;
+            border: 1px solid #555;
+        }
+
+        .tour-popup .tour-btn.skip:hover {
+            background: #404040;
+            color: #ccc;
+        }
+
+        .tour-popup.explorer-pos { top: 120px; left: 80px; }
+        .tour-popup.editor-pos { top: 180px; left: 280px; }
+        .tour-popup.terminal-pos { top: 380px; left: 280px; }
+        .tour-popup.toolbar-pos { top: 80px; left: 280px; }
+
+        .success-msg {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 20px 32px;
+            z-index: 300;
+            display: none;
+            text-align: center;
+        }
+
+        .success-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
+        .success-msg p { color: #ccc; font-size: 13px; margin: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Nivel 3: Tu primer programa</h1>
-        <div class="explanation">
-            <h2>Hola Mundo!</h2>
-            <p>El programa m&aacute;s cl&aacute;sico en programaci&oacute;n es <strong>"Hola Mundo"</strong>.</p>
-            <p>Es una tradici&oacute;n que data de los a&ntilde;os 70 y es lo primero que todo programador escribe.</p>
+    <div class="desktop">
+        <!-- Intro Panel -->
+        <div class="intro-panel" id="intro">
+            <h2>🎉 Tu Primer Programa</h2>
+            <p class="subtitle">¡Hola, Mundo!</p>
+            
+            <div class="info-box">
+                <h3>📝 print() - Mostrar en pantalla</h3>
+                <ul>
+                    <li><code>print("texto")</code> muestra el texto</li>
+                    <li><code>print(x)</code> muestra el valor de x</li>
+                    <li>Las comillas "" indican texto</li>
+                </ul>
+            </div>
+            
+            <p><strong>¡Manos a la obra!</strong> Escribe tu primer programa y ejecútalo.</p>
+            <button class="btn-comenzar" onclick="startSim()">Comenzar →</button>
         </div>
-        <div id="simulator-container"></div>
-        <div class="navigation">
-            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
-            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+
+        <!-- Tour Popup -->
+        <div class="tour-popup explorer-pos" id="tour-1">
+            <div class="tour-header">
+                <span class="tour-icon">📁</span>
+                <span class="tour-title">Explorador</span>
+                <span class="tour-step">1/4</span>
+            </div>
+            <div class="tour-content">
+                Aquí tienes tus archivos.<br>
+                <code>hola.py</code> es tu programa.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup editor-pos" id="tour-2">
+            <div class="tour-header">
+                <span class="tour-icon">📝</span>
+                <span class="tour-title">Editor de Código</span>
+                <span class="tour-step">2/4</span>
+            </div>
+            <div class="tour-content">
+                Escribe tu programa:<br>
+                <code>print("¡Hola, Mundo!")</code>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup terminal-pos" id="tour-3">
+            <div class="tour-header">
+                <span class="tour-icon">🔶</span>
+                <span class="tour-title">Terminal</span>
+                <span class="tour-step">3/4</span>
+            </div>
+            <div class="tour-content">
+                Aquí verás el resultado<br>
+                de tu programa Python.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup toolbar-pos" id="tour-4">
+            <div class="tour-header">
+                <span class="tour-icon">▶</span>
+                <span class="tour-title">Ejecutar Código</span>
+                <span class="tour-step">4/4</span>
+            </div>
+            <div class="tour-content">
+                Presiona <code>F5</code> para<br>
+                ejecutar tu programa.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">¡Listo! →</button>
+            </div>
+        </div>
+
+        <!-- VS Code Window -->
+        <div class="ventana vscode-window" id="ventana-vscode" style="display:none; width:800px; height:520px; left:50px; top:30px;">
+            <div class="title-bar">
+                <div class="icono">📊</div>
+                <span class="titulo">Visual Studio Code - hola.py</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('vscode')">─</div>
+                    <div class="window-btn" onclick="maximizarVentana('vscode')">□</div>
+                    <div class="window-btn close" onclick="cerrarVentana('vscode')">×</div>
+                </div>
+            </div>
+            
+            <div class="menu-bar">
+                <span class="menu-item">Archivo</span>
+                <span class="menu-item">Editar</span>
+                <span class="menu-item">Ver</span>
+                <span class="menu-item">Terminal</span>
+                <span class="menu-item">Ayuda</span>
+            </div>
+            
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="newFile()">📄 Nuevo</button>
+                <button class="toolbar-btn" onclick="openFile()">📂 Abrir</button>
+                <button class="toolbar-btn run" onclick="runCode()">▶ Ejecutar (F5)</button>
+                <button class="toolbar-btn" onclick="resetCode()">↻ Reiniciar</button>
+            </div>
+            
+            <div class="main-area">
+                <div class="explorer">
+                    <div class="explorer-title">Explorador</div>
+                    <div class="file-item active">🐍 hola.py</div>
+                    <div class="file-item">📄 saludos.py</div>
+                </div>
+                
+                <div class="editor-area">
+                    <div class="tabs">
+                        <div class="tab active">🐍 hola.py ×</div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="line-nums" id="lines">1</div>
+                        <textarea class="code-input" id="code" spellcheck="false">print("¡Hola, Mundo!")</textarea>
+                    </div>
+                    <div class="terminal">
+                        <div class="term-header">🔶 TERMINAL</div>
+                        <pre class="term-output" id="term"><span class="info">⏳ Cargando Python...</span></pre>
+                    </div>
+                    <div class="status-bar">
+                        <span>🐍 principal</span>
+                        <span>Ln 1, Col 1</span>
+                        <span>Python 3.11</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-msg" id="success">
+            <h3>🎉 ¡Felicitaciones!</h3>
+            <p>Has ejecutado tu primer programa Python</p>
+            <p style="margin-top:8px; color:#60cdff;">¡Subcategoría completada!</p>
         </div>
     </div>
-    <script src="../../src/js/pyodide-loader.js"></script>
-    <script src="../../src/js/simulator-editor.js"></script>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-vscode" onclick="abrirVentana('vscode')">📊</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶 🔋</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">20/4/2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../simulacion-core.js"></script>
     <script>
-        const levelConfig = {
-            explanation: '<h3>Escribe "Hola Mundo"</h3><p>Usa <code>print("Hola Mundo")</code></p>',
-            initialCode: '# Tu primer programa\nprint("Hola Mundo")',
-            totalSteps: 1, startStep: 1,
-            steps: [{ title: 'Hola Mundo', code: 'print("Hola Mundo")', type: 'exact', expected: 'Hola Mundo', successMessage: 'Felicitaciones! Has escrito "Hola Mundo"', hint: 'Usa print("Hola Mundo")' }],
-            completionMessage: 'Felicitaciones! Has completado el Nivel 3 - IDE e Interprete'
-        };
-        function onLevelComplete() { }
-        function goToLevel(d) { window.location.href = d === 'prev' ? 'ide-2.html' : '../variables/variables-1.html'; }
-        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+        let pyReady = false;
+        let py = null;
+        let done = false;
+        let tourStep = 0;
+
+        async function loadPy() {
+            try {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+                document.head.appendChild(s);
+                s.onload = async () => {
+                    py = await window.loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'});
+                    pyReady = true;
+                    document.getElementById('term').textContent = '✅ Python listo\\n\\n📝 Escribe: print("¡Hola, Mundo!")\\nPresiona F5 para ejecutar';
+                };
+            } catch(e) {
+                document.getElementById('term').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function startSim() {
+            console.log('startSim called');
+            
+            // Ocultar botón comenzar
+            const btn = document.querySelector('.btn-comenzar');
+            if(btn) {
+                btn.style.display = 'none';
+            }
+            
+            // Ocultar intro
+            document.getElementById('intro').style.display = 'none';
+            
+            // Abrir VS Code
+            const ventana = document.getElementById('ventana-vscode');
+            console.log('ventana found:', !!ventana);
+            
+            if(ventana) {
+                ventana.style.display = 'flex';
+                ventana.classList.add('visible');
+                console.log('ventana display set to flex');
+            }
+            
+            // Agregar taskbar activo
+            const taskbar = document.getElementById('taskbar-vscode');
+            if(taskbar) {
+                taskbar.classList.add('active');
+            }
+            
+            loadPy();
+            setTimeout(() => showTourStep(1), 800);
+        }
+
+        function showTourStep(num) {
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            const current = document.getElementById('tour-' + num);
+            if(current) {
+                current.style.display = 'block';
+                tourStep = num;
+                window.tourTimeout = setTimeout(() => nextTourStep(), 5000);
+            }
+        }
+
+        function nextTourStep() {
+            clearTimeout(window.tourTimeout);
+            if(tourStep < 4) {
+                showTourStep(tourStep + 1);
+            } else {
+                skipTour();
+                setTimeout(() => autoNext(), 500);
+            }
+        }
+
+        function skipTour() {
+            clearTimeout(window.tourTimeout);
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            tourStep = 0;
+        }
+
+        async function autoNext() {
+            document.getElementById('success').style.display = 'block';
+            if(window.parent && window.parent.completarNivelYAvanzar) {
+                try { await window.parent.completarNivelYAvanzar(); }
+                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            } else {
+                setTimeout(() => window.parent.location.reload(), 2500);
+            }
+        }
+
+        function updateLines() {
+            const c = document.getElementById('code');
+            const n = c.value.split('\n').length;
+            let l = '';
+            for(let i=1; i<=n; i++) l += i + '\n';
+            document.getElementById('lines').innerHTML = l;
+        }
+
+        function syncScroll() {
+            const c = document.getElementById('code');
+            document.getElementById('lines').scrollTop = c.scrollTop;
+        }
+
+        async function runCode() {
+            const code = document.getElementById('code').value;
+            const term = document.getElementById('term');
+            
+            if(!code.trim()) { term.innerHTML = '<span class="error">✏️ Escribe código</span>'; return; }
+            if(!pyReady) { term.innerHTML = '<span class="info">⏳ Cargando...</span>'; return; }
+            
+            term.textContent = '🔄 Ejecutando...\n';
+            
+            try {
+                py.runPython('import sys\nfrom io import StringIO\nsys.stdout = StringIO()');
+                py.runPython(code);
+                const res = py.runPython('sys.stdout.getvalue()');
+                term.textContent = res || '(sin output)';
+                
+                // Verificar que contiene "Hola"
+                if(!done && (res.includes('Hola') || res.includes('Mundo'))) {
+                    done = true;
+                    term.textContent += '\n\n🎉 ¡Tu primer programa!';
+                    setTimeout(() => autoNext(), 1200);
+                }
+            } catch(e) {
+                term.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function newFile() { document.getElementById('term').textContent = '📄 Nuevo archivo'; }
+        function openFile() { document.getElementById('term').textContent = '📂 Abrir archivo'; }
+        function resetCode() { 
+            document.getElementById('code').value = 'print("¡Hola, Mundo!")'; 
+            updateLines(); 
+            document.getElementById('term').textContent = '✅ Código reiniciado';
+        }
+
+        function onVentanaAbierta(t) {}
+        function onVentanaCerrada(t) {}
+
+        document.getElementById('code').addEventListener('input', updateLines);
+        document.getElementById('code').addEventListener('scroll', syncScroll);
+        document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });
     </script>
 </body>
 </html>
