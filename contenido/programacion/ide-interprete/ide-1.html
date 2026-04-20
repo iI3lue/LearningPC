@@ -3,195 +3,686 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Que es un IDE? - LearningPC</title>
-    <link rel="stylesheet" href="../../src/css/styles.css">
+    <title>¿Qué es un IDE? - LearningPC</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <link rel="stylesheet" href="../../trucos-dividir-pantalla.css">
     <style>
-        .simulator-editor {
-            background: var(--bg-secondary);
+        .intro-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
             border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 28px 36px;
+            max-width: 600px;
+            margin: 30px auto;
+            text-align: center;
         }
-        .step-indicator {
-            background: var(--accent-solid);
-            color: white;
-            padding: 10px 20px;
+        
+        .intro-panel h2 { color: #47A1EB; font-size: 22px; margin-bottom: 16px; }
+        .intro-panel .subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
+        .intro-panel p { color: #aaa; font-size: 13px; line-height: 1.7; margin-bottom: 12px; text-align: left; }
+        
+        .intro-panel .concepto {
+            background: #252526;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+        }
+        
+        .intro-panel .concepto h3 { color: #60cdff; font-size: 14px; margin-bottom: 10px; }
+        .intro-panel .concepto ul { margin: 0; padding-left: 18px; }
+        .intro-panel .concepto li { color: #ccc; font-size: 13px; margin-bottom: 6px; }
+        
+        .intro-panel .diferencia {
+            background: rgba(71, 161, 235, 0.1);
+            border: 1px solid #47A1EB;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+        }
+        
+        .intro-panel .diferencia h3 { color: #47A1EB; font-size: 14px; margin-bottom: 10px; }
+        .intro-panel .diferencia p { margin: 0; }
+        .intro-panel strong { color: #fff; }
+        .intro-panel code { background: #333; padding: 2px 6px; border-radius: 3px; color: #f472b6; font-family: 'Consolas', monospace; }
+
+        .btn-comenzar {
+            background: #0067c0;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn-comenzar:hover { background: #0078d4; }
+
+        .vscode-window {
+            width: 800px;
+            height: 520px;
+            background: #1e1e1e;
+            border: 1px solid #3d3d3d;
             border-radius: 8px;
-            margin-bottom: 15px;
-            font-weight: bold;
         }
-        .editor-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+
+        .vscode-window.visible {
+            display: flex !important;
         }
-        .explanation {
-            background: var(--bg-primary);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            line-height: 1.6;
+
+        /* Make sure base ventana visible also works */
+        .ventana.visible {
+            display: flex !important;
         }
-        .code-editor-wrapper {
+
+        .vscode-window .title-bar { background: #323232; }
+        
+        .vscode-window .menu-bar {
+            background: #3c3c3c;
+            padding: 6px 12px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .vscode-window .menu-item {
+            color: #cccccc;
+            font-size: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        .vscode-window .menu-item:hover { background: #4d4d4d; }
+
+        .vscode-window .toolbar {
+            background: #252526;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #3d3d3d;
+        }
+
+        .vscode-window .toolbar-btn {
+            background: #3d3d3d;
+            color: #ccc;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .vscode-window .toolbar-btn:hover { background: #4d4d4d; }
+        .vscode-window .toolbar-btn.run { background: #16a34a; color: white; }
+        .vscode-window .toolbar-btn.run:hover { background: #15803d; }
+
+        .vscode-window .main-area {
+            display: flex;
+            flex: 1;
+            background: #1e1e1e;
+        }
+
+        .vscode-window .explorer {
+            width: 180px;
+            background: #252526;
+            border-right: 1px solid #3d3d3d;
+        }
+
+        .vscode-window .explorer-title {
+            color: #858585;
+            font-size: 11px;
+            padding: 8px 12px;
+            text-transform: uppercase;
+        }
+
+        .vscode-window .file-item {
+            color: #d4d4d4;
+            padding: 6px 12px 6px 24px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .vscode-window .file-item:hover { background: #2a2d2e; }
+        .vscode-window .file-item.active { background: #37373d; }
+
+        .vscode-window .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vscode-window .tabs {
+            display: flex;
+            background: #2d2d2d;
+        }
+
+        .vscode-window .tab {
+            background: #2d2d2d;
+            color: #969696;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-right: 1px solid #1e1e1e;
+        }
+
+        .vscode-window .tab.active {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        .vscode-window .code-wrapper {
+            flex: 1;
             display: flex;
             background: #1e1e1e;
-            border-radius: 8px;
-            overflow: hidden;
+            overflow: auto;
         }
-        .line-numbers {
-            background: #2d2d2d;
-            color: #858585;
-            padding: 10px 5px;
+
+        .vscode-window .line-nums {
+            background: #1e1e1e;
+            color: #5a5a5a;
+            padding: 10px 8px;
             text-align: right;
-            font-family: monospace;
-            font-size: 14px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
             line-height: 1.5;
             user-select: none;
         }
-        .code-editor {
+
+        .vscode-window .code-input {
             flex: 1;
             background: #1e1e1e;
             color: #d4d4d4;
             border: none;
             padding: 10px;
-            font-family: monospace;
-            font-size: 14px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
             line-height: 1.5;
             resize: none;
             outline: none;
         }
-        .editor-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
+
+        .vscode-window .terminal {
+            background: #0d0d0d;
+            border-top: 1px solid #3d3d3d;
+            min-height: 80px;
         }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--elevation-2);
-        }
-        .btn-primary {
-            background: var(--accent-solid);
-            color: white;
-        }
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-color);
-        }
-        .output-panel {
+
+        .vscode-window .term-header {
             background: #1e1e1e;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .output-header {
-            background: #2d2d2d;
             color: #858585;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 11px;
+            padding: 4px 12px;
         }
-        .btn-clear {
-            background: transparent;
-            border: none;
-            color: #858585;
-            cursor: pointer;
-        }
-        .code-output {
-            color: #10b981;
-            font-family: monospace;
-            font-size: 14px;
-            padding: 15px;
-            margin: 0;
-            min-height: 200px;
-            max-height: 300px;
-            overflow: auto;
+
+        .vscode-window .term-output {
+            color: #22c55e;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            padding: 8px 12px;
             white-space: pre-wrap;
         }
-        .feedback {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
+
+        .vscode-window .term-output.error { color: #f87171; }
+        .vscode-window .term-output.info { color: #fbbf24; }
+
+        .vscode-window .status-bar {
+            background: #007acc;
+            color: white;
+            font-size: 12px;
+            padding: 3px 12px;
+            display: flex;
+            justify-content: space-between;
         }
-        .feedback.success { background: #d1fae5; color: #065f46; }
-        .feedback.error { background: #fee2e2; color: #991b1b; }
-        .feedback.warning { background: #fef3c7; color: #92400e; }
-        .feedback.info { background: #dbeafe; color: #1e40af; }
+
+        .success-msg {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 20px 32px;
+            z-index: 300;
+            display: none;
+            text-align: center;
+        }
+
+        .success-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
+        .success-msg p { color: #ccc; font-size: 13px; margin: 0; }
+
+        /* Tour Popup */
+        .tour-popup {
+            position: fixed;
+            background: #323233;
+            border: 1px solid #454545;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 320px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 400;
+            display: none;
+            display: none;
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tour-popup .tour-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tour-popup .tour-icon {
+            font-size: 24px;
+        }
+
+        .tour-popup .tour-title {
+            color: #60cdff;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .tour-popup .tour-step {
+            background: #0078d4;
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .tour-popup .tour-content {
+            color: #cccccc;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .tour-popup .tour-content code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #f472b6;
+            font-family: 'Consolas', monospace;
+        }
+
+        .tour-popup .tour-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .tour-popup .tour-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+        }
+
+        .tour-popup .tour-btn.next {
+            background: #0078d4;
+            color: white;
+        }
+
+        .tour-popup .tour-btn.next:hover {
+            background: #1084d8;
+        }
+
+        .tour-popup .tour-btn.skip {
+            background: transparent;
+            color: #888;
+            border: 1px solid #555;
+        }
+
+        .tour-popup .tour-btn.skip:hover {
+            background: #404040;
+            color: #ccc;
+        }
+
+        /* Posiciones del tour */
+        .tour-popup.explorer-pos { top: 120px; left: 80px; }
+        .tour-popup.editor-pos { top: 180px; left: 280px; }
+        .tour-popup.terminal-pos { top: 380px; left: 280px; }
+        .tour-popup.toolbar-pos { top: 80px; left: 280px; }
+
+        .tour-highlight {
+            box-shadow: 0 0 0 3px #0078d4, 0 0 20px rgba(0,120,212,0.4);
+            position: relative;
+            z-index: 350;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Nivel 1: Qu&eacute; es un IDE?</h1>
-        
-        <div class="explanation">
-            <h2>Que es un IDE?</h2>
-            <p>Un <strong>IDE</strong> (Entorno de Desarrollo Integrado) es un programa que te ayuda a escribir codigo.</p>
-            <p>Un IDE tiene:</p>
-            <ul>
-                <li><strong>Editor de texto</strong> - donde escribes tu codigo</li>
-                <li><strong>Intérprete/Compilador</strong> - que ejecuta tu codigo</li>
-                <li><strong>Depurador</strong> - para encontrar errores</li>
-            </ul>
-            <p>En este IDE simulado, puedes escribir codigo Python y verlo ejecutarse.</p>
+    <div class="desktop">
+        <!-- Intro Panel -->
+        <div class="intro-panel" id="intro">
+            <h2>🤖 ¿Qué es un IDE?</h2>
+            <p class="subtitle">Visual Studio Code - El entorno de desarrollo más popular</p>
+            
+            <div class="concepto">
+                <h3>📝 IDE = Entorno de Desarrollo Integrado</h3>
+                <p>Un IDE es un programa que agrupa varias herramientas:</p>
+                <ul>
+                    <li><strong>Editor de código</strong> - Escribes tu código con resaltado de sintaxis</li>
+                    <li><strong>Intérprete/Compilador</strong> - Traduce y ejecuta tu código</li>
+                    <li><strong>Depurador</strong> - Encuentra y corrige errores</li>
+                    <li><strong>Autocompletado</strong> - Sugiere código mientras escribes</li>
+                </ul>
+            </div>
+            
+            <div class="diferencia">
+                <h3>⚙️ IDE vs Intérprete</h3>
+                <p><strong>Intérprete</strong> solo ejecuta código (como Python en consola).</p>
+                <p><strong>IDE</strong> = Editor + Intérprete + Depurador + Más herramientas.</p>
+            </div>
+            
+            <p>Vamos a explorar el IDE y ejecutar tu primer programa Python.</p>
+            <button class="btn-comenzar" onclick="startSim()">Explorar el IDE →</button>
         </div>
-        
-        <div id="simulator-container"></div>
-        
-        <div class="navigation">
-            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
-            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+
+        <!-- Tour Popup -->
+        <div class="tour-popup explorer-pos" id="tour-1">
+            <div class="tour-header">
+                <span class="tour-icon">📁</span>
+                <span class="tour-title">Explorador</span>
+                <span class="tour-step">1/4</span>
+            </div>
+            <div class="tour-content">
+                Aquí ves los archivos de tu proyecto.<br>
+                <code>hola.py</code> es tu archivo principal.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup editor-pos" id="tour-2">
+            <div class="tour-header">
+                <span class="tour-icon">📝</span>
+                <span class="tour-title">Editor de Código</span>
+                <span class="tour-step">2/4</span>
+            </div>
+            <div class="tour-content">
+                Escribe tu código Python aquí.<br>
+                Verás los números de línea a la izquierda.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup terminal-pos" id="tour-3">
+            <div class="tour-header">
+                <span class="tour-icon">🔶</span>
+                <span class="tour-title">Terminal</span>
+                <span class="tour-step">3/4</span>
+            </div>
+            <div class="tour-content">
+                Aquí ves el resultado de tu código.<br>
+                Los errores aparecen en rojo.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup toolbar-pos" id="tour-4">
+            <div class="tour-header">
+                <span class="tour-icon">▶</span>
+                <span class="tour-title">Ejecutar Código</span>
+                <span class="tour-step">4/4</span>
+            </div>
+            <div class="tour-content">
+                Presiona <code>F5</code> o haz click en "Ejecutar"<br>
+                paraRun tu código Python.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">¡Listo! →</button>
+            </div>
+        </div>
+
+        <!-- VS Code Window -->
+        <div id="ventana-vscode" class="ventana vscode-window" style="display:none; width:800px; height:520px; left:50px; top:30px;">
+            <div class="title-bar">
+                <div class="icono">📊</div>
+                <span class="titulo">Visual Studio Code - hola.py</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('vscode')">─</div>
+                    <div class="window-btn" onclick="maximizarVentana('vscode')">□</div>
+                    <div class="window-btn close" onclick="cerrarVentana('vscode')">×</div>
+                </div>
+            </div>
+            
+            <div class="menu-bar">
+                <span class="menu-item">Archivo</span>
+                <span class="menu-item">Editar</span>
+                <span class="menu-item">Ver</span>
+                <span class="menu-item">Terminal</span>
+                <span class="menu-item">Ayuda</span>
+            </div>
+            
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="newFile()">📄 Nuevo</button>
+                <button class="toolbar-btn" onclick="openFile()">📂 Abrir</button>
+                <button class="toolbar-btn run" onclick="runCode()">▶ Ejecutar (F5)</button>
+                <button class="toolbar-btn" onclick="resetCode()">↻ Reiniciar</button>
+            </div>
+            
+            <div class="main-area">
+                <div class="explorer">
+                    <div class="explorer-title">Explorador</div>
+                    <div class="file-item active">🐍 hola.py</div>
+                    <div class="file-item">📄 main.py</div>
+                    <div class="file-item">📄 utils.py</div>
+                </div>
+                
+                <div class="editor-area">
+                    <div class="tabs">
+                        <div class="tab active">🐍 hola.py ×</div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="line-nums" id="lines">1</div>
+                        <textarea class="code-input" id="code" spellcheck="false">print("¡Hola, Mundo!")</textarea>
+                    </div>
+                    <div class="terminal">
+                        <div class="term-header">🔶 TERMINAL</div>
+                        <pre class="term-output" id="term"><span class="info">⏳ Cargando Python...</span></pre>
+                    </div>
+                    <div class="status-bar">
+                        <span>🐍 principal</span>
+                        <span>Ln 1, Col 1</span>
+                        <span>Python 3.11</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-msg" id="success">
+            <h3>🎉 ¡Nivel completado!</h3>
+            <p>Avanzando al siguiente nivel...</p>
         </div>
     </div>
-    
-    <script src="../../src/js/pyodide-loader.js"></script>
-    <script src="../../src/js/simulator-editor.js"></script>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-vscode" onclick="abrirVentana('vscode')">📊</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶 🔋</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">20/4/2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../simulacion-core.js"></script>
     <script>
-        // Configuracion del nivel
-        const levelConfig = {
-            explanation: '<h3>Tu primer programa</h3><p>Escribe <code>print("Hola")</code> y presiona "Ejecutar" para ver la salida.</p>',
-            initialCode: '# Escribe tu codigo aqui\nprint("Hola")',
-            totalSteps: 1,
-            startStep: 1,
-            steps: [
-                {
-                    title: 'Ejecutar print("Hola")',
-                    code: 'print("Hola")',
-                    type: 'exact',
-                    expected: 'Hola',
-                    successMessage: 'Perfecto! Has ejecutado tu primer programa Python.',
-                    hint: 'Usa print("Hola") con comillas'
+        let pyReady = false;
+        let py = null;
+        let done = false;
+        let tourStep = 0;
+
+        async function loadPy() {
+            try {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+                document.head.appendChild(s);
+                s.onload = async () => {
+                    py = await window.loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'});
+                    pyReady = true;
+                    document.getElementById('term').textContent = '✅ Python listo\\nPresiona F5 o Ejecutar';
+                };
+            } catch(e) {
+                document.getElementById('term').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function startSim() {
+            console.log('startSim called');
+            document.getElementById('intro').style.display = 'none';
+            
+            const ventana = document.getElementById('ventana-vscode');
+            const taskbar = document.getElementById('taskbar-vscode');
+            
+            // Force show
+            ventana.classList.add('visible');
+            ventana.style.display = 'flex';
+            taskbar.classList.add('active');
+            
+            console.log('ventana visible:', ventana.style.display);
+            
+            console.log('calling loadPy');
+            loadPy();
+            // Iniciar tour después de 800ms
+            setTimeout(() => showTourStep(1), 800);
+        }
+
+        function showTourStep(num) {
+            // Ocultar todos los popups
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            
+            // Mostrar popup actual
+            const current = document.getElementById('tour-' + num);
+            if(current) {
+                current.style.display = 'block';
+                tourStep = num;
+                
+                // Auto avanzar después de 5 segundos si no hay interacción
+                window.tourTimeout = setTimeout(() => {
+                    nextTourStep();
+                }, 5000);
+            }
+        }
+
+        function nextTourStep() {
+            clearTimeout(window.tourTimeout);
+            if(tourStep < 4) {
+                showTourStep(tourStep + 1);
+            } else {
+                skipTour();
+                setTimeout(() => autoNext(), 500);
+            }
+        }
+
+function skipTour() {
+            clearTimeout(window.tourTimeout);
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            tourStep = 0;
+        }
+
+        async function autoNext() {
+            document.getElementById('success').style.display = 'block';
+            if(window.parent && window.parent.completarNivelYAvanzar) {
+                try { await window.parent.completarNivelYAvanzar(); } 
+                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            } else {
+                setTimeout(() => window.parent.location.reload(), 2500);
+            }
+        }
+
+        function updateLines() {
+            const c = document.getElementById('code');
+            const n = c.value.split('\\n').length;
+            let l = '';
+            for(let i=1; i<=n; i++) l += i + '\\n';
+            document.getElementById('lines').textContent = l;
+        }
+
+        function syncScroll() {
+            const c = document.getElementById('code');
+            document.getElementById('lines').scrollTop = c.scrollTop;
+        }
+
+        async function runCode() {
+            const code = document.getElementById('code').value;
+            const term = document.getElementById('term');
+            
+            if(!code.trim()) { term.innerHTML = '<span class="error">✏️ Escribe código</span>'; return; }
+            if(!pyReady) { term.innerHTML = '<span class="info">⏳ Cargando...</span>'; return; }
+            
+            term.textContent = '🔄 Ejecutando...\\n';
+            
+            try {
+                py.runPython('import sys\\nfrom io import StringIO\\nsys.stdout = StringIO()');
+                py.runPython(code);
+                const res = py.runPython('sys.stdout.getvalue()');
+                term.textContent = res || '(sin output)';
+                
+                if(!done && (res.includes('Hola') || res.includes('Mundo'))) {
+                    done = true;
+                    term.textContent += '\\n\\n✅ ¡Correcto!';
+                    setTimeout(() => autoNext(), 1000);
                 }
-            ],
-            completionMessage: 'Felicitaciones! Has completado el Nivel 1: Que es un IDE?'
-        };
-        
-        function onLevelComplete() {
-            // Nivel completado
+            } catch(e) {
+                term.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
         }
-        
-        function goToLevel(direction) {
-            window.location.href = 'ide-2.html';
+
+        async function autoNext() {
+            document.getElementById('success').style.display = 'block';
+            if(window.parent && window.parent.completarNivelYAvanzar) {
+                try { await window.parent.completarNivelYAvanzar(); } 
+                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            } else {
+                setTimeout(() => window.parent.location.reload(), 2500);
+            }
         }
-        
-        // Inicializar cuando el DOM este listo
-        document.addEventListener('DOMContentLoaded', function() {
-            initSimulatorEditor(levelConfig);
-        });
+
+        function newFile() { document.getElementById('term').textContent = '📄 Nuevo archivo'; }
+        function openFile() { document.getElementById('term').textContent = '📂 Abrir archivo'; }
+        function resetCode() { document.getElementById('code').value = 'print("¡Hola, Mundo!")'; updateLines(); }
+
+        function onVentanaAbierta(t) {}
+        function onVentanaCerrada(t) {}
+
+        document.getElementById('code').addEventListener('input', updateLines);
+        document.getElementById('code').addEventListener('scroll', syncScroll);
+        document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });
     </script>
 </body>
 </html>

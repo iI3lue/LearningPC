@@ -6,11 +6,12 @@
 :root {
     /* Tema Light Microsoft */
     --bg-color: #FFFFFF;
-    --sidebar-bg: #F3F4F6;
+    --sidebar-bg: #F8F9FA;
     --text-color: #1F2937;
+    --text-secondary: #6B7280;
     --accent-pastel: #D1E8FF;
     --accent-solid: #0078D4; /* Azul Microsoft */
-    --border-color: rgba(0, 0, 0, 0.1);
+    --border-color: rgba(0, 0, 0, 0.25);
     --hover-bg: #E5E7EB;
     --active-indicator: #0078D4;
     --input-bg: #FFFFFF;
@@ -34,15 +35,15 @@
 
     /* Elevations (Fluent depth) */
     --elevation-0: none;
-    --elevation-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
-    --elevation-2: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
-    --elevation-3: 0 8px 16px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08);
-    --elevation-4: 0 16px 32px rgba(0,0,0,0.16), 0 8px 16px rgba(0,0,0,0.08);
+    --elevation-1: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --elevation-2: 0 4px 8px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    --elevation-3: 0 8px 16px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06);
+    --elevation-4: 0 16px 32px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
 
     /* Borders */
-    --border-subtle: 1px solid rgba(0,0,0,0.04);
-    --border-weak: 1px solid rgba(0,0,0,0.08);
-    --border-strong: 1px solid rgba(0,0,0,0.12);
+    --border-subtle: 1px solid rgba(0,0,0,0.10);
+    --border-weak: 1px solid rgba(0,0,0,0.15);
+    --border-strong: 1px solid rgba(0,0,0,0.25);
 
     /* Category icon backgrounds */
     --cat-office-bg: rgba(0, 120, 212, 0.12);
@@ -65,9 +66,10 @@
     --bg-color: #1F1F1F;
     --sidebar-bg: #2D2D2D;
     --text-color: #F9FAFB;
+    --text-secondary: #9CA3AF;
     --accent-pastel: #374151;
     --accent-solid: #47A1EB;
-    --border-color: rgba(255, 255, 255, 0.12);
+    --border-color: rgba(255, 255, 255, 0.15);
     --hover-bg: #3F3F46;
     --active-indicator: #47A1EB;
     --input-bg: #252525;
@@ -854,8 +856,7 @@ button:active {
 
 .stat-label {
     font-size: 11px;
-    color: var(--text-color);
-    opacity: 0.7;
+    color: var(--text-secondary);
     margin-top: 4px;
 }
 
@@ -966,28 +967,31 @@ button:active {
 
 .header-actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
     margin-top: auto;
-    padding-top: 24px;
+    padding-top: 16px;
     border-top: 1px solid var(--border-color);
 }
 
 .header-btn {
-    flex: 1;
     padding: 12px;
     background: var(--bg-color);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     color: var(--text-color);
     transition: background var(--duration-fast) var(--ease-fluent),
                 border-color var(--duration-fast) var(--ease-fluent),
                 transform var(--duration-fast) var(--ease-fluent);
+}
+
+.header-btn svg {
+    width: 22px;
+    height: 22px;
 }
 
 .header-btn:hover {
@@ -1171,7 +1175,7 @@ button:active {
     display: flex;
     flex-direction: column;
     background: var(--bg-color);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
     border-top: 3px solid var(--accent-solid);
     border-radius: 8px;
     box-shadow: var(--elevation-1);
@@ -1221,8 +1225,7 @@ button:active {
 .categoria-progreso {
     margin-left: auto;
     font-size: 13px;
-    color: var(--text-color);
-    opacity: 0.7;
+    color: var(--text-secondary);
 }
 
 .categoria-progress-bar {

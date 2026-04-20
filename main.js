@@ -66,20 +66,25 @@ app.whenReady().then(() => {
             'trucos-botones-control.html': 'contenido/trucos-botones-control.html',
             'trucos-dividir-pantalla.html':'contenido/trucos-dividir-pantalla.html',
         };
-        const niveles = db.prepare(
-            "SELECT id_nivel, ruta_archivo FROM niveles WHERE ruta_archivo IS NOT NULL AND ruta_archivo != ''"
-        ).all();
+        
+        const niveles = db.prepare("SELECT id_nivel, ruta_archivo FROM niveles").all();
+        console.log(`[DB] Verificando ${niveles.length} niveles...`);
+        
         for (const nivel of niveles) {
-            const nombreArchivo = nivel.ruta_archivo.split('/').pop();
+            const rutaActual = nivel.ruta_archivo || '';
+            const nombreArchivo = rutaActual.replace(/\\/g, '/').split('/').pop();
             const rutaCorrecta = rutasCorrectas[nombreArchivo];
-            if (rutaCorrecta && nivel.ruta_archivo !== rutaCorrecta) {
+            
+            console.log(`[DB] Nivel ID ${nivel.id_nivel}: Archivo="${nombreArchivo}", Actual="${rutaActual}", Esperada="${rutaCorrecta}"`);
+            
+            if (rutaCorrecta && rutaActual !== rutaCorrecta) {
                 db.prepare('UPDATE niveles SET ruta_archivo = ? WHERE id_nivel = ?')
                     .run(rutaCorrecta, nivel.id_nivel);
-                console.log(`[DB] Ruta restaurada: ${nivel.ruta_archivo} → ${rutaCorrecta}`);
+                console.log(`[DB] ✅ Ruta corregida para ID ${nivel.id_nivel}: ${rutaCorrecta}`);
             }
         }
     } catch (e) {
-        console.log('[DB] Sin rutas que restaurar:', e.message);
+        console.error('[DB] ❌ Error en migración de rutas:', e.message);
     }
 
     createWindow();

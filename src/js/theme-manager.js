@@ -19,11 +19,8 @@ function toggleTheme() {
 }
 
 function updateThemeButtonUI(theme) {
-    // Buscar todos los botones de tema
-    const buttons = document.querySelectorAll('#btn-toggle-theme');
-    buttons.forEach(btn => {
-        btn.textContent = theme === 'light' ? 'Modo Oscuro' : 'Modo Claro';
-    });
+    // Ya no necesita actualizar texto porque los botones ahora son solo iconos
+    // Los iconos SVG ya están definidos en los HTMLs correspondientes
 }
 
 // Inicializar cuando el DOM esté listo

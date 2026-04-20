@@ -72,6 +72,144 @@
             display: flex !important;
         }
 
+        /* VSCode Window Styles */
+        .vscode-window .title-bar { background: #323232; }
+        .vscode-window .menu-bar {
+            background: #3c3c3c;
+            padding: 6px 12px;
+            display: flex;
+            gap: 16px;
+        }
+        .vscode-window .menu-item {
+            color: #cccccc;
+            font-size: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .vscode-window .menu-item:hover { background: #4d4d4d; }
+        .vscode-window .toolbar {
+            background: #252526;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        .vscode-window .toolbar-btn {
+            background: #3d3d3d;
+            color: #ccc;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .vscode-window .toolbar-btn:hover { background: #4d4d4d; }
+        .vscode-window .toolbar-btn.run { background: #16a34a; color: white; }
+        .vscode-window .toolbar-btn.run:hover { background: #15803d; }
+        .vscode-window .main-area {
+            display: flex;
+            flex: 1;
+            background: #1e1e1e;
+        }
+        .vscode-window .explorer {
+            width: 180px;
+            background: #252526;
+            border-right: 1px solid #3d3d3d;
+        }
+        .vscode-window .explorer-title {
+            color: #858585;
+            font-size: 11px;
+            padding: 8px 12px;
+            text-transform: uppercase;
+        }
+        .vscode-window .file-item {
+            color: #d4d4d4;
+            padding: 6px 12px 6px 24px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .vscode-window .file-item:hover { background: #2a2d2e; }
+        .vscode-window .file-item.active { background: #37373d; }
+        .vscode-window .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .vscode-window .tabs {
+            display: flex;
+            background: #2d2d2d;
+        }
+        .vscode-window .tab {
+            background: #2d2d2d;
+            color: #969696;
+            padding: 8px 16px;
+            font-size: 13px;
+            border-right: 1px solid #1e1e1e;
+        }
+        .vscode-window .tab.active {
+            background: #1e1e1e;
+            color: #fff;
+        }
+        .vscode-window .code-wrapper {
+            flex: 1;
+            display: flex;
+            background: #1e1e1e;
+            overflow: auto;
+        }
+        .vscode-window .line-nums {
+            background: #1e1e1e;
+            color: #5a5a5a;
+            padding: 10px 8px;
+            text-align: right;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            user-select: none;
+        }
+        .vscode-window .code-input {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+        .vscode-window .terminal {
+            background: #0d0d0d;
+            border-top: 1px solid #3d3d3d;
+            min-height: 80px;
+        }
+        .vscode-window .term-header {
+            background: #1e1e1e;
+            color: #858585;
+            font-size: 11px;
+            padding: 4px 12px;
+        }
+        .vscode-window .term-output {
+            color: #22c55e;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            padding: 8px 12px;
+            white-space: pre-wrap;
+        }
+        .vscode-window .term-output.error { color: #f87171; }
+        .vscode-window .term-output.info { color: #fbbf24; }
+        .vscode-window .status-bar {
+            background: #007acc;
+            color: white;
+            font-size: 12px;
+            padding: 3px 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
         /* Tour Popup */
         .tour-popup {
             position: fixed;
@@ -163,10 +301,10 @@
             color: #ccc;
         }
 
-        .tour-popup.explorer-pos { top: 120px; left: 80px; }
-        .tour-popup.editor-pos { top: 180px; left: 280px; }
-        .tour-popup.terminal-pos { top: 380px; left: 280px; }
-        .tour-popup.toolbar-pos { top: 80px; left: 280px; }
+        .tour-popup.explorer-pos { top: 120px; right: 30px; }
+        .tour-popup.editor-pos { top: 180px; right: 30px; }
+        .tour-popup.terminal-pos { top: 320px; right: 30px; }
+        .tour-popup.toolbar-pos { top: 30px; right: 30px; }
 
         .success-msg {
             position: fixed;
@@ -230,8 +368,9 @@
                 <span class="tour-step">2/4</span>
             </div>
             <div class="tour-content">
-                Escribe tu programa:<br>
-                <code>print("¡Hola, Mundo!")</code>
+                Escribe en el editor:<br>
+                <code>print("¡Hola, Mundo!")</code><br>
+                <span style="color:#888;font-size:12px;">Luego haz clic en Siguiente</span>
             </div>
             <div class="tour-actions">
                 <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
@@ -311,7 +450,7 @@
                     </div>
                     <div class="code-wrapper">
                         <div class="line-nums" id="lines">1</div>
-                        <textarea class="code-input" id="code" spellcheck="false">print("¡Hola, Mundo!")</textarea>
+                        <textarea class="code-input" id="code" spellcheck="false" placeholder="Escribe aquí tu código..."></textarea>
                     </div>
                     <div class="terminal">
                         <div class="term-header">🔶 TERMINAL</div>
@@ -349,12 +488,41 @@
         </div>
     </div>
 
-    <script src="../../simulacion-core.js"></script>
+<script src="../../simulacion-core.js"></script>
     <script>
         let pyReady = false;
         let py = null;
         let done = false;
         let tourStep = 0;
+
+        // === MODO STEP-BY-STEP: Solo avanza si completaste la acción ===
+        let pasoCompletado = {
+            1: false, // Explorar archivos
+            2: false, // Escribir código
+            3: false, // Ejecutar código
+            4: false  // Ver verificación
+        };
+
+        function puedeAvanzar(paso) {
+            // Solo puede avanzar si el paso actual está completado
+            if (!pasoCompletado[paso]) {
+                mostrarToastFallo();
+                return false;
+            }
+            return true;
+        }
+
+        function mostrarToastFallo() {
+            const mensajes = [
+                "📁 Explora los archivos primero",
+                "✏️ Escribe el código primero",
+                "▶️ Ejecuta el código primero",
+                "👀 Verifica el resultado primero"
+            ];
+            const msg = mensajes[tourStep - 1] || "Completa esta acción primero";
+            const term = document.getElementById('term');
+            term.innerHTML = '<span class="error">' + msg + '</span>';
+        }
 
         async function loadPy() {
             try {
@@ -364,7 +532,7 @@
                 s.onload = async () => {
                     py = await window.loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'});
                     pyReady = true;
-                    document.getElementById('term').textContent = '✅ Python listo\\n\\n📝 Escribe: print("¡Hola, Mundo!")\\nPresiona F5 para ejecutar';
+                    document.getElementById('term').textContent = '✅ Python listo\n\n📝 Escribe: print("¡Hola, Mundo!")\nPresiona F5 para ejecutar';
                 };
             } catch(e) {
                 document.getElementById('term').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
@@ -412,12 +580,18 @@
             if(current) {
                 current.style.display = 'block';
                 tourStep = num;
-                window.tourTimeout = setTimeout(() => nextTourStep(), 5000);
+                window.tourTimeout = setTimeout(() => nextTourStep(), 8000);
             }
         }
 
         function nextTourStep() {
             clearTimeout(window.tourTimeout);
+            // Validar que el paso actual esté completado ANTES de avanzar
+            if (!puedeAvanzar(tourStep)) {
+                // Mantener el popup actual y dejar que intente de nuevo
+                window.tourTimeout = setTimeout(() => nextTourStep(), 8000);
+                return;
+            }
             if(tourStep < 4) {
                 showTourStep(tourStep + 1);
             } else {
@@ -433,6 +607,10 @@
                 if(popup) popup.style.display = 'none';
             }
             tourStep = 0;
+            // Auto-avanzar si todo completado
+            if(pasoCompletado[1] && pasoCompletado[2] && pasoCompletado[3] && pasoCompletado[4]) {
+                setTimeout(() => autoNext(), 500);
+            }
         }
 
         async function autoNext() {
@@ -462,8 +640,14 @@
             const code = document.getElementById('code').value;
             const term = document.getElementById('term');
             
-            if(!code.trim()) { term.innerHTML = '<span class="error">✏️ Escribe código</span>'; return; }
-            if(!pyReady) { term.innerHTML = '<span class="info">⏳ Cargando...</span>'; return; }
+            if(!code.trim()) { 
+                term.innerHTML = '<span class="error">✏️ Escribe código</span>'; 
+                return;
+            }
+            if(!pyReady) { 
+                term.innerHTML = '<span class="info">⏳ Cargando...</span>'; 
+                return; 
+            }
             
             term.textContent = '🔄 Ejecutando...\n';
             
@@ -473,11 +657,14 @@
                 const res = py.runPython('sys.stdout.getvalue()');
                 term.textContent = res || '(sin output)';
                 
-                // Verificar que contiene "Hola"
+                // Verificar que contiene "Hola" o "Mundo"
                 if(!done && (res.includes('Hola') || res.includes('Mundo'))) {
                     done = true;
+                    pasoCompletado[3] = true; // Código ejecutado correctamente
+                    pasoCompletado[4] = true; // Resultado verificado
                     term.textContent += '\n\n🎉 ¡Tu primer programa!';
-                    setTimeout(() => autoNext(), 1200);
+                    // Ocultar popup y mostrar success
+                    skipTour();
                 }
             } catch(e) {
                 term.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
@@ -495,6 +682,22 @@
         function onVentanaAbierta(t) {}
         function onVentanaCerrada(t) {}
 
+        // === REGISTRAR ACCIONES PARA CADA PASO ===
+        
+        // Paso 1: Click en archivo del explorer
+        document.querySelectorAll('.file-item').forEach(item => {
+            item.addEventListener('click', () => {
+                pasoCompletado[1] = true;
+                document.getElementById('term').textContent = '📁 Archivo seleccionado\nAhora escribe tu código';
+            });
+        });
+
+        // Paso 2: Input en el editor de código
+        document.getElementById('code').addEventListener('input', () => {
+            pasoCompletado[2] = true;
+        });
+
+        // Event listeners básicos
         document.getElementById('code').addEventListener('input', updateLines);
         document.getElementById('code').addEventListener('scroll', syncScroll);
         document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });

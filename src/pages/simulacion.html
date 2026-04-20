@@ -598,6 +598,11 @@ function actualizarUI() {
 
         // Completar nivel
         document.getElementById('btn-completar').onclick = async () => {
+            await completarNivelYAvanzar();
+        };
+
+        // Función para completar nivel desde iframe (auto-completar)
+        async function completarNivelYAvanzar() {
             const usuario = JSON.parse(sessionStorage.getItem('usuario'));
             if (usuario && idNivel) {
                 const resultado = await window.api.marcarNivelCompletado(usuario.id_usuario, parseInt(idNivel));
@@ -618,6 +623,14 @@ function actualizarUI() {
                         }
                     }, 1500);
                 }
+            }
+        }
+
+        // Exponer función global para auto-completar desde iframe
+        window.completarNivelYAvanzar = completarNivelYAvanzar;
+        window.irASiguienteNivel = function() {
+            if (nivelActualIndex < niveles.length - 1) {
+                nivelSiguiente();
             }
         };
 

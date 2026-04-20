@@ -7,6 +7,22 @@ const btnNuevo = document.getElementById('btn-nuevo');
 const btnReportes = document.getElementById('btn-reportes');
 const tituloTabla = document.getElementById('titulo-tabla') || null;
 
+// Función para mostrar toast
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('gestion-toast');
+    const toastMessage = toast ? toast.querySelector('.toast-message') : null;
+    if (!toast || !toastMessage) return;
+    
+    toast.classList.remove('success', 'error', 'info');
+    toast.classList.add(type);
+    toastMessage.textContent = message;
+    toast.classList.add('visible');
+    
+    setTimeout(() => {
+        toast.classList.remove('visible');
+    }, 3000);
+}
+
 // Cargar niveles con nueva estructura
 async function cargarNiveles() {
     try {
@@ -57,12 +73,13 @@ window.eliminarNivel = async (id) => {
         try {
             const result = await window.api.eliminarNivel(id);
             if (result.ok) {
+                showToast('Nivel eliminado exitosamente.', 'success');
                 cargarNiveles();
             } else {
-                alert('Error: ' + result.mensaje);
+                showToast('Error: ' + result.mensaje, 'error');
             }
         } catch (error) {
-            alert('Error al eliminar nivel');
+            showToast('Error al eliminar nivel', 'error');
         }
     }
 };

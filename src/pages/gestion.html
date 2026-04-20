@@ -63,9 +63,9 @@
             <strong style="text-transform: uppercase; letter-spacing: 1px;">ADMINISTRACIÓN DE CONTENIDOS</strong>
         </div>
         <div id="nav-controles">
-            <button id="btn-toggle-theme" class="btn-nav">MODO OSCURO</button>
-            <button id="btn-reportes" class="btn-nav">REPORTES</button>
-            <button id="btn-volver" class="btn-nav">VOLVER</button>
+            <button id="btn-toggle-theme" class="btn-nav" data-tooltip="Cambiar tema claro/oscuro">MODO OSCURO</button>
+            <button id="btn-reportes" class="btn-nav" data-tooltip="Ver reportes del sistema">REPORTES</button>
+            <button id="btn-volver" class="btn-nav" data-tooltip="Volver al dashboard">VOLVER</button>
         </div>
     </header>
 
@@ -89,6 +89,14 @@
             </tbody>
         </table>
     </main>
+
+    <!-- Toast Notification -->
+    <div id="gestion-toast" class="toast-notification">
+        <svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <span class="toast-message" id="toast-message"></span>
+    </div>
 
     <script src="../js/theme-manager.js"></script>
     <script src="../js/gestion.js"></script>

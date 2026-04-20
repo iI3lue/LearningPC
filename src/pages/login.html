@@ -172,13 +172,14 @@
             background: transparent !important;
             border: 1px solid var(--login-border) !important;
             color: var(--login-text-secondary) !important;
-            padding: 6px 12px !important;
-            font-size: 12px !important;
-            font-weight: 500 !important;
+            padding: 8px !important;
             cursor: pointer !important;
-            border-radius: 4px !important;
+            border-radius: 6px !important;
             transition: all 0.15s !important;
             z-index: 100 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #btn-toggle-theme:hover {
@@ -186,13 +187,42 @@
             color: var(--login-text) !important;
         }
 
-        #btn-toggle-theme::before {
-            content: '🌓 ';
-            font-size: 14px;
+        [data-theme="dark"] #btn-toggle-theme {
+            background: transparent !important;
+            border: 1px solid var(--login-border) !important;
+            color: var(--login-text-secondary) !important;
         }
 
+        [data-theme="dark"] #btn-toggle-theme:hover {
+            background: var(--login-border) !important;
+            color: var(--login-text) !important;
+        }
+
+        /* Eliminar pseudo-elementos que ya no se usan */
+        #btn-toggle-theme::before,
         [data-theme="dark"] #btn-toggle-theme::before {
-            content: '☀️ ';
+            display: none !important;
+        }
+
+        /* Recordarme checkbox */
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--login-accent);
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            color: var(--login-text-secondary);
+            cursor: pointer;
         }
 
         /* Responsive */
@@ -207,7 +237,9 @@
 </head>
 <body>
     <main id="login-container">
-        <button id="btn-toggle-theme" title="Cambiar tema">Tema</button>
+        <button id="btn-toggle-theme" title="Cambiar tema">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+        </button>
         
         <h1>Learning PC</h1>
         <h2>Iniciar sesión</h2>
@@ -223,6 +255,11 @@
                 <input type="password" id="contraseña" name="contraseña" placeholder="Ingresa tu contraseña" required />
             </div>
 
+            <div class="remember-me">
+                <input type="checkbox" id="recordarme" name="recordarme" />
+                <label for="recordarme">Recordarme</label>
+            </div>
+
             <p id="error-login"></p>
 
             <button type="submit" id="btn-login">Ingresar</button>
@@ -230,6 +267,14 @@
 
         <p>¿No tienes cuenta?<a href="#" id="link-registro">Regístrate aquí</a></p>
     </main>
+
+    <!-- Toast Notification -->
+    <div id="login-toast" class="toast-notification">
+        <svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <span class="toast-message" id="toast-message"></span>
+    </div>
 
     <script src="../js/theme-manager.js"></script>
     <script src="../js/login.js"></script>

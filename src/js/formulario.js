@@ -7,6 +7,22 @@ const selectSubcategoria = document.getElementById('id_subcategoria');
 const btnCancelar = document.getElementById('btn-cancelar');
 const formTitle = document.getElementById('form-title');
 
+// Función para mostrar toast
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('formulario-toast');
+    const toastMessage = toast ? toast.querySelector('.toast-message') : null;
+    if (!toast || !toastMessage) return;
+    
+    toast.classList.remove('success', 'error', 'info');
+    toast.classList.add(type);
+    toastMessage.textContent = message;
+    toast.classList.add('visible');
+    
+    setTimeout(() => {
+        toast.classList.remove('visible');
+    }, 3000);
+}
+
 // Cargar categorías
 async function cargarCategorias() {
     const categorias = await window.api.getCategorias();
@@ -78,7 +94,7 @@ formNivel.addEventListener('submit', async (e) => {
     // Validar que se seleccione subcategoría
     const idSubcategoria = parseInt(document.getElementById('id_subcategoria').value);
     if (!idSubcategoria) {
-        alert('Por favor selecciona una subcategoría.');
+        showToast('Por favor selecciona una subcategoría.', 'error');
         return;
     }
 
@@ -97,13 +113,13 @@ formNivel.addEventListener('submit', async (e) => {
         const resultado = await window.api.guardarNivel(datos);
 
         if (resultado.ok) {
-            alert('Contenido guardado exitosamente.');
-            window.api.irA('gestion');
+            showToast('Contenido guardado exitosamente.', 'success');
+            setTimeout(() => window.api.irA('gestion'), 1500);
         } else {
-            alert('Error al guardar: ' + resultado.mensaje);
+            showToast('Error al guardar: ' + resultado.mensaje, 'error');
         }
     } catch (error) {
-        alert('Error al guardar: ' + error.message);
+        showToast('Error al guardar: ' + error.message, 'error');
     }
 });
 
