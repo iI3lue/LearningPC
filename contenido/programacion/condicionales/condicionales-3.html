@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Condicionales 3 - LearningPC</title>
+    <link rel="stylesheet" href="../../src/css/styles.css">
+    <style>
+        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; }
+        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; }
+        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; }
+        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: var(--accent-solid); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .output-panel { background: #1e1e1e; border-radius: 8px; }
+        .code-output { color: #10b981; font-family: monospace; padding: 15px; min-height: 200px; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; }
+        .feedback.success { background: #d1fae5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multiples condiciones</h1>
+        <div class="explanation">
+            <h2>elif - multiples opciones</h2>
+            <p>Usa <code>elif</code> para multiples condiciones:</p>
+            <pre>if nota >= 90:
+    print("A")
+elif nota >= 80:
+    print("B")
+else:
+    print("C")</pre>
+        </div>
+        <div id="simulator-container"></div>
+        <div class="navigation">
+            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
+            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+        </div>
+    </div>
+    <script src="../../src/js/pyodide-loader.js"></script>
+    <script src="../../src/js/simulator-editor.js"></script>
+    <script>
+        const levelConfig = {
+            initialCode: '# elif\nnota = 85\nif nota >= 90:\n    print("A")\nelif nota >= 80:\n    print("B")\nelse:\n    print("C")',
+            totalSteps: 1, startStep: 1,
+            steps: [{ type: 'contains', expected: 'B', successMessage: 'elif funciona!', hint: '85 >= 80 es true' }],
+            completionMessage: 'Condicionales completado!'
+        };
+        function goToLevel(d) { window.location.href = d === 'next' ? '../funciones/funciones-1.html' : 'condicionales-2.html'; }
+        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+    </script>
+</body>
+</html>

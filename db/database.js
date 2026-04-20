@@ -127,7 +127,38 @@ function aplicarMigraciones() {
                     ('Office', 'Manejo de herramientas de Microsoft Office', '📎', 1),
                     ('Navegación en Internet', 'Uso del navegador y motores de búsqueda', '🌐', 2),
                     ('Navegación en Windows', 'Uso del sistema operativo Windows', '🪟', 3),
-                    ('Trucos Adicionales', 'Atajos y consejos útiles del computador', '💡', 4);
+                    ('Trucos Adicionales', 'Atajos y consejos útiles del computador', '💡', 4),
+                    ('Programación', 'Introducción a la programación con Python', '💻', 5);
+            `);
+            
+            // Insertar subcategorías de Programación
+            db.exec(`
+                INSERT INTO subcategorias (id_categoria, nombre, descripcion, icono, orden) VALUES
+                (5, 'IDE e Intérprete', 'Conceptos básicos del entorno', '🖥️', 1),
+                (5, 'Variables', 'Almacena y usa datos', '📦', 2),
+                (5, 'Condicionales', 'Toma de decisiones', '🔀', 3),
+                (5, 'Funciones', 'Código reutilizable', '⚡', 4)
+            `);
+            
+            // Insertar niveles de Programación
+            db.exec(`
+                -- IDE e Intérprete
+                INSERT INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
+                (16, '¿Qué es un IDE?', 'Introducción al entorno de desarrollo integrado', 'programacion/ide-interprete/ide-1.html', 1, 1, 10),
+                (16, 'El Intérprete', 'Cómo se ejecuta el código Python', 'programacion/ide-interprete/ide-2.html', 2, 2, 10),
+                (16, 'Tu primer programa', 'Hola Mundo tu primer código', 'programacion/ide-interprete/ide-3.html', 3, 3, 15),
+                -- Variables
+                (17, '¿Qué es una variable?', 'Guardar y usar datos', 'programacion/variables/variables-1.html', 1, 1, 10),
+                (17, 'Tipos de datos', 'str, int, float, bool', 'programacion/variables/variables-2.html', 2, 2, 15),
+                (17, 'Operaciones con tipos', 'Concatenación y conversión', 'programacion/variables/variables-3.html', 3, 3, 15),
+                -- Condicionales
+                (18, 'Decisiones con if', 'Tomar decisiones en código', 'programacion/condicionales/condicionales-1.html', 1, 1, 10),
+                (18, 'Si no, entonces...', 'Usando else', 'programacion/condicionales/condicionales-2.html', 2, 2, 10),
+                (18, 'Múltiples condiciones', 'Usando elif', 'programacion/condicionales/condicionales-3.html', 3, 3, 15),
+                -- Funciones
+                (19, 'Crear funciones', 'Definiendo funciones con def', 'programacion/funciones/funciones-1.html', 1, 1, 10),
+                (19, 'Parámetros', 'Funciones con entradas', 'programacion/funciones/funciones-2.html', 2, 2, 15),
+                (19, 'Retornar valores', 'Funciones con salidas', 'programacion/funciones/funciones-3.html', 3, 3, 15);
             `);
         }
         

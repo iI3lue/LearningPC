@@ -1,35 +1,35 @@
 // home.js - Dashboard Informativo Learning PC
 
 (function() {
-    // Debug inicial
-    const debugPanel = document.getElementById('debug-panel');
-    function log(msg) {
-        console.log(msg);
-        if (debugPanel) {
-            debugPanel.innerHTML += '<div>' + msg + '</div>';
-            debugPanel.style.display = 'block';
-        }
+    // Función para mostrar toast
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('home-toast');
+        const toastMessage = toast ? toast.querySelector('.toast-message') : null;
+        if (!toast || !toastMessage) return;
+        
+        toast.classList.remove('success', 'error', 'info');
+        toast.classList.add(type);
+        toastMessage.textContent = message;
+        toast.classList.add('visible');
+        
+        setTimeout(() => {
+            toast.classList.remove('visible');
+        }, 3000);
     }
-    
-    log('[HOME] Script iniciado');
 
     const usuario = JSON.parse(sessionStorage.getItem('usuario'));
 
     if (!usuario) {
-        log('[HOME] No hay usuario, redirigiendo...');
         window.api.irA('login');
         return;
     }
 
-    log('[HOME] Usuario: ' + usuario.usuario);
-
-    // Función helper para obtener elementos del DOM cuando se necesiten
+    // Función helper para obtener elementos del DOM cuando se necesites
     function getEl(id) {
         const el = document.getElementById(id);
-        if (!el) log('[ERROR] No encontrado: ' + id);
         return el;
     }
-
+    
     // User info - obtener elementos cuando se usen
     const nombreUsuario = getEl('nombre-usuario');
     if (nombreUsuario) nombreUsuario.textContent = usuario.usuario;
@@ -177,19 +177,14 @@
 
     // Render category cards
     function renderCategorias(categoriasData, progresoData, stats) {
-        log('[RENDER] Iniciando render de ' + categoriasData.length + ' categorías');
-        
         const categoriasGrid = getEl('categorias-grid');
         if (!categoriasGrid) {
-            log('[RENDER] ERROR: categoriasGrid es null');
             return;
         }
 
-        log('[RENDER] categoriasGrid encontrado, limpándolo...');
         categoriasGrid.innerHTML = '';
 
         categoriasData.forEach((cat, index) => {
-            log('[RENDER] Renderizando categoría: ' + cat.nombre);
             
             let totalNiveles = 0;
             let completados = 0;
@@ -211,7 +206,7 @@
 
             const card = document.createElement('article');
             card.className = 'categoria-card';
-            card.style.cssText = 'background: var(--sidebar-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 16px;';
+            card.style.cssText = 'background: var(--sidebar-bg); border-radius: 8px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 16px; box-shadow: var(--elevation-1);';
             card.dataset.idCategoria = cat.id_categoria;
 
             let subcategoriasHtml = '';
@@ -221,7 +216,7 @@
                         progresoData.some(p => p.id_nivel === n.id_nivel && p.completado)
                     ).length : 0;
                     const subTotal = sub.niveles ? sub.niveles.length : 0;
-                    return `<li style="padding: 4px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;"><span>${sub.nombre}</span><span style="color: var(--accent-solid);">${subCompletados}/${subTotal}</span></li>`;
+                    return `<li style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; color: var(--text-color);"><span>${sub.nombre}</span><span style="color: var(--accent-solid); font-weight: 600;">${subCompletados}/${subTotal}</span></li>`;
                 }).join('');
             }
 
@@ -234,16 +229,13 @@
                 <div style="height: 6px; background: var(--border-color); border-radius: 3px; margin-bottom: 16px; overflow: hidden;">
                     <div style="height: 100%; width: ${percent}%; background: var(--accent-solid); border-radius: 3px;"></div>
                 </div>
-                <ul style="list-style: none; padding: 0; margin: 0 0 16px 0;">${subcategoriasHtml}</ul>
+                <ul style="list-style: none; padding: 0; margin: 0 0 16px 0; color: var(--text-color);">${subcategoriasHtml}</ul>
                 <button class="btn-expandir" data-id="${cat.id_categoria}" style="width: 100%; padding: 10px; background: var(--accent-pastel); color: var(--accent-solid); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Ver niveles</button>
             `;
 
             card.querySelector('.btn-expandir').addEventListener('click', () => toggleNiveles(cat.id_categoria, card));
             categoriasGrid.appendChild(card);
-            log('[RENDER] Card agregada para: ' + cat.nombre);
         });
-        
-        log('[RENDER] Completado. Total elementos: ' + categoriasGrid.children.length);
     }
 
     function getCategoriaIcon(nombre) {
@@ -256,27 +248,14 @@
         return icons[nombre] || '📚';
     }
 
-    // Toggle niveles
-    function toggleNiveles(idCategoria, card) {
-        log('[TOGGLE] Click en categoría: ' + idCategoria);
-        const existente = card.querySelector('.niveles-expandidos');
-        if (existente) {
-            existente.remove();
-            return;
-        }
-        loadAndRenderNiveles(idCategoria, card);
-    }
-
-    async function loadAndRenderNiveles(idCategoria, card) {
+// Toggle niveles
+    async function toggleNiveles(idCategoria, cardElement) {
         try {
-            log('[TOGGLE] Cargando niveles para categoría: ' + idCategoria);
-            
-            const subcategorias = await window.api.getSubcategoriasPorCategoria(idCategoria);
-            log('[TOGGLE] Subcategorías: ' + subcategorias.length);
-            
             const progreso = await window.api.getProgreso(usuario.id_usuario);
             const completados = new Set(progreso.filter(p => p.completado).map(p => p.id_nivel));
 
+            // Obtener subcategorías para esta categoría
+            const subcategorias = await window.api.getSubcategoriasPorCategoria(idCategoria);
             for (const sub of subcategorias) {
                 sub.niveles = await window.api.getNivelesPorSubcategoria(sub.id_subcategoria);
             }
@@ -298,24 +277,24 @@
                             const tiempo = nivel.tiempo_estimado_min ? `(${nivel.tiempo_estimado_min} min)` : '';
                             
                             html += `
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border-radius: 6px; margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px;">
                                     <div>
-                                        <strong style="font-size: 13px;">Nivel ${nivel.nivel_ordinal}: ${nivel.titulo}</strong>
-                                        <div style="font-size: 12px; opacity: 0.7;">${nivel.descripcion || ''} ${tiempo}</div>
-                                        ${estaCompletado ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: #dcfce7; color: #15803d; border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
+                                        <strong style="font-size: 13px; color: var(--text-color);">Nivel ${nivel.nivel_ordinal}: ${nivel.titulo}</strong>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">${nivel.descripcion || ''} ${tiempo}</div>
+                                        ${estaCompletado ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: var(--accent-pastel); color: var(--accent-solid); border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
                                     </div>
                                     <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" data-idsub="${sub.id_subcategoria}" style="padding: 8px 16px; background: var(--accent-solid); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
                                 </div>
                             `;
                         });
                     } else {
-                        html += '<p style="font-size: 12px; opacity: 0.5;">No hay niveles en esta subcategoría.</p>';
+                        html += '<p style="font-size: 12px; color: var(--text-secondary);">No hay niveles en esta subcategoría.</p>';
                     }
                 });
                 container.innerHTML = html;
             }
 
-            card.appendChild(container);
+            cardElement.appendChild(container);
 
             container.querySelectorAll('.btn-iniciar').forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -331,31 +310,26 @@
                         sessionStorage.setItem('simulacion_id_subcategoria', idSub);
                         window.api.irA('simulacion');
                     } else {
-                        alert('Esta lección aún no tiene contenido disponible.');
+                        showToast('Esta lección aún no tiene contenido disponible.', 'info');
                     }
                 });
             });
         } catch (error) {
-            log('[TOGGLE] ERROR: ' + error.message);
+            // Error loading levels
         }
     }
 
     // Load all data
     async function cargarDashboard() {
         try {
-            log('[HOME] Iniciando carga...');
-            
             const [categorias, progreso] = await Promise.all([
                 window.api.getCategorias(),
                 window.api.getProgreso(usuario.id_usuario)
             ]);
-
-            log('[HOME] Categorías obtenidas: ' + categorias.length);
             
             if (!categorias || categorias.length === 0) {
-                log('[HOME] ERROR: No hay categorías');
                 const grid = getEl('categorias-grid');
-                if (grid) grid.innerHTML = '<p style="color:red;">No hay categorías en la base de datos</p>';
+                if (grid) grid.innerHTML = '<p style="color: var(--accent-solid); padding: 20px;">No hay categorías disponibles en la base de datos</p>';
                 return;
             }
 
@@ -363,7 +337,6 @@
             const categoriasConDatos = await Promise.all(
                 categorias.map(async cat => {
                     const subcategorias = await window.api.getSubcategoriasPorCategoria(cat.id_categoria);
-                    log('[HOME] Subcats de ' + cat.nombre + ': ' + subcategorias.length);
                     for (const sub of subcategorias) {
                         sub.niveles = await window.api.getNivelesPorSubcategoria(sub.id_subcategoria);
                     }
@@ -371,17 +344,14 @@
                 })
             );
 
-            log('[HOME] Datos cargados, renderizando...');
-
             const stats = renderStats(progreso, categoriasConDatos);
             const siguiente = getSiguienteNivel(categoriasConDatos, progreso);
             const siguienteNivelNombre = getEl('siguiente-nivel-nombre');
             if (siguienteNivelNombre) siguienteNivelNombre.textContent = siguiente;
 
             renderCategorias(categoriasConDatos, progreso, stats);
-            log('[HOME] COMPLETO');
         } catch (error) {
-            log('[HOME] ERROR: ' + error.message);
+            // Error loading dashboard
         }
     }
 
@@ -390,6 +360,7 @@
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
             sessionStorage.removeItem('usuario');
+            localStorage.removeItem('usuario');
             window.api.irA('login');
         });
     }
@@ -402,6 +373,5 @@
     }
 
     // Init
-    log('[HOME] Llamando cargarDashboard...');
     cargarDashboard();
 })();

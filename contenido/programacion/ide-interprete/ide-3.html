@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu primer programa - LearningPC</title>
+    <link rel="stylesheet" href="../../src/css/styles.css">
+    <style>
+        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; margin-bottom: 15px; line-height: 1.6; }
+        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
+        .line-numbers { background: #2d2d2d; color: #858585; padding: 10px 5px; text-align: right; font-family: monospace; font-size: 14px; line-height: 1.5; user-select: none; }
+        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; font-size: 14px; line-height: 1.5; resize: none; outline: none; }
+        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--elevation-2); }
+        .btn-primary { background: var(--accent-solid); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-color); }
+        .output-panel { background: #1e1e1e; border-radius: 8px; overflow: hidden; }
+        .output-header { background: #2d2d2d; color: #858585; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-clear { background: transparent; border: none; color: #858585; cursor: pointer; }
+        .code-output { color: #10b981; font-family: monospace; font-size: 14px; padding: 15px; margin: 0; min-height: 200px; max-height: 300px; overflow: auto; white-space: pre-wrap; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; }
+        .feedback.success { background: #d1fae5; color: #065f46; }
+        .feedback.error { background: #fee2e2; color: #991b1b; }
+        .feedback.warning { background: #fef3c7; color: #92400e; }
+        .feedback.info { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nivel 3: Tu primer programa</h1>
+        <div class="explanation">
+            <h2>Hola Mundo!</h2>
+            <p>El programa m&aacute;s cl&aacute;sico en programaci&oacute;n es <strong>"Hola Mundo"</strong>.</p>
+            <p>Es una tradici&oacute;n que data de los a&ntilde;os 70 y es lo primero que todo programador escribe.</p>
+        </div>
+        <div id="simulator-container"></div>
+        <div class="navigation">
+            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
+            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+        </div>
+    </div>
+    <script src="../../src/js/pyodide-loader.js"></script>
+    <script src="../../src/js/simulator-editor.js"></script>
+    <script>
+        const levelConfig = {
+            explanation: '<h3>Escribe "Hola Mundo"</h3><p>Usa <code>print("Hola Mundo")</code></p>',
+            initialCode: '# Tu primer programa\nprint("Hola Mundo")',
+            totalSteps: 1, startStep: 1,
+            steps: [{ title: 'Hola Mundo', code: 'print("Hola Mundo")', type: 'exact', expected: 'Hola Mundo', successMessage: 'Felicitaciones! Has escrito "Hola Mundo"', hint: 'Usa print("Hola Mundo")' }],
+            completionMessage: 'Felicitaciones! Has completado el Nivel 3 - IDE e Interprete'
+        };
+        function onLevelComplete() { }
+        function goToLevel(d) { window.location.href = d === 'prev' ? 'ide-2.html' : '../variables/variables-1.html'; }
+        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+    </script>
+</body>
+</html>

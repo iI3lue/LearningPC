@@ -4,6 +4,9 @@ const { contextBridge, ipcRenderer } = require('electron');
 // Expone funciones controladas al frontend mediante window.api
 contextBridge.exposeInMainWorld('api', {
 
+    // ── Ruta base de la aplicación ─────────────────────────────
+    getAppPath: () => ipcRenderer.invoke('app:getPath'),
+
     // ── Autenticación ──────────────────────────────────────────
     login: (usuario, contraseña) =>
         ipcRenderer.invoke('auth:login', { usuario, contraseña }),

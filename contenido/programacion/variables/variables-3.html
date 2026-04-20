@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Variables 3 - LearningPC</title>
+    <link rel="stylesheet" href="../../src/css/styles.css">
+    <style>
+        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; }
+        .line-numbers { background: #2d2d2d; color: #858585; padding: 10px 5px; text-align: right; font-family: monospace; font-size: 14px; }
+        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; font-size: 14px; resize: none; }
+        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: var(--accent-solid); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-secondary { background: var(--bg-tertiary); }
+        .output-panel { background: #1e1e1e; border-radius: 8px; }
+        .output-header { background: #2d2d2d; color: #858585; padding: 10px 15px; }
+        .code-output { color: #10b981; font-family: monospace; font-size: 14px; padding: 15px; min-height: 200px; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; }
+        .feedback.success { background: #d1fae5; color: #065f46; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Operaciones con tipos</h1>
+        <div class="explanation">
+            <h2>Convirtiendo tipos</h2>
+            <p>Puedes convertir entre tipos:</p>
+            <ul>
+                <li><code>int("10")</code> - texto a n&uacute;mero</li>
+                <li><code>str(123)</code> - n&uacute;mero a texto</li>
+                <li><code>float("3.14")</code> - texto a decimal</li>
+            </ul>
+        </div>
+        <div id="simulator-container"></div>
+        <div class="navigation">
+            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
+            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+        </div>
+    </div>
+    <script src="../../src/js/pyodide-loader.js"></script>
+    <script src="../../src/js/simulator-editor.js"></script>
+    <script>
+        const levelConfig = {
+            initialCode: '# Convert\nnum = int("10")\nprint(num)\ntexto = str(123)\nprint(texto)',
+            totalSteps: 1, startStep: 1,
+            steps: [{ type: 'contains', expected: '10', successMessage: 'Conversi&oacute;n correcta!', hint: 'int("10")' }],
+            completionMessage: 'Variables completado!'
+        };
+        function goToLevel(d) { window.location.href = d === 'next' ? '../condicionales/condicionales-1.html' : 'variables-2.html'; }
+        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+    </script>
+</body>
+</html>

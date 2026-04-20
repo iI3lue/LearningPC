@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Funciones 1 - LearningPC</title>
+    <link rel="stylesheet" href="../../src/css/styles.css">
+    <style>
+        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; }
+        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; }
+        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; }
+        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: var(--accent-solid); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .output-panel { background: #1e1e1e; border-radius: 8px; }
+        .code-output { color: #10b981; font-family: monospace; padding: 15px; min-height: 200px; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; }
+        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; }
+        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; }
+        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; }
+        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; }
+        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: var(--accent-solid); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .output-panel { background: #1e1e1e; border-radius: 8px; }
+        .code-output { color: #10b981; font-family: monospace; padding: 15px; min-height: 200px; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Crear funciones</h1>
+        <div class="explanation">
+            <h2>def - definir funciones</h2>
+            <p>Una <strong>funci&oacute;n</strong> es c&oacute;digo reutilizable.</p>
+            <pre>def nombre():
+    print("Hola")</pre>
+        </div>
+        <div id="simulator-container"></div>
+        <div class="navigation">
+            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
+            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+        </div>
+    </div>
+    <script src="../../src/js/pyodide-loader.js"></script>
+    <script src="../../src/js/simulator-editor.js"></script>
+    <script>
+        const levelConfig = {
+            initialCode: '# Funcion\ndef saludar():\n    print("Hola")\n\nsaludar()',
+            totalSteps: 1, startStep: 1,
+            steps: [{ type: 'contains', expected: 'Hola', successMessage: 'Funcion creada!', hint: 'Usa def saludar(): y luego saludar()' }],
+            completionMessage: 'Funciones Nivel 1 completo'
+        };
+        function goToLevel(d) { window.location.href = d === 'next' ? 'funciones-2.html' : '../condicionales/condicionales-3.html'; }
+        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+    </script>
+</body>
+</html>

@@ -63,6 +63,43 @@ CREATE TABLE IF NOT EXISTS progreso_usuario (
 );
 
 -- =============================================
+-- Nueva categoría: Programación
+-- =============================================
+INSERT OR IGNORE INTO categorias (id_categoria, nombre, descripcion, icono, orden) VALUES
+    (5, 'Programación', 'Introducción a la programación con Python', '💻', 5);
+
+-- Subcategorías de Programación
+INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, descripcion, icono, orden) VALUES
+    (16, 5, 'IDE e Intérprete', 'Conceptos básicos del entorno de desarrollo', '🖥️', 1),
+    (17, 5, 'Variables', 'Almacena y usa datos', '📦', 2),
+    (18, 5, 'Condicionales', 'Toma de decisiones', '🔀', 3),
+    (19, 5, 'Funciones', 'Código reutilizable', '⚡', 4);
+
+-- Niveles: IDE e Intérprete (id=16)
+INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
+    (16, '¿Qué es un IDE?', 'Introducción al entorno de desarrollo integrado', 'programacion/ide-interprete/ide-1.html', 1, 1, 10),
+    (16, 'El Intérprete', 'Cómo se ejecuta el código Python', 'programacion/ide-interprete/ide-2.html', 2, 2, 10),
+    (16, 'Tu primer programa', 'Hola Mundo tu primer código', 'programacion/ide-interprete/ide-3.html', 3, 3, 15);
+
+-- Niveles: Variables (id=17)
+INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
+    (17, '¿Qué es una variable?', 'Guardar y usar datos', 'programacion/variables/variables-1.html', 1, 1, 10),
+    (17, 'Tipos de datos', 'str, int, float, bool', 'programacion/variables/variables-2.html', 2, 2, 15),
+    (17, 'Operaciones con tipos', 'Concatenación y conversión', 'programacion/variables/variables-3.html', 3, 3, 15);
+
+-- Niveles: Condicionales (id=18)
+INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
+    (18, 'Decisiones con if', 'Tomar decisiones en código', 'programacion/condicionales/condicionales-1.html', 1, 1, 10),
+    (18, 'Si no, entonces...', 'Usando else', 'programacion/condicionales/condicionales-2.html', 2, 2, 10),
+    (18, 'Múltiples condiciones', 'Usando elif', 'programacion/condicionales/condicionales-3.html', 3, 3, 15);
+
+-- Niveles: Funciones (id=19)
+INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
+    (19, 'Crear funciones', 'Definiendo funciones con def', 'programacion/funciones/funciones-1.html', 1, 1, 10),
+    (19, 'Parámetros', 'Funciones con entradas', 'programacion/funciones/funciones-2.html', 2, 2, 15),
+    (19, 'Retornar valores', 'Funciones con salidas', 'programacion/funciones/funciones-3.html', 3, 3, 15);
+
+-- =============================================
 -- Datos iniciales de categorías
 -- =============================================
 INSERT OR IGNORE INTO usuarios (usuario, contraseña, edad, progreso_total) VALUES

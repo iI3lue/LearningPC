@@ -13,8 +13,8 @@ let mainWindow;
 // ── Crear ventana principal ──────────────────────────────────────────────────
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 1024,
-        height: 720,
+        width: 1280,
+        height: 800,
         resizable: true,
         minWidth: 800,
         minHeight: 600,
@@ -22,47 +22,75 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false,
+            webSecurity: false,
         },
     });
 
+    // Abrir maximizada por defecto
+    mainWindow.maximize();
+
     // Cargar la pantalla de login al inicio
     mainWindow.loadFile(path.join(__dirname, 'src', 'pages', 'login.html'));
-
-    // NO iniciar en pantalla completa automáticamente
-    // mainWindow.setFullScreen(true);
 }
 
 // ── Inicializar app ──────────────────────────────────────────────────────────
 app.whenReady().then(() => {
     // Solo inicializar (mantiene BD existente)
     initDatabase();
-    
-    // Corregir rutas de simulaciones (solo si existen niveles)
+
+    // Restaurar rutas a su ruta completa relativa a la raíz del proyecto.
+    // La migración anterior dejó rutas como '../../contenido/ide-1.html'
+    // que perdían el subdirectorio real (ej: programacion/ide-interprete/).
     try {
         const db = getDatabase();
-        const niveles = db.prepare("SELECT id_nivel, ruta_archivo FROM niveles WHERE ruta_archivo IS NOT NULL AND ruta_archivo != ''").all();
+        const rutasCorrectas = {
+            'ide-1.html':                  'contenido/programacion/ide-interprete/ide-1.html',
+            'ide-2.html':                  'contenido/programacion/ide-interprete/ide-2.html',
+            'ide-3.html':                  'contenido/programacion/ide-interprete/ide-3.html',
+            'variables-1.html':            'contenido/programacion/variables/variables-1.html',
+            'variables-2.html':            'contenido/programacion/variables/variables-2.html',
+            'variables-3.html':            'contenido/programacion/variables/variables-3.html',
+            'condicionales-1.html':        'contenido/programacion/condicionales/condicionales-1.html',
+            'condicionales-2.html':        'contenido/programacion/condicionales/condicionales-2.html',
+            'condicionales-3.html':        'contenido/programacion/condicionales/condicionales-3.html',
+            'funciones-1.html':            'contenido/programacion/funciones/funciones-1.html',
+            'funciones-2.html':            'contenido/programacion/funciones/funciones-2.html',
+            'funciones-3.html':            'contenido/programacion/funciones/funciones-3.html',
+            'atajos-copiar-pegar.html':    'contenido/atajos-copiar-pegar.html',
+            'atajos-deshacer-rehacer.html':'contenido/atajos-deshacer-rehacer.html',
+            'atajos-win.html':             'contenido/atajos-win.html',
+            'explorador-abrir.html':       'contenido/explorador-abrir.html',
+            'explorador-navegar.html':     'contenido/explorador-navegar.html',
+            'explorador-organizar.html':   'contenido/explorador-organizar.html',
+            'trucos-arrastre-bordes.html': 'contenido/trucos-arrastre-bordes.html',
+            'trucos-botones-control.html': 'contenido/trucos-botones-control.html',
+            'trucos-dividir-pantalla.html':'contenido/trucos-dividir-pantalla.html',
+        };
+        const niveles = db.prepare(
+            "SELECT id_nivel, ruta_archivo FROM niveles WHERE ruta_archivo IS NOT NULL AND ruta_archivo != ''"
+        ).all();
         for (const nivel of niveles) {
-            if (nivel.ruta_archivo && !nivel.ruta_archivo.startsWith('../../')) {
-                const partes = nivel.ruta_archivo.split('/');
-                const nombreArchivo = partes[partes.length - 1];
-                const nuevaRuta = '../../contenido/' + nombreArchivo;
-                
+            const nombreArchivo = nivel.ruta_archivo.split('/').pop();
+            const rutaCorrecta = rutasCorrectas[nombreArchivo];
+            if (rutaCorrecta && nivel.ruta_archivo !== rutaCorrecta) {
                 db.prepare('UPDATE niveles SET ruta_archivo = ? WHERE id_nivel = ?')
-                    .run(nuevaRuta, nivel.id_nivel);
-                console.log('[DB] Ruta corregida: ' + nuevaRuta);
+                    .run(rutaCorrecta, nivel.id_nivel);
+                console.log(`[DB] Ruta restaurada: ${nivel.ruta_archivo} → ${rutaCorrecta}`);
             }
         }
     } catch (e) {
-        // Si no existe la tabla, no hacer nada
-        console.log('[DB] Base de datos vacía o sin niveles');
+        console.log('[DB] Sin rutas que restaurar:', e.message);
     }
-    
+
     createWindow();
 });
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
+
+// ── Ruta base de la app ──────────────────────────────────────────────────────
+ipcMain.handle('app:getPath', () => __dirname);
 
 // ── Control de Ventana (Pantalla Completa) ───────────────────────────────────
 ipcMain.on('window:toggleFullScreen', () => {
@@ -106,14 +134,25 @@ ipcMain.on('nav:irA', (event, pagina) => {
 // ── Autenticación ────────────────────────────────────────────────────────────
 ipcMain.handle('auth:login', (event, { usuario, contraseña }) => {
     const db = getDatabase();
+    
+    // Primero verificar si el usuario existe
+    const userExists = db.prepare(
+        'SELECT * FROM usuarios WHERE usuario = ?'
+    ).get(usuario);
+    
+    if (!userExists) {
+        return { ok: false, mensaje: 'El usuario no existe.', codigo: 'usuario_no_existe' };
+    }
+    
+    // El usuario existe, verificar contraseña
     const user = db.prepare(
         'SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ?'
     ).get(usuario, contraseña);
-
+    
     if (user) {
         return { ok: true, usuario: user };
     } else {
-        return { ok: false, mensaje: 'Usuario o contraseña incorrectos.' };
+        return { ok: false, mensaje: 'Contraseña incorrecta.', codigo: 'contraseña_incorrecta' };
     }
 });
 

@@ -417,7 +417,7 @@ function actualizarUI() {
             }
         }
 
-        function cargarSimulacion() {
+        async function cargarSimulacion() {
             console.log('=== CARGAR SIMULACION ===');
             
             // Determinar qué nivel usar
@@ -441,12 +441,22 @@ function actualizarUI() {
             
             if (ruta && ruta !== 'null' && ruta !== '') {
                 tituloEl.textContent = tit;
-                // Si la ruta ya tiene ../../contenido/, no duplicar
-                const rutaCompleta = ruta.startsWith('../../contenido/') 
-                    ? ruta 
-                    : '../../contenido/' + ruta;
-                console.log('Iframe src:', rutaCompleta);
-                iframe.src = rutaCompleta;
+
+                // Normalizar la ruta: eliminar prefijos relativos (../../) que
+                // pudo haber insertado una migración anterior en main.js
+                let rutaNormalizada = ruta.replace(/^\.\.\/\.\.\//g, '');
+
+                // Si aún no empieza con 'contenido/', agregarlo
+                if (!rutaNormalizada.startsWith('contenido/')) {
+                    rutaNormalizada = 'contenido/' + rutaNormalizada;
+                }
+
+                // Construir URL file:// absoluta usando el appPath del proceso principal
+                const appPath = (await window.api.getAppPath()).replace(/\\/g, '/');
+                const rutaAbsoluta = 'file:///' + appPath + '/' + rutaNormalizada;
+
+                console.log('Iframe src:', rutaAbsoluta);
+                iframe.src = rutaAbsoluta;
             } else {
                 tituloEl.textContent = '⚠️ Simulación no disponible';
                 console.log('NO HAY RUTA - mostrando mensaje');
