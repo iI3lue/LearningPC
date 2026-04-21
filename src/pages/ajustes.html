@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearningPC - Ajustes</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .ajustes-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .ajustes-seccion {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .ajustes-seccion h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-color);
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ajuste-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ajuste-item:last-child {
+            border-bottom: none;
+        }
+
+        .ajuste-info h3 {
+            font-size: 14px;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .ajuste-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Color picker */
+        .color-opciones {
+            display: flex;
+            gap: 12px;
+        }
+
+        .color-opcion {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .color-opcion:hover {
+            transform: scale(1.1);
+        }
+
+        .color-opcion.seleccionado {
+            border-color: var(--text-color);
+        }
+
+        .color-opcion.seleccionado::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: var(--hover-bg);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-solid);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--transition-fast);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+
+        /* Volver */
+        .btn-volver {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--accent-solid);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 24px;
+            transition: background var(--transition-fast);
+        }
+
+        .btn-volver:hover {
+            background: var(--accent-pastel);
+            color: var(--accent-solid);
+        }
+
+        .header-ajustes {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header-ajustes h1 {
+            color: var(--text-color);
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ajustes-container">
+        <button class="btn-volver" onclick="volverHome()">
+            ← Volver
+        </button>
+
+        <div class="header-ajustes">
+            <h1>⚙️ Ajustes</h1>
+        </div>
+
+        <!-- Sección: Apariencia -->
+        <div class="ajustes-seccion">
+            <h2>🎨 Apariencia</h2>
+            
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Tema</h3>
+                    <p>Cambiar entre modo claro y oscuro</p>
+                </div>
+                <div class="toggle-switch" id="toggle-tema" onclick="toggleTema()"></div>
+            </div>
+
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Color Secundario</h3>
+                    <p>Elige un color de acento secundario</p>
+                </div>
+                <div class="color-opciones" id="colores-secundarios">
+                    <div class="color-opcion" style="background: #10B981;" data-color="emerald" onclick="cambiarColorSecundario('emerald')"></div>
+                    <div class="color-opcion" style="background: #8B5CF6;" data-color="violeta" onclick="cambiarColorSecundario('violeta')"></div>
+                    <div class="color-opcion" style="background: #F59E0B;" data-color="amber" onclick="cambiarColorSecundario('amber')"></div>
+                    <div class="color-opcion" style="background: #EF4444;" data-color="rojo" onclick="cambiarColorSecundario('rojo')"></div>
+                    <div class="color-opcion" style="background: #EC4899;" data-color="rosa" onclick="cambiarColorSecundario('rosa')"></div>
+                    <div class="color-opcion" style="background: #06B6D4;" data-color="cyan" onclick="cambiarColorSecundario('cyan')"></div>
+                </div>
+            </div>
+
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Efectos Visuales</h3>
+                    <p>Animaciones y transiciones suaves</p>
+                </div>
+                <div class="toggle-switch active" id="toggle-efectos" onclick="toggleEfectos()"></div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn-volver" onclick="aplicarCambios()" style="background: var(--accent-solid);">
+                    Aplicar cambios
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección: Sonido -->
+        <div class="ajustes-seccion">
+            <h2>🔊 Sonido</h2>
+            
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Sonido de Notificaciones</h3>
+                    <p>Sonido al completar niveles</p>
+                </div>
+                <div class="toggle-switch active" id="toggle-sonido" onclick="toggleSonido()"></div>
+            </div>
+        </div>
+
+        <!-- Sección: Progreso -->
+        <div class="ajustes-seccion">
+            <h2>📊 Progreso</h2>
+            
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Reiniciar Progreso</h3>
+                    <p>Borrar todo el progreso y comenzar desde cero</p>
+                </div>
+                <button class="btn-volver" style="background: #DC2626;" onclick="reiniciarProgreso()">
+                    Reiniciar
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección: Información -->
+        <div class="ajustes-seccion">
+            <h2>ℹ️ Información</h2>
+            
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Versión</h3>
+                    <p>LearningPC v1.0.0</p>
+                </div>
+            </div>
+
+            <div class="ajuste-item">
+                <div class="ajuste-info">
+                    <h3>Licencia</h3>
+                    <p>Uso educativo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/theme-manager.js"></script>
+    <script>
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarAjustes();
+        });
+
+        function cargarAjustes() {
+            // Tema
+            const tema = localStorage.getItem('theme') || 'light';
+            document.getElementById('toggle-tema').classList.toggle('active', tema === 'dark');
+
+            // Color secundario
+            const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+            document.querySelectorAll('.color-opcion').forEach(el => {
+                el.classList.toggle('seleccionado', el.dataset.color === colorSec);
+            });
+
+            // Efectos
+            const efectos = localStorage.getItem('efectos') !== 'false';
+            document.getElementById('toggle-efectos').classList.toggle('active', efectos);
+
+            // Sonido
+            const sonido = localStorage.getItem('sonido') !== 'false';
+            document.getElementById('toggle-sonido').classList.toggle('active', sonido);
+        }
+
+        function toggleTema() {
+            const toggle = document.getElementById('toggle-tema');
+            toggle.classList.toggle('active');
+            const nuevoTema = toggle.classList.contains('active') ? 'dark' : 'light';
+            localStorage.setItem('theme', nuevoTema);
+            
+            document.documentElement.setAttribute('data-theme', nuevoTema);
+        }
+
+        function cambiarColorSecundario(color) {
+            localStorage.setItem('secondaryColor', color);
+            
+            // Definir colores según selección
+            const colores = {
+                emerald: { solid: '#10B981', light: '#D1FAE5', dark: '#065F46' },
+                violeta: { solid: '#8B5CF6', light: '#EDE9FE', dark: '#4C1D95' },
+                amber: { solid: '#F59E0B', light: '#FEF3C7', dark: '#92400E' },
+                rojo: { solid: '#EF4444', light: '#FEE2E2', dark: '#991B1B' },
+                rosa: { solid: '#EC4899', light: '#FCE7F3', dark: '#9D174D' },
+                cyan: { solid: '#06B6D4', light: '#CFFAFE', dark: '#155E75' }
+            };
+
+            const c = colores[color];
+            if (c) {
+                document.documentElement.style.setProperty('--secondary-1', c.solid);
+                document.documentElement.style.setProperty('--secondary-1-light', c.light);
+                document.documentElement.style.setProperty('--secondary-1-dark', c.dark);
+            }
+            
+            // Actualizar UI
+            document.querySelectorAll('.color-opcion').forEach(el => {
+                el.classList.toggle('seleccionado', el.dataset.color === color);
+            });
+        }
+
+        function toggleEfectos() {
+            const toggle = document.getElementById('toggle-efectos');
+            toggle.classList.toggle('active');
+            localStorage.setItem('efectos', toggle.classList.contains('active'));
+        }
+
+        function toggleSonido() {
+            const toggle = document.getElementById('toggle-sonido');
+            toggle.classList.toggle('active');
+            localStorage.setItem('sonido', toggle.classList.contains('active'));
+        }
+
+        function reiniciarProgreso() {
+            if (confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('progreso_global');
+                localStorage.removeItem('player_stats');
+                localStorage.removeItem('navegacion_actual');
+                alert('Progreso reiniciado. Recarga la página para comenzar desde cero.');
+            }
+        }
+
+        function volverHome() {
+            window.location.href = 'home.html';
+        }
+
+        function aplicarCambios() {
+            // Guardar todos los cambios antes de aplicar
+            localStorage.setItem('theme', document.getElementById('toggle-tema').classList.contains('active') ? 'dark' : 'light');
+            localStorage.setItem('efectos', document.getElementById('toggle-efectos').classList.contains('active'));
+            localStorage.setItem('sonido', document.getElementById('toggle-sonido').classList.contains('active'));
+            
+            // Recargar para aplicar cambios
+            alert('Cambios aplicados correctamente!');
+            window.location.reload();
+        }
+    </script>
+</body>
+
+</html>

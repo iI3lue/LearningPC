@@ -1,11 +1,12 @@
 /**
  * theme-manager.js
- * Gestiona el cambio de tema (Light/Dark) de forma global y persistente.
+ * Gestiona el cambio de tema (Light/Dark) y color secundario de forma global y persistente.
  */
 
 function initTheme() {
     const theme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', theme);
+    cargarColorSecundario();
     updateThemeButtonUI(theme);
 }
 
@@ -18,31 +19,78 @@ function toggleTheme() {
     updateThemeButtonUI(newTheme);
 }
 
+function cargarColorSecundario() {
+    const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+    
+    const colores = {
+        emerald: { solid: '#10B981', light: '#D1FAE5', dark: '#065F46' },
+        violeta: { solid: '#8B5CF6', light: '#EDE9FE', dark: '#4C1D95' },
+        amber: { solid: '#F59E0B', light: '#FEF3C7', dark: '#92400E' },
+        rojo: { solid: '#EF4444', light: '#FEE2E2', dark: '#991B1B' },
+        rosa: { solid: '#EC4899', light: '#FCE7F3', dark: '#9D174D' },
+        cyan: { solid: '#06B6D4', light: '#CFFAFE', dark: '#155E75' }
+    };
+    
+    const c = colores[colorSec];
+    if (c) {
+        // Aplicar a todos los elementos de interfaz
+        document.documentElement.style.setProperty('--accent-solid', c.solid);
+        document.documentElement.style.setProperty('--accent-pastel', c.light);
+        document.documentElement.style.setProperty('--secondary-1-solid', c.solid);
+        document.documentElement.style.setProperty('--secondary-1-light', c.light);
+        
+        // Actualizar toggles y progress bars
+        document.querySelectorAll('.toggle-switch.active').forEach(el => {
+            el.style.background = c.solid;
+        });
+        
+        document.querySelectorAll('.progress-fill, .progreso-fill').forEach(el => {
+            el.style.background = `linear-gradient(90deg, ${c.solid}, ${c.light})`;
+        });
+    }
+}
+
 function updateThemeButtonUI(theme) {
-    // Ya no necesita actualizar texto porque los botones ahora son solo iconos
-    // Los iconos SVG ya están definidos en los HTMLs correspondientes
+    const btn = document.getElementById('btn-toggle-theme');
+    const icono = document.getElementById('icono-tema');
+    
+    if (btn && icono) {
+        // Obtener color secundario guardado
+        const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+        const colores = {
+            emerald: '#10B981', violeta: '#8B5CF6', amber: '#F59E0B',
+            rojo: '#EF4444', rosa: '#EC4899', cyan: '#06B6D4'
+        };
+        const color = colores[colorSec] || '#10B981';
+        
+        // Aplicar color secundario al botón
+        btn.style.background = color;
+        btn.style.border = 'none';
+        
+        // Mostrar icono según tema (emoji simple)
+        icono.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
 }
 
 // Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initTheme);
-} else {
-    initTheme();
+function iniciar() {
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    cargarColorSecundario();
+    updateThemeButtonUI(theme);
+    
+    // Agregar listener al botón
+    const btn = document.getElementById('btn-toggle-theme');
+    if (btn) {
+        btn.addEventListener('click', toggleTheme);
+    }
 }
 
-// Agregar listeners a los botones de tema
-document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('#btn-toggle-theme');
-    buttons.forEach(btn => {
-        // Remover listeners existentes para evitar duplicados
-        btn.replaceWith(btn.cloneNode(false));
-    });
-    
-    // Volver a buscar después de clonar
-    document.querySelectorAll('#btn-toggle-theme').forEach(btn => {
-        btn.addEventListener('click', toggleTheme);
-    });
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciar);
+} else {
+    iniciar();
+}
 
 // También exportar para uso global
 window.toggleTheme = toggleTheme;
