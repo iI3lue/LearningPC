@@ -130,7 +130,7 @@ Todos los preferencias se guardan en localStorage del navegador.
 ## 🤝 Contribuir
 
 1. Fork del repositorio
-2. Crear branch的特征`git checkout -b feature/NuevaCaracteristica`)
+2. Crear branch:`git checkout -b feature/NuevaCaracteristica`)
 3. Commit cambios (`git commit -m 'Add nueva caracteristica'`)
 4. Push al branch (`git push origin feature/NuevaCaracteristica`)
 5. Abrir Pull Request
@@ -145,8 +145,10 @@ Uso educativo - Learning PC
 
 ## 📬 Contacto
 
-Para dudas o sugerencias, abre un issue en el repositorio.
+Para dudas o sugerencias
+Juan Diego Diaz
 
 ---
 
 *Learning PC - Aprende Windows y Programación de forma práctica*
+*I3lue*
