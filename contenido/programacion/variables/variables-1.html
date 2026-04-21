@@ -3,60 +3,664 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Variables 1 - LearningPC</title>
-    <link rel="stylesheet" href="../../src/css/styles.css">
+    <title>Variables 1 - ¿Qué es una variable? - LearningPC</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <link rel="stylesheet" href="../../trucos-dividir-pantalla.css">
     <style>
-        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
-        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; }
-        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; margin-bottom: 15px; line-height: 1.6; }
-        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        .line-numbers { background: #2d2d2d; color: #858585; padding: 10px 5px; text-align: right; font-family: monospace; font-size: 14px; line-height: 1.5; user-select: none; }
-        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; font-size: 14px; line-height: 1.5; resize: none; outline: none; }
-        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: transform 0.2s, box-shadow 0.2s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: var(--elevation-2); }
-        .btn-primary { background: var(--accent-solid); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-color); }
-        .output-panel { background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        .output-header { background: #2d2d2d; color: #858585; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-clear { background: transparent; border: none; color: #858585; cursor: pointer; }
-        .code-output { color: #10b981; font-family: monospace; font-size: 14px; padding: 15px; margin: 0; min-height: 200px; max-height: 300px; overflow: auto; white-space: pre-wrap; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; }
-        .feedback.success { background: #d1fae5; color: #065f46; }
-        .feedback.error { background: #fee2e2; color: #991b1b; }
-        .feedback.warning { background: #fef3c7; color: #92400e; }
-        .feedback.info { background: #dbeafe; color: #1e40af; }
+        .intro-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 28px 36px;
+            max-width: 650px;
+            margin: 30px auto;
+            text-align: center;
+        }
+        
+        .intro-panel h2 { color: #47A1EB; font-size: 22px; margin-bottom: 12px; }
+        .intro-panel .subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
+        .intro-panel p { color: #aaa; font-size: 13px; line-height: 1.7; margin-bottom: 12px; text-align: left; }
+        
+        .intro-panel .teoria {
+            background: #252526;
+            border-radius: 6px;
+            padding: 18px;
+            margin: 16px 0;
+            text-align: left;
+        }
+        
+        .intro-panel .teoria h3 { color: #60cdff; font-size: 15px; margin-bottom: 12px; }
+        .intro-panel .teoria ul { margin: 0; padding-left: 20px; }
+        .intro-panel .teoria li { color: #ccc; font-size: 13px; margin-bottom: 8px; }
+        
+        .intro-panel .ejemplo {
+            background: #1e1e1e;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+            font-family: 'Consolas', monospace;
+        }
+        
+        .intro-panel .ejemplo h3 { color: #f472b6; font-size: 13px; margin-bottom: 8px; }
+        .intro-panel .ejemplo code { color: #22c55e; font-size: 13px; }
+        
+        .intro-panel strong { color: #fff; }
+
+        .btn-comenzar {
+            background: #0067c0;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn-comenzar:hover { background: #0078d4; }
+
+        /* === VSCode Window Styles (completo) === */
+        .vscode-window {
+            width: 800px;
+            height: 520px;
+            background: #1e1e1e;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+        }
+
+        .vscode-window.visible { display: flex !important; }
+        .ventana.visible { display: flex !important; }
+
+        .vscode-window .title-bar { background: #323232; }
+        .vscode-window .menu-bar {
+            background: #3c3c3c;
+            padding: 6px 12px;
+            display: flex;
+            gap: 16px;
+        }
+        .vscode-window .menu-item {
+            color: #cccccc;
+            font-size: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .vscode-window .menu-item:hover { background: #4d4d4d; }
+        .vscode-window .toolbar {
+            background: #252526;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        .vscode-window .toolbar-btn {
+            background: #3d3d3d;
+            color: #ccc;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .vscode-window .toolbar-btn:hover { background: #4d4d4d; }
+        .vscode-window .toolbar-btn.run { background: #16a34a; color: white; }
+        .vscode-window .toolbar-btn.run:hover { background: #15803d; }
+        .vscode-window .main-area { display: flex; flex: 1; background: #1e1e1e; }
+        .vscode-window .explorer { width: 180px; background: #252526; border-right: 1px solid #3d3d3d; }
+        .vscode-window .explorer-title { color: #858585; font-size: 11px; padding: 8px 12px; text-transform: uppercase; }
+        .vscode-window .file-item { color: #d4d4d4; padding: 6px 12px 6px 24px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .vscode-window .file-item:hover { background: #2a2d2e; }
+        .vscode-window .file-item.active { background: #37373d; }
+        .vscode-window .editor-area { flex: 1; display: flex; flex-direction: column; }
+        .vscode-window .tabs { display: flex; background: #2d2d2d; }
+        .vscode-window .tab { background: #2d2d2d; color: #969696; padding: 8px 16px; font-size: 13px; border-right: 1px solid #1e1e1e; }
+        .vscode-window .tab.active { background: #1e1e1e; color: #fff; }
+        .vscode-window .code-wrapper { flex: 1; display: flex; background: #1e1e1e; overflow-y: auto; overflow-x: hidden; }
+.vscode-window .line-nums { 
+            background: #1e1e1f; 
+            color: #5a5a5a; 
+            padding: 10px 8px; 
+            text-align: right; 
+            font-family: 'Consolas', monospace; 
+            font-size: 13px; 
+            line-height: 1.5; 
+            user-select: none; 
+            min-width: 30px;
+            height: auto;
+            display: block;
+            flex-shrink: 0;
+        }
+        .vscode-window .code-input { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: 'Consolas', monospace; font-size: 13px; line-height: 1.5; resize: none; outline: none; height: auto; flex-shrink: 0; }
+        .vscode-window .terminal { background: #0d0d0d; border-top: 1px solid #3d3d3d; min-height: 80px; }
+        .vscode-window .term-header { background: #1e1e1e; color: #858585; font-size: 11px; padding: 4px 12px; }
+        .vscode-window .term-output { color: #22c55e; font-family: 'Consolas', monospace; font-size: 12px; padding: 8px 12px; white-space: pre-wrap; }
+        .vscode-window .term-output.error { color: #f87171; }
+        .vscode-window .term-output.info { color: #fbbf24; }
+        .vscode-window .status-bar { background: #007acc; color: white; font-size: 12px; padding: 3px 12px; display: flex; justify-content: space-between; }
+
+        /* === Tour Popups === */
+        .tour-popup {
+            position: fixed;
+            background: #323233;
+            border: 1px solid #454545;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 360px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 400;
+            display: none;
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tour-popup .tour-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .tour-popup .tour-icon { font-size: 24px; }
+        .tour-popup .tour-title { color: #60cdff; font-size: 15px; font-weight: 600; }
+        .tour-popup .tour-step { background: #0078d4; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+
+        .tour-popup .tour-content {
+            color: #cccccc;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .tour-popup .tour-content code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #f472b6;
+            font-family: 'Consolas', monospace;
+        }
+        .tour-popup .tour-content strong { color: #fff; }
+        .tour-popup .tour-content ul { margin: 10px 0; padding-left: 18px; }
+        .tour-popup .tour-content li { margin-bottom: 6px; color: #bbb; }
+
+        .tour-popup .tour-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .tour-popup .tour-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+        }
+        .tour-popup .tour-btn.next { background: #0078d4; color: white; }
+        .tour-popup .tour-btn.next:hover { background: #1084d8; }
+        .tour-popup .tour-btn.skip { background: transparent; color: #888; border: 1px solid #555; }
+        .tour-popup .tour-btn.skip:hover { background: #404040; color: #ccc; }
+
+        /* Posiciones a la derecha */
+        .tour-popup.theory-pos { top: 120px; right: 30px; }
+        .tour-popup.syntax-pos { top: 200px; right: 30px; }
+        .tour-popup.create-pos { top: 280px; right: 30px; }
+        .tour-popup.run-pos { top: 360px; right: 30px; }
+
+        .success-msg {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 20px 32px;
+            z-index: 300;
+            display: none;
+            text-align: center;
+        }
+        .success-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
+        .success-msg p { color: #ccc; font-size: 13px; margin: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Variables: &iquest;Qu&eacute; es una variable?</h1>
-        <div class="explanation">
-            <h2>Las variables guardan datos</h2>
-            <p>Una <strong>variable</strong> es como una caja donde guardas un valor.</p>
-            <p>Para crear una variable usa: <code>nombre = valor</code></p>
+    <div class="desktop">
+        <!-- Botón Comenzar -->
+        <button class="btn-comenzar" onclick="startSim()" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; padding: 16px 40px;">Comenzar →</button>
+
+        <!-- Intro Panel -->
+        <div class="intro-panel" id="intro">
+            <h2>📦 ¿Qué es una variable?</h2>
+            <p class="subtitle">Python - Conceptos Fundamentals</p>
+            
+            <div class="teoria">
+                <h3>📦 Una variable es un contenedor</h3>
+                <p>Una <strong>variable</strong> en Python es como una caja donde guardas un valor.</p>
+                <ul>
+                    <li>Tiene un <strong>nombre</strong> (para identificarla)</li>
+                    <li>Guarda un <strong>valor</strong> (dato)</li>
+                    <li>El valor puede cambiar (por eso se llama "variable")</li>
+                </ul>
+            </div>
+            
+            <div class="ejemplo">
+                <h3>✏️ Sintaxis en Python</h3>
+                <code>nombre = valor</code>
+                <p style="margin-top: 8px; color: #888; font-size: 12px;">
+                    Ejemplos:<br>
+                    <code>x = 5</code> (número)<br>
+                    <code>nombre = "Ana"</code> (texto)<br>
+                    <code>activo = True</code> (verdadero/falso)
+                </p>
+            </div>
+            
+            <p>Vamos a practicar creando tu primera variable Python.</p>
+            <button class="btn-comenzar" onclick="startSim()">Comenzar →</button>
         </div>
-        <div id="simulator-container"></div>
-        <div class="navigation">
-            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
-            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+
+        <!-- Tour Popups - Enfoque Teórico -->
+        <div class="tour-popup theory-pos" id="tour-1">
+            <div class="tour-header">
+                <span class="tour-icon">📦</span>
+                <span class="tour-title">¿Qué es una variable?</span>
+                <span class="tour-step">1/4</span>
+            </div>
+            <div class="tour-content">
+                <p>Una <strong>variable</strong> es un contenedor que guarda un valor en memoria.</p>
+                <ul>
+                    <li><strong>Nombre</strong>: cómo la identificas (ej: <code>x</code>, <code>nombre</code>)</li>
+                    <li><strong>Valor</strong>: el dato que guardar (ej: <code>5</code>, <code>"Ana"</code>)</li>
+                    <li><strong>Tipo</strong>: Python lo detecta automáticamente</li>
+                </ul>
+                <p><strong>En Python:</strong> No necesitas declarar el tipo.</p>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup syntax-pos" id="tour-2">
+            <div class="tour-header">
+                <span class="tour-icon">✏️</span>
+                <span class="tour-title">Sintaxis en Python</span>
+                <span class="tour-step">2/4</span>
+            </div>
+            <div class="tour-content">
+                <p>Para crear una variable usa:</p>
+                <p><code>nombre = valor</code></p>
+                <ul>
+                    <li>El <strong>signo =</strong> asigna el valor</li>
+                    <li>Texto siempre con <strong>comillas</strong></li>
+                    <li>Los números van sin comillas</li>
+                </ul>
+                <p><strong>Ejemplos:</strong></p>
+                <code>edad = 25</code><br>
+                <code>nombre = "Maria"</code><br>
+                <code>precio = 19.99</code>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup create-pos" id="tour-3">
+            <div class="tour-header">
+                <span class="tour-icon">👆</span>
+                <span class="tour-title">Crear tu variable</span>
+                <span class="tour-step">3/4</span>
+            </div>
+            <div class="tour-content">
+                <p><strong>Ahora crea una variable:</strong></p>
+                <code>x = 5</code>
+                <p style="margin-top: 8px;">Y luego imprímela:</p>
+                <code>print(x)</code>
+                <p style="margin-top: 8px; color: #888;">El editor está vacío. Escribe el código.</p>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup run-pos" id="tour-4">
+            <div class="tour-header">
+                <span class="tour-icon">▶</span>
+                <span class="tour-title">Ejecutar en Python</span>
+                <span class="tour-step">4/4</span>
+            </div>
+            <div class="tour-content">
+                <p><strong>Ejecuta el código:</strong></p>
+                <ul>
+                    <li>Presiona <code>F5</code> en tu teclado</li>
+                    <li>O haz click en <strong>▶ Ejecutar (F5)</strong></li>
+                </ul>
+                <p>Deberías ver <code>5</code> en la terminal.</p>
+                <p style="color: #888; margin-top: 8px;">¡Eso es tu primera variable Python!</p>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">¡Listo! →</button>
+            </div>
+        </div>
+
+        <!-- VS Code Window -->
+        <div class="ventana vscode-window" id="ventana-vscode" style="display:none; width:800px; height:520px; left:50px; top:30px;">
+            <div class="title-bar">
+                <div class="icono">📊</div>
+                <span class="titulo">Visual Studio Code - variables.py</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('vscode')">─</div>
+                    <div class="window-btn" onclick="maximizarVentana('vscode')">□</div>
+                    <div class="window-btn close" onclick="cerrarVentana('vscode')">×</div>
+                </div>
+            </div>
+            
+            <div class="menu-bar">
+                <span class="menu-item">Archivo</span>
+                <span class="menu-item">Editar</span>
+                <span class="menu-item">Ver</span>
+                <span class="menu-item">Terminal</span>
+                <span class="menu-item">Ayuda</span>
+            </div>
+            
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="newFile()">📄 Nuevo</button>
+                <button class="toolbar-btn" onclick="openFile()">📂 Abrir</button>
+                <button class="toolbar-btn run" onclick="runCode()">▶ Ejecutar (F5)</button>
+                <button class="toolbar-btn" onclick="resetCode()">↻ Reiniciar</button>
+            </div>
+            
+            <div class="main-area">
+                <div class="explorer">
+                    <div class="explorer-title">Explorador</div>
+                    <div class="file-item active">🐍 variables.py</div>
+                </div>
+                
+                <div class="editor-area">
+                    <div class="tabs">
+                        <div class="tab active">🐍 variables.py ×</div>
+                    </div>
+                    <div class="code-wrapper" id="code-wrapper">
+                        <div class="line-nums" id="lines">1</div>
+                        <textarea class="code-input" id="code" spellcheck="false" placeholder="Escribe: x = 5"></textarea>
+                    </div>
+                    <div class="terminal">
+                        <div class="term-header">🔶 TERMINAL</div>
+                        <pre class="term-output" id="term"><span class="info">⏳ Cargando Python...</span></pre>
+                    </div>
+                    <div class="status-bar">
+                        <span>🐍 principal</span>
+                        <span>Ln 1, Col 1</span>
+                        <span>Python 3.11</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div class="success-msg" id="success">
+            <h3>🎉 ¡Variables completado!</h3>
+            <p>Has creado tu primera variable Python</p>
         </div>
     </div>
-    <script src="../../src/js/pyodide-loader.js"></script>
-    <script src="../../src/js/simulator-editor.js"></script>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-vscode" onclick="abrirVentana('vscode')">📊</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶 🔋</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">20/4/2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../simulacion-core.js"></script>
     <script>
-        const levelConfig = {
-            explanation: '<h3>Paso 1: Crea una variable</h3><p>Crea una variable llamada <code>nombre</code> con tu nombre.</p>',
-            initialCode: '# Crea una variable\nnombre = "TuNombre"\nprint(nombre)',
-            totalSteps: 1, startStep: 1,
-            steps: [{ title: 'Crear variable', code: 'nombre = "Maria"\nprint(nombre)', type: 'contains', expected: 'Maria', successMessage: 'Has creado una variable!', hint: 'Usa nombre = "TuNombre"' }],
-            completionMessage: 'Felicitaciones! Has completado Variables Nivel 1'
+        let pyReady = false;
+        let py = null;
+        let done = false;
+        let tourStep = 0;
+
+        // === STEP-BY-STEP VALIDATION ===
+        let pasoCompletado = {
+            1: false, // Theory leída
+            2: false, // Sintaxis vista  
+            3: false, // Código escrito
+            4: false  // Código ejecutado
         };
-        function onLevelComplete() { }
-        function goToLevel(d) { window.location.href = d === 'next' ? 'variables-2.html' : '../ide-interprete/ide-3.html'; }
-        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+
+        function puedeAvanzar(paso) {
+            if (!pasoCompletado[paso]) {
+                mostrarToastFallo(paso);
+                return false;
+            }
+            return true;
+        }
+
+        function mostrarToastFallo(paso) {
+            const mensajes = [
+                "Lee la teoría primero",
+                "Lee la sintaxis primero",
+                "Escribe el código primero",
+                "Ejecuta el código primero"
+            ];
+            const msg = mensajes[paso - 1] || "Completa esta acción primero";
+            document.getElementById('term').innerHTML = '<span class="error">' + msg + '</span>';
+        }
+
+        async function loadPy() {
+            try {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+                document.head.appendChild(s);
+                s.onload = async () => {
+                    py = await window.loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'});
+                    pyReady = true;
+                    document.getElementById('term').textContent = '✅ Python listo\n\n📝 Crea: x = 5\nprint(x)\nPresiona F5';
+                };
+            } catch(e) {
+                document.getElementById('term').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function startSim() {
+            // Ocultar intro
+            document.getElementById('intro').style.display = 'none';
+            
+            const btn = document.querySelector('.btn-comenzar');
+            if(btn) btn.style.display = 'none';
+            
+            // Abrir VS Code
+            const ventana = document.getElementById('ventana-vscode');
+            if(ventana) {
+                ventana.style.display = 'flex';
+                ventana.classList.add('visible');
+            }
+            
+            const taskbar = document.getElementById('taskbar-vscode');
+            if(taskbar) taskbar.classList.add('active');
+            
+            loadPy();
+            setTimeout(() => showTourStep(1), 800);
+        }
+
+        function showTourStep(num) {
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            const current = document.getElementById('tour-' + num);
+            if(current) {
+                current.style.display = 'block';
+                tourStep = num;
+                window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+            }
+        }
+
+        function nextTourStep() {
+            clearTimeout(window.tourTimeout);
+            if (!puedeAvanzar(tourStep)) {
+                window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                return;
+            }
+            if(tourStep < 4) {
+                showTourStep(tourStep + 1);
+            } else {
+                skipTour();
+                setTimeout(() => autoNext(), 500);
+            }
+        }
+
+        function skipTour() {
+            clearTimeout(window.tourTimeout);
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            tourStep = 0;
+            if(pasoCompletado[3] && pasoCompletado[4]) {
+                setTimeout(() => autoNext(), 500);
+            }
+        }
+
+        async function autoNext() {
+            document.getElementById('success').style.display = 'block';
+            if(window.parent && window.parent.completarNivelYAvanzar) {
+                try { await window.parent.completarNivelYAvanzar(); }
+                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            } else {
+                setTimeout(() => window.parent.location.reload(), 2500);
+            }
+        }
+
+function updateLines() {
+            const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            const wrapper = document.getElementById('code-wrapper');
+            const n = c.value.split('\n').length;
+            let l = '';
+            for(let i=1; i<=n; i++) l += i + '<br>';
+            lines.innerHTML = l;
+            
+            // Sincronizar altura
+            const lineHeight = 19.5;
+            const totalHeight = n * lineHeight;
+            lines.style.height = totalHeight + 'px';
+            
+            // Reset scroll when adding lines
+            lines.scrollTop = 0;
+            c.scrollTop = 0;
+        }
+
+        function syncScroll() {
+            const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            lines.scrollTop = c.scrollTop;
+        }
+
+        function syncScroll() {
+            const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            const scrollRatio = c.scrollTop / (c.scrollHeight - c.clientHeight || 1);
+            lines.scrollTop = scrollRatio * (lines.scrollHeight - lines.clientHeight);
+        }
+
+        async function runCode() {
+            const code = document.getElementById('code').value;
+            const term = document.getElementById('term');
+            
+            if(!code.trim()) { 
+                term.innerHTML = '<span class="error">✏️ Escribe código</span>'; 
+                return;
+            }
+            if(!pyReady) { 
+                term.innerHTML = '<span class="info">⏳ Cargando...</span>'; 
+                return; 
+            }
+            
+            term.textContent = '🔄 Ejecutando...\n';
+            
+            try {
+                py.runPython('import sys\nfrom io import StringIO\nsys.stdout = StringIO()');
+                py.runPython(code);
+                const res = py.runPython('sys.stdout.getvalue()');
+                term.textContent = res || '(sin output)';
+                
+                // Verificar que execução foi bem-sucedida
+                if(!done && res.trim()) {
+                    done = true;
+                    pasoCompletado[3] = true; // Código escrito
+                    pasoCompletado[4] = true; // Código executado
+                    term.textContent += '\n\n✅ ¡Variable creada!';
+                    skipTour();
+                }
+            } catch(e) {
+                term.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function newFile() { document.getElementById('term').textContent = '📄 Nuevo archivo'; }
+        function openFile() { document.getElementById('term').textContent = '📂 Abrir archivo'; }
+        function resetCode() { 
+            document.getElementById('code').value = ''; 
+            updateLines(); 
+            document.getElementById('term').textContent = '✅ Código reiniciado';
+        }
+
+        function onVentanaAbierta(t) {}
+        function onVentanaCerrada(t) {}
+
+        // === REGISTRAR ACCIONES ===
+        
+        // Paso 1: Mostrar teoría = automático ao abrir popup
+        document.getElementById('tour-1').addEventListener('click', () => {
+            pasoCompletado[1] = true;
+        });
+
+        // Paso 2: Mostrar sintaxis
+        document.getElementById('tour-2').addEventListener('click', () => {
+            pasoCompletado[2] = true;
+        });
+
+        // Paso 3: Input no editor = código escrito + auto-avanzar
+        let codeWritten = false;
+        document.getElementById('code').addEventListener('input', (e) => {
+            const code = e.target.value.toLowerCase().replace(/\s/g, '');
+            
+            // Validar que contenga print(x) o print(x) con cualquier valor
+            const hasPrint = code.includes('print(') && code.includes(')');
+            
+            if(hasPrint) {
+                pasoCompletado[3] = true;
+                
+                // Si estamos en paso 3 y escribe print(), avanzar automáticamente
+                if(tourStep === 3 && !codeWritten) {
+                    codeWritten = true;
+                    clearTimeout(window.tourTimeout);
+                    document.getElementById('tour-3').style.display = 'none';
+                    document.getElementById('tour-4').style.display = 'block';
+                    tourStep = 4;
+                    // Mostrar mensaje de éxito
+                    document.getElementById('term').innerHTML = '<span class="info">✅ print() detectado - Avanza al siguiente paso</span>';
+                    window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                }
+            }
+        });
+
+        // Event listeners básicos
+        document.getElementById('code').addEventListener('input', function(e) {
+            updateLines();
+        });
+        document.getElementById('code').addEventListener('scroll', syncScroll);
+        document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });
+        
+        // Inicializar líneas al cargar
+        updateLines();
     </script>
 </body>
 </html>

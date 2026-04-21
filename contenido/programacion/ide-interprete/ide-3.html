@@ -157,7 +157,8 @@
             flex: 1;
             display: flex;
             background: #1e1e1e;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         .vscode-window .line-nums {
             background: #1e1e1e;
@@ -168,6 +169,10 @@
             font-size: 13px;
             line-height: 1.5;
             user-select: none;
+            min-width: 30px;
+            height: auto;
+            display: block;
+            flex-shrink: 0;
         }
         .vscode-window .code-input {
             flex: 1;
@@ -175,6 +180,8 @@
             color: #d4d4d4;
             border: none;
             padding: 10px;
+            height: auto;
+            flex-shrink: 0;
             font-family: 'Consolas', monospace;
             font-size: 13px;
             line-height: 1.5;
@@ -448,7 +455,7 @@
                     <div class="tabs">
                         <div class="tab active">🐍 hola.py ×</div>
                     </div>
-                    <div class="code-wrapper">
+                    <div class="code-wrapper" id="code-wrapper">
                         <div class="line-nums" id="lines">1</div>
                         <textarea class="code-input" id="code" spellcheck="false" placeholder="Escribe aquí tu código..."></textarea>
                     </div>
@@ -623,17 +630,36 @@
             }
         }
 
-        function updateLines() {
+function updateLines() {
             const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            const wrapper = document.getElementById('code-wrapper');
             const n = c.value.split('\n').length;
             let l = '';
-            for(let i=1; i<=n; i++) l += i + '\n';
-            document.getElementById('lines').innerHTML = l;
+            for(let i=1; i<=n; i++) l += i + '<br>';
+            lines.innerHTML = l;
+            
+            // Sincronizar altura
+            const lineHeight = 19.5;
+            const totalHeight = n * lineHeight;
+            lines.style.height = totalHeight + 'px';
+            
+            // Reset scroll when adding lines
+            lines.scrollTop = 0;
+            c.scrollTop = 0;
         }
 
         function syncScroll() {
             const c = document.getElementById('code');
-            document.getElementById('lines').scrollTop = c.scrollTop;
+            const lines = document.getElementById('lines');
+            lines.scrollTop = c.scrollTop;
+        }
+
+        function syncScroll() {
+            const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            const scrollRatio = c.scrollTop / (c.scrollHeight - c.clientHeight || 1);
+            lines.scrollTop = scrollRatio * (lines.scrollHeight - lines.clientHeight);
         }
 
         async function runCode() {
@@ -698,9 +724,14 @@
         });
 
         // Event listeners básicos
-        document.getElementById('code').addEventListener('input', updateLines);
+        document.getElementById('code').addEventListener('input', function(e) {
+            updateLines();
+        });
         document.getElementById('code').addEventListener('scroll', syncScroll);
         document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });
+        
+        // Inicializar líneas al cargar
+        updateLines();
     </script>
 </body>
 </html>
