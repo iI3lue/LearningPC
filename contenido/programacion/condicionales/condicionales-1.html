@@ -318,11 +318,12 @@
                 <span class="tour-step">3/4</span>
             </div>
             <div class="tour-content">
-                <p><strong>Escribe el código:</strong></p>
+                <p><strong>Escribe el código con indentación:</strong></p>
                 <code>edad = 18</code><br>
                 <code>if edad >= 18:</code><br>
                 <code>&nbsp;&nbsp;&nbsp;&nbsp;print("Mayor")</code>
-                <p style="margin-top: 8px; color: #888;">El editor está vacío. Escribe el código.</p>
+                <p style="margin-top: 8px; color: #888;">Usa 4 espacios (o tab) para indentar <code>print()</code></p>
+                <p style="color: #f87171; font-size: 12px;">Importante: si no indentas, no funcionará</p>
             </div>
             <div class="tour-actions">
                 <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
@@ -622,14 +623,17 @@
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: detectar if + print + auto-avance
+        // Paso 3: detectar if con indentación正确a + print + auto-avance
         let ifWritten = false;
         document.getElementById('code').addEventListener('input', (e) => {
-            const code = e.target.value.toLowerCase();
-            const hasIf = code.includes('if ');
-            const hasPrint = code.includes('print(');
+            const code = e.target.value;
+            const codeLower = code.toLowerCase();
             
-            if(hasIf && hasPrint) {
+            // Debe tener: if + dos puntos (:), y print con indentación (4 espacios o tab)
+            const hasIfCondition = codeLower.includes('if ') && codeLower.includes(':');
+            const hasIndentedPrint = codeLower.includes('    print(') || codeLower.includes('\tprint(');
+            
+            if(hasIfCondition && hasIndentedPrint) {
                 pasoCompletado[3] = true;
                 
                 if(tourStep === 3 && !ifWritten) {
@@ -638,7 +642,7 @@
                     document.getElementById('tour-3').style.display = 'none';
                     document.getElementById('tour-4').style.display = 'block';
                     tourStep = 4;
-                    document.getElementById('term').innerHTML = '<span class="info">✅ if + print detectado - Avanza al siguiente paso</span>';
+                    document.getElementById('term').innerHTML = '<span class="info">✅ if con indentación detectado - Avanza al siguiente paso</span>';
                     window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
                 }
             }

@@ -2,64 +2,627 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Funciones 2 - LearningPC</title>
-    <link rel="stylesheet" href="../../src/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funciones 2 - Parámetros - LearningPC</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <link rel="stylesheet" href="../../trucos-dividir-pantalla.css">
     <style>
-        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
-        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; }
-        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; }
-        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; }
-        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; }
-        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-primary { background: var(--accent-solid); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .output-panel { background: #1e1e1e; border-radius: 8px; }
-        .code-output { color: #10b981; font-family: monospace; padding: 15px; min-height: 200px; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; }
-    </style>
-        .simulator-editor { background: var(--bg-secondary); border-radius: 8px; padding: 20px; margin: 20px 0; }
-        .step-indicator { background: var(--accent-solid); color: white; padding: 10px 20px; border-radius: 8px; }
-        .editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .explanation { background: var(--bg-primary); padding: 15px; border-radius: 8px; }
-        .code-editor-wrapper { display: flex; background: #1e1e1e; border-radius: 8px; }
-        .code-editor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; padding: 10px; font-family: monospace; }
-        .editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-primary { background: var(--accent-solid); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .output-panel { background: #1e1e1e; border-radius: 8px; }
-        .code-output { color: #10b981; font-family: monospace; padding: 15px; min-height: 200px; }
-        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; }
+        .intro-panel {
+            background: #1f1f1f;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 28px 36px;
+            max-width: 650px;
+            margin: 30px auto;
+            text-align: center;
+        }
+        
+        .intro-panel h2 { color: #47A1EB; font-size: 22px; margin-bottom: 12px; }
+        .intro-panel .subtitle { color: #888; font-size: 14px; margin-bottom: 20px; }
+        .intro-panel p { color: #aaa; font-size: 13px; line-height: 1.7; margin-bottom: 12px; text-align: left; }
+        
+        .intro-panel .teoria {
+            background: #252526;
+            border-radius: 6px;
+            padding: 18px;
+            margin: 16px 0;
+            text-align: left;
+        }
+        
+        .intro-panel .teoria h3 { color: #60cdff; font-size: 15px; margin-bottom: 12px; }
+        .intro-panel .teoria ul { margin: 0; padding-left: 20px; }
+        .intro-panel .teoria li { color: #ccc; font-size: 13px; margin-bottom: 8px; }
+        
+        .intro-panel .ejemplo {
+            background: #1e1e1e;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+            font-family: 'Consolas', monospace;
+        }
+        
+        .intro-panel .ejemplo h3 { color: #f472b6; font-size: 13px; margin-bottom: 8px; }
+        .intro-panel .ejemplo code { color: #22c55e; font-size: 13px; }
+        
+        .intro-panel strong { color: #fff; }
+
+        .btn-comenzar {
+            background: #0067c0;
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn-comenzar:hover { background: #0078d4; }
+
+        .vscode-window {
+            width: 800px;
+            height: 520px;
+            background: #1e1e1e;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+        }
+
+        .vscode-window.visible { display: flex !important; }
+        .ventana.visible { display: flex !important; }
+
+        .vscode-window .title-bar { background: #323232; }
+        .vscode-window .menu-bar {
+            background: #3c3c3c;
+            padding: 6px 12px;
+            display: flex;
+            gap: 16px;
+        }
+        .vscode-window .menu-item {
+            color: #cccccc;
+            font-size: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .vscode-window .menu-item:hover { background: #4d4d4d; }
+        .vscode-window .toolbar {
+            background: #252526;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #3d3d3d;
+        }
+        .vscode-window .toolbar-btn {
+            background: #3d3d3d;
+            color: #ccc;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .vscode-window .toolbar-btn:hover { background: #4d4d4d; }
+        .vscode-window .toolbar-btn.run { background: #16a34a; color: white; }
+        .vscode-window .toolbar-btn.run:hover { background: #15803d; }
+        .vscode-window .main-area { display: flex; flex: 1; background: #1e1e1e; }
+        .vscode-window .explorer { width: 180px; background: #252526; border-right: 1px solid #3d3d3d; }
+        .vscode-window .explorer-title { color: #858585; font-size: 11px; padding: 8px 12px; text-transform: uppercase; }
+        .vscode-window .file-item { color: #d4d4d4; padding: 6px 12px 6px 24px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .vscode-window .file-item:hover { background: #2a2d2e; }
+        .vscode-window .file-item.active { background: #37373d; }
+        .vscode-window .editor-area { flex: 1; display: flex; flex-direction: column; }
+        .vscode-window .tabs { display: flex; background: #2d2d2d; }
+        .vscode-window .tab { background: #2d2d2d; color: #969696; padding: 8px 16px; font-size: 13px; border-right: 1px solid #1e1e1e; }
+        .vscode-window .tab.active { background: #1e1e1e; color: #fff; }
+        .vscode-window .code-wrapper { 
+            flex: 1; 
+            display: flex; 
+            background: #1e1e1e; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            min-height: 200px;
+        }
+        .vscode-window .line-nums { 
+            background: #1e1e1e; 
+            color: #5a5a5a; 
+            padding: 10px 8px; 
+            text-align: right; 
+            font-family: 'Consolas', monospace; 
+            font-size: 13px; 
+            line-height: 1.5; 
+            user-select: none; 
+            min-width: 30px;
+            height: 200px;
+            display: block;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .vscode-window .code-input { 
+            flex: 1; 
+            background: #1e1e1e; 
+            color: #d4d4d4; 
+            border: none; 
+            padding: 10px; 
+            font-family: 'Consolas', monospace; 
+            font-size: 13px; 
+            line-height: 1.5; 
+            resize: none; 
+            outline: none;
+            height: 200px;
+            flex-shrink: 0;
+            min-height: 200px;
+            overflow-y: auto;
+        }
+        .vscode-window .terminal { background: #0d0d0d; border-top: 1px solid #3d3d3d; min-height: 80px; }
+        .vscode-window .term-header { background: #1e1e1e; color: #858585; font-size: 11px; padding: 4px 12px; }
+        .vscode-window .term-output { color: #22c55e; font-family: 'Consolas', monospace; font-size: 12px; padding: 8px 12px; white-space: pre-wrap; }
+        .vscode-window .term-output.error { color: #f87171; }
+        .vscode-window .term-output.info { color: #fbbf24; }
+        .vscode-window .status-bar { background: #007acc; color: white; font-size: 12px; padding: 3px 12px; display: flex; justify-content: space-between; }
+
+        .tour-popup {
+            position: fixed;
+            background: #323233;
+            border: 1px solid #454545;
+            border-radius: 8px;
+            padding: 16px 20px;
+            max-width: 360px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 400;
+            display: none;
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tour-popup .tour-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .tour-popup .tour-icon { font-size: 24px; }
+        .tour-popup .tour-title { color: #60cdff; font-size: 15px; font-weight: 600; }
+        .tour-popup .tour-step { background: #0078d4; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+
+        .tour-popup .tour-content {
+            color: #cccccc;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .tour-popup .tour-content code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #f472b6;
+            font-family: 'Consolas', monospace;
+            display: block;
+            margin: 4px 0;
+        }
+        .tour-popup .tour-content strong { color: #fff; }
+        .tour-popup .tour-content ul { margin: 10px 0; padding-left: 18px; }
+        .tour-popup .tour-content li { margin-bottom: 6px; color: #bbb; }
+
+        .tour-popup .tour-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .tour-popup .tour-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.15s;
+        }
+        .tour-popup .tour-btn.next { background: #0078d4; color: white; }
+        .tour-popup .tour-btn.next:hover { background: #1084d8; }
+        .tour-popup .tour-btn.skip { background: transparent; color: #888; border: 1px solid #555; }
+        .tour-popup .tour-btn.skip:hover { background: #404040; color: #ccc; }
+
+        .tour-popup.theory-pos { top: 120px; right: 30px; }
+        .tour-popup.syntax-pos { top: 200px; right: 30px; }
+        .tour-popup.create-pos { top: 280px; right: 30px; }
+        .tour-popup.run-pos { top: 360px; right: 30px; }
+
+        .success-msg {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid #22c55e;
+            border-radius: 10px;
+            padding: 20px 32px;
+            z-index: 300;
+            display: none;
+            text-align: center;
+        }
+        .success-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
+        .success-msg p { color: #ccc; font-size: 13px; margin: 0; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Parametros</h1>
-        <div class="explanation">
-            <h2>Parametros input</h2>
-            <p>Las funciones pueden recibir datos:</p>
-            <pre>def saludar(nombre):
-    print("Hola " + nombre)</pre>
+    <div class="desktop">
+        <button class="btn-comenzar" onclick="startSim()" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; padding: 16px 40px;">Comenzar →</button>
+
+        <div class="intro-panel" id="intro">
+            <h2>📥 Funciones - Parámetros</h2>
+            <p class="subtitle">Python - Datos de entrada</p>
+            
+            <div class="teoria">
+                <h3>¿Qué son los parámetros?</h3>
+                <p>Los <strong>parámetros</strong> son datos que Pasamos a la función:</p>
+                <ul>
+                    <li>Se definen <strong>entre paréntesis</strong></li>
+                    <li>Se usan <strong>dentro</strong> de la función</li>
+                    <li>Cada llamada puede tener valores diferentes</li>
+                </ul>
+            </div>
+            
+            <div class="ejemplo">
+                <h3>✏️ Sintaxis</h3>
+                <code>def saludar(nombre):</code><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;print("Hola " + nombre)</code>
+                <p style="margin-top: 8px; color: #888;">Llamar: <code>saludar("Ana")</code></p>
+            </div>
+            
+            <p>Vamos a usar parámetros.</p>
+            <button class="btn-comenzar" onclick="startSim()">Comenzar →</button>
         </div>
-        <div id="simulator-container"></div>
-        <div class="navigation">
-            <button class="btn-nav" onclick="goToLevel('prev')">Anterior</button>
-            <button class="btn-nav" onclick="goToLevel('next')">Siguiente</button>
+
+        <div class="tour-popup theory-pos" id="tour-1">
+            <div class="tour-header">
+                <span class="tour-icon">📥</span>
+                <span class="tour-title">¿Qué son parámetros?</span>
+                <span class="tour-step">1/4</span>
+            </div>
+            <div class="tour-content">
+                <p>Los <strong>parámetros</strong> son datos de entrada:</p>
+                <ul>
+                    <li>Se escriben en los <strong>paréntesis</strong></li>
+                    <li>La función los <strong>recibe</strong> y usa</li>
+                    <li>Pueden cambiar en cada llamada</li>
+                </ul>
+                <p>Ejemplo: <code>saludar("Maria")</code> pasa "Maria" a la función.</p>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup syntax-pos" id="tour-2">
+            <div class="tour-header">
+                <span class="tour-icon">✏️</span>
+                <span class="tour-title">Sintaxis con parámetro</span>
+                <span class="tour-step">2/4</span>
+            </div>
+            <div class="tour-content">
+                <p><strong>Definir:</strong></p>
+                <code>def nombre(param):</code><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;# usar param</code>
+                <p><strong>Llamar:</strong></p>
+                <code>nombre("valor")</code>
+                <ul>
+                    <li>El parámetro se define en <code>def</code></li>
+                    <li>Se pasa el valor en la llamada</li>
+                </ul>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup create-pos" id="tour-3">
+            <div class="tour-header">
+                <span class="tour-icon">👆</span>
+                <span class="tour-title">Crear con parámetro</span>
+                <span class="tour-step">3/4</span>
+            </div>
+            <div class="tour-content">
+                <p><strong>Escribe:</strong></p>
+                <code>def saludar(nombre):</code><br>
+                <code>&nbsp;&nbsp;&nbsp;&nbsp;print("Hola " + nombre)</code>
+                <code>saludar("Ana")</code>
+                <p style="margin-top: 8px; color: #888;">El parámetro debe estar entre paréntesis en def Y en la llamada</p>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">Siguiente →</button>
+            </div>
+        </div>
+
+        <div class="tour-popup run-pos" id="tour-4">
+            <div class="tour-header">
+                <span class="tour-icon">▶</span>
+                <span class="tour-title">Ejecutar y Verificar</span>
+                <span class="tour-step">4/4</span>
+            </div>
+            <div class="tour-content">
+                <p><strong>Ejecuta:</strong></p>
+                <ul>
+                    <li>Presiona <code>F5</code></li>
+                    <li>O haz click en <strong>▶ Ejecutar (F5)</strong></li>
+                </ul>
+                <p>Deberías ver: <code>Hola Ana</code></p>
+                <p style="margin-top: 8px; color: #888;">¡Has usado un parámetro!</p>
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn skip" onclick="skipTour()">Omitir</button>
+                <button class="tour-btn next" onclick="nextTourStep()">¡Listo! →</button>
+            </div>
+        </div>
+
+        <div class="ventana vscode-window" id="ventana-vscode" style="display:none; width:800px; height:520px; left:50px; top:30px;">
+            <div class="title-bar">
+                <div class="icono">📊</div>
+                <span class="titulo">Visual Studio Code - parametros.py</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarVentana('vscode')">─</div>
+                    <div class="window-btn" onclick="maximizarVentana('vscode')">□</div>
+                    <div class="window-btn close" onclick="cerrarVentana('vscode')">×</div>
+                </div>
+            </div>
+            
+            <div class="menu-bar">
+                <span class="menu-item">Archivo</span>
+                <span class="menu-item">Editar</span>
+                <span class="menu-item">Ver</span>
+                <span class="menu-item">Terminal</span>
+                <span class="menu-item">Ayuda</span>
+            </div>
+            
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="newFile()">📄 Nuevo</button>
+                <button class="toolbar-btn" onclick="openFile()">📂 Abrir</button>
+                <button class="toolbar-btn run" onclick="runCode()">▶ Ejecutar (F5)</button>
+                <button class="toolbar-btn" onclick="resetCode()">↻ Reiniciar</button>
+            </div>
+            
+            <div class="main-area">
+                <div class="explorer">
+                    <div class="explorer-title">Explorador</div>
+                    <div class="file-item active">🐍 parametros.py</div>
+                </div>
+                
+                <div class="editor-area">
+                    <div class="tabs">
+                        <div class="tab active">🐍 parametros.py ×</div>
+                    </div>
+                    <div class="code-wrapper" id="code-wrapper">
+                        <div class="line-nums" id="lines">1</div>
+                        <textarea class="code-input" id="code" spellcheck="false" placeholder="def saludar(nombre):"></textarea>
+                    </div>
+                    <div class="terminal">
+                        <div class="term-header">🔶 TERMINAL</div>
+                        <pre class="term-output" id="term"><span class="info">⏳ Cargando Python...</span></pre>
+                    </div>
+                    <div class="status-bar">
+                        <span>🐍 principal</span>
+                        <span>Ln 1, Col 1</span>
+                        <span>Python 3.11</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="success-msg" id="success">
+            <h3>🎉 ¡Parámetros completado!</h3>
+            <p>Has usado parámetros en funciones</p>
         </div>
     </div>
-    <script src="../../src/js/pyodide-loader.js"></script>
-    <script src="../../src/js/simulator-editor.js"></script>
+
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-vscode" onclick="abrirVentana('vscode')">📊</div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶 🔋</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+                <div class="clock-fecha" id="clock-fecha">21/4/2026</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../simulacion-core.js"></script>
     <script>
-        const levelConfig = {
-            initialCode: '# Parametro\ndef saludar(nombre):\n    print("Hola " + nombre)\n\nsaludar("Ana")',
-            totalSteps: 1, startStep: 1,
-            steps: [{ type: 'contains', expected: 'Ana', successMessage: 'Parametro funciona!', hint: 'saludar("Juan")' }],
-            completionMessage: 'Funciones con parametros listo!'
-        };
-        function goToLevel(d) { window.location.href = d === 'next' ? 'funciones-3.html' : 'funciones-1.html'; }
-        document.addEventListener('DOMContentLoaded', () => initSimulatorEditor(levelConfig));
+        let pyReady = false;
+        let py = null;
+        let done = false;
+        let tourStep = 0;
+
+        let pasoCompletado = { 1: false, 2: false, 3: false, 4: false };
+
+        function puedeAvanzar(paso) {
+            if (!pasoCompletado[paso]) {
+                mostrarToastFallo(paso);
+                return false;
+            }
+            return true;
+        }
+
+        function mostrarToastFallo(paso) {
+            const mensajes = ["Lee la teoría primero", "Lee la sintaxis primero", "Escribe la función primero", "Ejecuta el código primero"];
+            const msg = mensajes[paso - 1] || "Completa esta acción primero";
+            document.getElementById('term').innerHTML = '<span class="error">' + msg + '</span>';
+        }
+
+        async function loadPy() {
+            try {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+                document.head.appendChild(s);
+                s.onload = async () => {
+                    py = await window.loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'});
+                    pyReady = true;
+                    document.getElementById('term').textContent = '✅ Python listo\n\n📝 def saludar(nombre):\n    print("Hola " + nombre)\nsaludar("Ana")\nPresiona F5';
+                };
+            } catch(e) {
+                document.getElementById('term').innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function startSim() {
+            document.getElementById('intro').style.display = 'none';
+            const btn = document.querySelector('.btn-comenzar');
+            if(btn) btn.style.display = 'none';
+            
+            const ventana = document.getElementById('ventana-vscode');
+            if(ventana) { ventana.style.display = 'flex'; ventana.classList.add('visible'); }
+            
+            const taskbar = document.getElementById('taskbar-vscode');
+            if(taskbar) taskbar.classList.add('active');
+            
+            loadPy();
+            setTimeout(() => showTourStep(1), 800);
+        }
+
+        function showTourStep(num) {
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            const current = document.getElementById('tour-' + num);
+            if(current) {
+                current.style.display = 'block';
+                tourStep = num;
+                window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+            }
+        }
+
+        function nextTourStep() {
+            clearTimeout(window.tourTimeout);
+            if (!puedeAvanzar(tourStep)) {
+                window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                return;
+            }
+            if(tourStep < 4) { showTourStep(tourStep + 1); }
+            else { skipTour(); setTimeout(() => autoNext(), 500); }
+        }
+
+        function skipTour() {
+            clearTimeout(window.tourTimeout);
+            for(let i = 1; i <= 4; i++) {
+                const popup = document.getElementById('tour-' + i);
+                if(popup) popup.style.display = 'none';
+            }
+            tourStep = 0;
+            if(pasoCompletado[3] && pasoCompletado[4]) { setTimeout(() => autoNext(), 500); }
+        }
+
+        async function autoNext() {
+            document.getElementById('success').style.display = 'block';
+            if(window.parent && window.parent.completarNivelYAvanzar) {
+                try { await window.parent.completarNivelYAvanzar(); }
+                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            } else {
+                setTimeout(() => window.parent.location.reload(), 2500);
+            }
+        }
+
+        function updateLines() {
+            const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            const n = Math.max(1, c.value.split('\n').length);
+            let l = '';
+            for(let i=1; i<=n; i++) l += i + '<br>';
+            lines.innerHTML = l;
+            
+            const lineHeight = 19.5;
+            const totalHeight = n * lineHeight;
+            const minHeight = 200;
+            
+            const newHeight = Math.max(minHeight, totalHeight);
+            lines.style.height = newHeight + 'px';
+            c.style.height = newHeight + 'px';
+            
+            lines.scrollTop = 0;
+            c.scrollTop = 0;
+        }
+
+        function syncScroll() {
+            const c = document.getElementById('code');
+            const lines = document.getElementById('lines');
+            lines.scrollTop = c.scrollTop;
+        }
+
+        async function runCode() {
+            const code = document.getElementById('code').value;
+            const term = document.getElementById('term');
+            
+            if(!code.trim()) { term.innerHTML = '<span class="error">✏️ Escribe código</span>'; return; }
+            if(!pyReady) { term.innerHTML = '<span class="info">⏳ Cargando...</span>'; return; }
+            
+            term.textContent = '🔄 Ejecutando...\n';
+            
+            try {
+                py.runPython('import sys\nfrom io import StringIO\nsys.stdout = StringIO()');
+                py.runPython(code);
+                const res = py.runPython('sys.stdout.getvalue()');
+                term.textContent = res || '(sin output)';
+                
+                if(!done && res.trim()) {
+                    done = true;
+                    pasoCompletado[3] = true;
+                    pasoCompletado[4] = true;
+                    term.textContent += '\n\n✅ ¡Parámetro usado correctamente!';
+                    skipTour();
+                }
+            } catch(e) {
+                term.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
+            }
+        }
+
+        function newFile() { document.getElementById('term').textContent = '📄 Nuevo archivo'; }
+        function openFile() { document.getElementById('term').textContent = '📂 Abrir archivo'; }
+        function resetCode() { 
+            document.getElementById('code').value = ''; 
+            updateLines(); 
+            document.getElementById('term').textContent = '✅ Código reiniciado';
+        }
+
+        function onVentanaAbierta(t) {}
+        function onVentanaCerrada(t) {}
+
+        document.getElementById('tour-1').addEventListener('click', () => { pasoCompletado[1] = true; });
+        document.getElementById('tour-2').addEventListener('click', () => { pasoCompletado[2] = true; });
+
+        let funcWritten = false;
+        document.getElementById('code').addEventListener('input', (e) => {
+            const code = e.target.value;
+            const codeLower = code.toLowerCase();
+            const lines = code.split('\n').filter(l => l.trim());
+            
+            const hasDefParam = codeLower.includes('def ') && codeLower.includes('(') && codeLower.includes('):');
+            const hasIndentedPrint = codeLower.includes('    print(') || codeLower.includes('\tprint(');
+            const hasCall = codeLower.includes('(') && codeLower.includes(')') && !codeLower.includes('):');
+            const hasAllLines = lines.length >= 3;
+            
+            if(hasDefParam && hasIndentedPrint && hasCall && hasAllLines) {
+                pasoCompletado[3] = true;
+                
+                if(tourStep === 3 && !funcWritten) {
+                    funcWritten = true;
+                    clearTimeout(window.tourTimeout);
+                    document.getElementById('tour-3').style.display = 'none';
+                    document.getElementById('tour-4').style.display = 'block';
+                    tourStep = 4;
+                    document.getElementById('term').innerHTML = '<span class="info">✅ 3 líneas completas detectado - Avanza</span>';
+                    window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                }
+            }
+        });
+
+        document.getElementById('code').addEventListener('input', function(e) { updateLines(); });
+        document.getElementById('code').addEventListener('scroll', syncScroll);
+        document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });
+        
+        updateLines();
     </script>
 </body>
 </html>
