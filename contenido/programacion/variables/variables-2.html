@@ -635,13 +635,15 @@
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: detectar type() + auto-avance
+        // Paso 3: detectar print() + type() + auto-avance
         let typeWritten = false;
         document.getElementById('code').addEventListener('input', (e) => {
             const code = e.target.value.toLowerCase();
+            // Debe tener print() Y type()
+            const hasPrint = code.includes('print(');
             const hasType = code.includes('type(');
             
-            if(hasType) {
+            if(hasPrint && hasType) {
                 pasoCompletado[3] = true;
                 
                 if(tourStep === 3 && !typeWritten) {
@@ -650,7 +652,7 @@
                     document.getElementById('tour-3').style.display = 'none';
                     document.getElementById('tour-4').style.display = 'block';
                     tourStep = 4;
-                    document.getElementById('term').innerHTML = '<span class="info">✅ type() detectado - Avanza al siguiente paso</span>';
+                    document.getElementById('term').innerHTML = '<span class="info">✅ print() + type() detectado - Avanza al siguiente paso</span>';
                     window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
                 }
             }

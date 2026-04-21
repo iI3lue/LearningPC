@@ -627,18 +627,19 @@ function updateLines() {
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: Input no editor = código escrito + auto-avanzar
+        // Paso 3: detectar print() + asignación de variable + auto-avance
         let codeWritten = false;
         document.getElementById('code').addEventListener('input', (e) => {
             const code = e.target.value.toLowerCase().replace(/\s/g, '');
             
-            // Validar que contenga print(x) o print(x) con cualquier valor
+            // Debe tener: variable = valor Y print(variable)
+            const hasAssignment = code.includes('=');  // asignación como x = 5
             const hasPrint = code.includes('print(') && code.includes(')');
             
-            if(hasPrint) {
+            if(hasAssignment && hasPrint) {
                 pasoCompletado[3] = true;
                 
-                // Si estamos en paso 3 y escribe print(), avanzar automáticamente
+                // Si estamos en paso 3 y escribe código correcto, avanzar automáticamente
                 if(tourStep === 3 && !codeWritten) {
                     codeWritten = true;
                     clearTimeout(window.tourTimeout);
@@ -646,7 +647,7 @@ function updateLines() {
                     document.getElementById('tour-4').style.display = 'block';
                     tourStep = 4;
                     // Mostrar mensaje de éxito
-                    document.getElementById('term').innerHTML = '<span class="info">✅ print() detectado - Avanza al siguiente paso</span>';
+                    document.getElementById('term').innerHTML = '<span class="info">✅ variable + print() detectado - Avanza al siguiente paso</span>';
                     window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
                 }
             }

@@ -621,13 +621,15 @@
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: detectar función de conversión + auto-avance
+        // Paso 3: detectar print() con función de conversión + auto-avance
         let convWritten = false;
         document.getElementById('code').addEventListener('input', (e) => {
             const code = e.target.value.toLowerCase();
+            // Debe tener print() Y una función de conversión (int, str, float)
+            const hasPrint = code.includes('print(');
             const hasConv = code.includes('int(') || code.includes('str(') || code.includes('float(');
             
-            if(hasConv) {
+            if(hasPrint && hasConv) {
                 pasoCompletado[3] = true;
                 
                 if(tourStep === 3 && !convWritten) {
@@ -636,7 +638,7 @@
                     document.getElementById('tour-3').style.display = 'none';
                     document.getElementById('tour-4').style.display = 'block';
                     tourStep = 4;
-                    document.getElementById('term').innerHTML = '<span class="info">✅ Conversión detectada - Avanza al siguiente paso</span>';
+                    document.getElementById('term').innerHTML = '<span class="info">✅ print() + conversión detectada - Avanza al siguiente paso</span>';
                     window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
                 }
             }
