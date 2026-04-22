@@ -3,11 +3,17 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-// La BD se guarda junto a la app (en producción se puede mover a userData)
-const DB_PATH = path.join(__dirname, '..', 'learning_pc.db');
+// La BD se guarda junto a la app (en producción usar volumen persistente)
+// En Render: usar /data (RENDER_PERSISTENT_DISK_DIR) si está disponible
+const RENDER_DATA_DIR = process.env.RENDER_PERSISTENT_DISK_DIR || 
+                       process.env.DATA_DIR || 
+                       process.cwd();
+const DB_PATH = path.join(RENDER_DATA_DIR, 'learning_pc.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
 let db;
+
+console.log('[DB] Ruta de BD:', DB_PATH);
 
 /**
  * Inicializa la base de datos.
