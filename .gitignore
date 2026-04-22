@@ -9,3 +9,13 @@ test-electron.js
 minimal.js
 package-orig.json
 package-temp.json
+
+# Documentación (no necesaria para la app)
+*.docx
+documento.json
+create-doc.js
+fix-textrun.js
+
+# Logs y temporales
+*.log
+npm-debug.log*
