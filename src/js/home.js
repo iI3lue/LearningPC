@@ -55,6 +55,10 @@
     // Admin link
     const linkAdmin = getEl('link-admin');
     if (linkAdmin) {
+        // Mostrar botón solo si es admin
+        if (usuario && usuario.usuario === 'admin') {
+            linkAdmin.style.display = 'flex';
+        }
         linkAdmin.addEventListener('click', () => {
             window.api.irA('gestion');
         });
