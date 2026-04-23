@@ -497,7 +497,7 @@
                     </div>
                     <div class="code-wrapper">
                         <div class="line-nums" id="lines">1</div>
-                        <textarea class="code-input" id="code" spellcheck="false">print("¡Hola, Mundo!")</textarea>
+                        <textarea class="code-input" id="code" spellcheck="false" placeholder="Escribe tu código Python aquí..."></textarea>
                     </div>
                     <div class="terminal">
                         <div class="term-header">🔶 TERMINAL</div>
@@ -625,11 +625,21 @@ function skipTour() {
             }
         }
 
+async function autoNext() {
+            document.getElementById('success').style.display = 'block';
+            if(window.parent && window.parent.completarNivelYAvanzar) {
+                try { await window.parent.completarNivelYAvanzar(); } 
+                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            } else {
+                setTimeout(() => window.parent.location.reload(), 2500);
+            }
+        }
+
         function updateLines() {
             const c = document.getElementById('code');
-            const n = c.value.split('\\n').length;
+            const n = c.value.split('\n').length;
             let l = '';
-            for(let i=1; i<=n; i++) l += i + '\\n';
+            for(let i=1; i<=n; i++) l += i + '\n';
             document.getElementById('lines').textContent = l;
         }
 
@@ -645,17 +655,17 @@ function skipTour() {
             if(!code.trim()) { term.innerHTML = '<span class="error">✏️ Escribe código</span>'; return; }
             if(!pyReady) { term.innerHTML = '<span class="info">⏳ Cargando...</span>'; return; }
             
-            term.textContent = '🔄 Ejecutando...\\n';
+            term.textContent = '🔄 Ejecutando...\n';
             
             try {
-                py.runPython('import sys\\nfrom io import StringIO\\nsys.stdout = StringIO()');
+                py.runPython('import sys\nfrom io import StringIO\nsys.stdout = StringIO()');
                 py.runPython(code);
                 const res = py.runPython('sys.stdout.getvalue()');
                 term.textContent = res || '(sin output)';
                 
                 if(!done && (res.includes('Hola') || res.includes('Mundo'))) {
                     done = true;
-                    term.textContent += '\\n\\n✅ ¡Correcto!';
+                    term.textContent += '\n\n✅ ¡Correcto!';
                     setTimeout(() => autoNext(), 1000);
                 }
             } catch(e) {
@@ -663,19 +673,9 @@ function skipTour() {
             }
         }
 
-        async function autoNext() {
-            document.getElementById('success').style.display = 'block';
-            if(window.parent && window.parent.completarNivelYAvanzar) {
-                try { await window.parent.completarNivelYAvanzar(); } 
-                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
-            } else {
-                setTimeout(() => window.parent.location.reload(), 2500);
-            }
-        }
-
         function newFile() { document.getElementById('term').textContent = '📄 Nuevo archivo'; }
         function openFile() { document.getElementById('term').textContent = '📂 Abrir archivo'; }
-        function resetCode() { document.getElementById('code').value = 'print("¡Hola, Mundo!")'; updateLines(); }
+        function resetCode() { document.getElementById('code').value = ''; updateLines(); }
 
         function onVentanaAbierta(t) {}
         function onVentanaCerrada(t) {}
