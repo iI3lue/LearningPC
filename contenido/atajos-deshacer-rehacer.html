@@ -606,8 +606,8 @@
                     </div>
                 </div>
             </div>
-            <div class="document-area" onclick="focusDocument()">
-                <div class="document-page" id="documento" contenteditable="true">
+            <div class="document-area">
+                <div class="document-page" id="documento" contenteditable="true" tabindex="0" onclick="this.focus()" onmousedown="this.focus()">
                     <p>Querido amigo/a:</p>
                     <p>Este es un documento para practicar deshacer y rehacer.</p>
                     <p>Escribe algo y presiona Ctrl+Z para deshacer.</p>
@@ -691,6 +691,18 @@
         function focusDocument() {
             document.getElementById('documento').focus();
         }
+        
+        document.getElementById('documento').addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            this.focus();
+        });
+        
+        document.getElementById('document-area').addEventListener('mousedown', function(e) {
+            if (e.target === this) {
+                e.preventDefault();
+                document.getElementById('documento').focus();
+            }
+        });
         
         function focusWord() {
             document.getElementById('ventana').classList.add('visible');
