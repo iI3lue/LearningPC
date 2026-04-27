@@ -778,6 +778,16 @@
             'win-l': false
         };
         
+        let nivelCompletado = false;
+        
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+        
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('atajos-grid').style.display = 'grid';
@@ -926,6 +936,7 @@
             if (todos) {
                 document.getElementById('btn-reiniciar').classList.add('visible');
                 actualizarInstrucciones();
+                completarNivel();
             }
         }
         

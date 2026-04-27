@@ -616,6 +616,18 @@
             }
         }
         
+        // Bandera para prevenir duplicación
+        let nivelCompletado = false;
+
+        function marcarCompletadoNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            // Notificar al frame padre que el nivel se ha completado
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+
         function abrirExplorador(origen) {
             // Cerrar menú inicio si está abierto
             if (startMenuAbierto) {
@@ -661,6 +673,9 @@
             
             mostrarInfo(mensaje);
             actualizarPanel();
+            
+            // Marcar el nivel como completado cuando se abre exitosamente
+            setTimeout(marcarCompletadoNivel, 500);
         }
         
         function mostrarInfo(mensajeOtipo) {

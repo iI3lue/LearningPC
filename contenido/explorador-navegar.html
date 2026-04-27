@@ -780,6 +780,18 @@
         let pestañas = [{ ruta: 'Este equipo', titulo: 'Este equipo' }];
         let pestañaActiva = 0;
         
+        // Bandera para prevenir duplicación
+        let nivelCompletado = false;
+
+        function marcarCompletadoNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            // Notificar al frame padre que el nivel se ha completado
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+        
         const infoPopup = document.getElementById('info-popup');
         
         function iniciarSimulacion() {
@@ -952,6 +964,8 @@
                 actualizarEstado();
                 actualizarPestañas();
                 mostrarInfo('¡Subiste de nivel!', 'Ahora estás en la carpeta padre.');
+                // Marcar completación después de demostrar navegación
+                setTimeout(marcarCompletadoNivel, 500);
             }
         }
         

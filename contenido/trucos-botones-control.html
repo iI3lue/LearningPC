@@ -420,6 +420,15 @@
         let popupVisible = false;
         let ventanaActivaLayout = null;
         let divisionActiva = false;
+        let nivelCompletado = false;
+        
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
         
         const popup = document.getElementById('layout-popup');
         
@@ -550,6 +559,7 @@
             
             mostrarMensajePractica();
             mostrarToast('¡Pantalla dividida!');
+            completarNivel();
         }
         
         function mostrarMensajePractica() {

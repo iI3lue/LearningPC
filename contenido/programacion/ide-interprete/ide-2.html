@@ -549,6 +549,9 @@
         }
 
         function nextLevel() {
+            if (window.nextLevelCalled) return;
+            window.nextLevelCalled = true;
+            
             // Ocultar popup
             document.getElementById('theory-popup').style.display = 'none';
             document.getElementById('success').style.display = 'block';
@@ -567,12 +570,7 @@
             }
         }
 
-        // Funciones legacy (mantener para compatibilidad)
-        function showTourStep(num) {}
-        function nextTourStep() {}
-        function skipTour() {}
-        function loadPy() {} // Ya no se usa
-        function runCode() {} // Ya no se usa
+        // Event listeners para atualizar linhas do editor
         function updateLines() {
             const c = document.getElementById('code');
             const n = c.value.split('\n').length;
@@ -585,6 +583,10 @@
             const c = document.getElementById('code');
             document.getElementById('lines').scrollTop = c.scrollTop;
         }
+
+        // Event listeners
+        document.getElementById('code').addEventListener('input', updateLines);
+        document.getElementById('code').addEventListener('scroll', syncScroll);
     </script>
 </body>
 </html>

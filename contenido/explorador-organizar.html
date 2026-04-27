@@ -477,13 +477,28 @@
             }
         }
         
+        // Bandera para prevenir duplicación
+        let nivelCompletado = false;
+
+        function marcarCompletadoNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            // Notificar al frame padre que el nivel se ha completado
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+
         function siguientePaso() {
             if (pasoActual < pasos.length - 1) {
                 pasoActual++;
                 actualizarTutorial();
             } else {
+                // ¡Tutorial completado! - punto de completación
                 tutorialPanel.classList.remove('visible');
                 successPanel.classList.add('visible');
+                // Llamar a completarNivelYAvanzar después de mostrar el éxito
+                setTimeout(marcarCompletadoNivel, 1000);
                 setTimeout(() => reiniciarTutorial(), 5000);
             }
         }

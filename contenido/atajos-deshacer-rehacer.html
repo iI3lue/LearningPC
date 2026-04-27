@@ -542,6 +542,15 @@
         let historial = [];
         let historialIndex = -1;
         let estado = 'inicio';
+        let nivelCompletado = false;
+        
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
         
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
@@ -639,6 +648,7 @@
                 estado = 'completado';
                 document.getElementById('btn-reiniciar').classList.add('visible');
                 actualizarInstrucciones();
+                completarNivel();
             }
         }
         

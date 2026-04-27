@@ -983,6 +983,15 @@
         let wordVisible = false;
         let textoSeleccionadoActual = '';
         let primeraVez = true;
+        let nivelCompletado = false;
+        
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
 
         // ========== SELECCIÓN NATIVA DEL NAVEGADOR ==========
         
@@ -1072,12 +1081,13 @@
                     document.getElementById('btn-reiniciar').classList.add('visible');
                     mostrarToast('🎉 ¡Perfecto! Has pegado el texto', 'exito');
                     actualizarInstrucciones();
+                    completarNivel();
                 }
             } else {
                 mostrarToast('No hay nada en el portapapeles');
             }
         }
-
+        
         // ========== INICIAR SIMULACIÓN ==========
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
@@ -1148,6 +1158,7 @@
                             estado = 'completado';
                             document.getElementById('btn-reiniciar').classList.add('visible');
                             actualizarInstrucciones();
+                            completarNivel();
                         }
                     } else {
                         // Si no hay cursor visible, pegar al final
@@ -1161,6 +1172,7 @@
                             estado = 'completado';
                             document.getElementById('btn-reiniciar').classList.add('visible');
                             actualizarInstrucciones();
+                            completarNivel();
                         }
                     }
                 } else {

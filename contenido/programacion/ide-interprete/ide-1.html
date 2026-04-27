@@ -615,17 +615,11 @@ function skipTour() {
             tourStep = 0;
         }
 
+        let autoNextCalled = false;
         async function autoNext() {
-            document.getElementById('success').style.display = 'block';
-            if(window.parent && window.parent.completarNivelYAvanzar) {
-                try { await window.parent.completarNivelYAvanzar(); } 
-                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
-            } else {
-                setTimeout(() => window.parent.location.reload(), 2500);
-            }
-        }
-
-async function autoNext() {
+            if (autoNextCalled) return;
+            autoNextCalled = true;
+            
             document.getElementById('success').style.display = 'block';
             if(window.parent && window.parent.completarNivelYAvanzar) {
                 try { await window.parent.completarNivelYAvanzar(); } 

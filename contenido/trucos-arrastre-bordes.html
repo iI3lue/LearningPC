@@ -236,15 +236,24 @@
     <script src="simulacion-core.js"></script>
     
     <script>
-        // ═══════════════════════════════════════════════════════════
+        // ════════════════════════════════════════════════════════
         // SIMULACIÓN ESPECÍFICA: Dividir pantalla con Win + Flechas
-        // ═══════════════════════════════════════════════════════════
+        // ════════════════════════════════════════════════════════
         
         // Variables locales de esta simulación
         let navegadorAbierto = false;
         let bibliotecaAbierta = false;
         let selectorActivo = false;
         let ventanaArrastrando = null;
+        let nivelCompletado = false;
+        
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
         
         // Callbacks para el core
         function onVentanaAbierta(tipo) {
@@ -627,6 +636,8 @@
                 msg.classList.add('visible');
                 setTimeout(() => msg.classList.remove('visible'), 2500);
             }
+            
+            completarNivel();
         }
         
         // Agregar arrastre a ambas ventanas al cargar
