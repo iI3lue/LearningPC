@@ -817,3 +817,618 @@ body {
     transition: opacity 0.2s, transform 0.2s;
     pointer-events: none;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   TOUR POPUP - Estándar para popups informativos
+   ═══════════════════════════════════════════════════════════ */
+
+.tour-popup {
+    position: fixed;
+    background: #323233;
+    border: 1px solid #454545;
+    border-radius: 8px;
+    padding: 16px 20px;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    z-index: 400;
+    display: none;
+    animation: popIn 0.25s ease;
+}
+
+.tour-popup.visible {
+    display: block;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.tour-popup .tour-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tour-popup .tour-icon {
+    font-size: 24px;
+}
+
+.tour-popup .tour-title {
+    color: #60cdff;
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.tour-popup .tour-step {
+    background: #0078d4;
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.tour-popup .tour-content {
+    color: #cccccc;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.tour-popup .tour-content code {
+    background: #1e1e1e;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #f472b6;
+    font-family: 'Consolas', monospace;
+}
+
+.tour-popup .tour-content ul {
+    margin: 8px 0;
+    padding-left: 18px;
+}
+
+.tour-popup .tour-content li {
+    margin-bottom: 4px;
+    color: #bbbbbb;
+}
+
+.tour-popup .tour-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.tour-popup .tour-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s;
+}
+
+.tour-popup .tour-btn.next {
+    background: #0078d4;
+    color: white;
+}
+
+.tour-popup .tour-btn.next:hover {
+    background: #1084d8;
+}
+
+.tour-popup .tour-btn.skip {
+    background: transparent;
+    color: #888888;
+    border: 1px solid #555555;
+}
+
+.tour-popup .tour-btn.skip:hover {
+    background: #404040;
+    color: #cccccc;
+}
+
+/* Posiciones estándar para tour popups */
+.tour-popup.explorer-pos { top: 120px; right: 30px; }
+.tour-popup.editor-pos { top: 180px; right: 30px; }
+.tour-popup.terminal-pos { top: 380px; right: 30px; }
+.tour-popup.toolbar-pos { top: 80px; right: 30px; }
+.tour-popup.theory-pos { top: 120px; right: 30px; }
+.tour-popup.syntax-pos { top: 200px; right: 30px; }
+.tour-popup.create-pos { top: 280px; right: 30px; }
+.tour-popup.run-pos { top: 360px; right: 30px; }
+
+/* ═══════════════════════════════════════════════════════════
+   SUCCESS MESSAGE - Mensaje de nivel completado
+   ═══════════════════════════════════════════════════════════ */
+
+.success-msg {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid #22c55e;
+    border-radius: 10px;
+    padding: 20px 32px;
+    z-index: 300;
+    display: none;
+    text-align: center;
+    animation: popIn 0.25s ease;
+}
+
+.success-msg.visible {
+    display: block;
+}
+
+.success-msg h3 {
+    color: #22c55e;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.success-msg p {
+    color: #cccccc;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INTRO PANEL - Panel de teoría/instrucciones inicial
+   ═══════════════════════════════════════════════════════════ */
+
+.intro-panel {
+    background: #1f1f1f;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    padding: 28px 36px;
+    max-width: 600px;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.intro-panel h2 {
+    color: #47A1EB;
+    font-size: 22px;
+    margin-bottom: 16px;
+}
+
+.intro-panel .subtitle {
+    color: #888888;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.intro-panel p {
+    color: #aaaaaa;
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.intro-panel .teoria,
+.intro-panel .concepto,
+.intro-panel .ejemplo {
+    background: #252526;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+    text-align: left;
+}
+
+.intro-panel .teoria h3,
+.intro-panel .concepto h3,
+.intro-panel .ejemplo h3 {
+    color: #60cdff;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.intro-panel .teoria ul,
+.intro-panel .concepto ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.intro-panel .teoria li,
+.intro-panel .concepto li {
+    color: #cccccc;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.intro-panel strong {
+    color: #ffffff;
+}
+
+.intro-panel code {
+    background: #333333;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #f472b6;
+    font-family: 'Consolas', monospace;
+}
+
+.intro-panel .diferencia {
+    background: rgba(71, 161, 235, 0.1);
+    border: 1px solid #47A1EB;
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+    text-align: left;
+}
+
+.intro-panel .diferencia h3 {
+    color: #47A1EB;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.intro-panel .diferencia p {
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOTONES ESTÁNDAR
+   ═══════════════════════════════════════════════════════════ */
+
+.btn-comenzar {
+    background: #0067c0;
+    color: #ffffff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s;
+}
+
+.btn-comenzar:hover {
+    background: #0078d4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   VSCODE WINDOW - Estándar para editor de código Python
+   ═══════════════════════════════════════════════════════════ */
+
+.vscode-window {
+    width: 800px;
+    height: 520px;
+    background: #1e1e1e;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+}
+
+.vscode-window.visible,
+.ventana.visible {
+    display: flex !important;
+}
+
+.vscode-window .title-bar,
+.ventana .title-bar {
+    background: #323233;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    cursor: default;
+}
+
+.vscode-window .title-bar .icono,
+.ventana .title-bar .icono {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vscode-window .title-bar .titulo,
+.ventana .title-bar .titulo {
+    color: #ffffff;
+    font-size: 12px;
+    flex: 1;
+}
+
+.vscode-window .window-controls,
+.ventana .window-controls {
+    display: flex;
+    height: 32px;
+}
+
+.vscode-window .window-btn,
+.ventana .window-btn {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.vscode-window .window-btn:hover,
+.ventana .window-btn:hover {
+    background: #3d3d3d;
+}
+
+.vscode-window .window-btn.close:hover,
+.ventana .window-btn.close:hover {
+    background: #c42b1c;
+}
+
+.vscode-window .window-btn svg,
+.ventana .window-btn svg {
+    width: 10px;
+    height: 10px;
+    fill: #ffffff;
+}
+
+.vscode-window .menu-bar,
+.ventana .menu-bar {
+    background: #3c3c3c;
+    padding: 6px 12px;
+    display: flex;
+    gap: 16px;
+}
+
+.vscode-window .menu-item,
+.ventana .menu-item {
+    color: #cccccc;
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+.vscode-window .menu-item:hover,
+.ventana .menu-item:hover {
+    background: #4d4d4d;
+}
+
+.vscode-window .toolbar,
+.ventana .toolbar {
+    background: #252526;
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.vscode-window .toolbar-btn,
+.ventana .toolbar-btn {
+    background: #3d3d3d;
+    color: #cccccc;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.vscode-window .toolbar-btn:hover,
+.ventana .toolbar-btn:hover {
+    background: #4d4d4d;
+}
+
+.vscode-window .toolbar-btn.run,
+.ventana .toolbar-btn.run {
+    background: #16a34a;
+    color: white;
+}
+
+.vscode-window .toolbar-btn.run:hover,
+.ventana .toolbar-btn.run:hover {
+    background: #15803d;
+}
+
+.vscode-window .main-area,
+.ventana .main-area {
+    display: flex;
+    flex: 1;
+    background: #1e1e1e;
+}
+
+.vscode-window .explorer,
+.ventana .explorer {
+    width: 180px;
+    background: #252526;
+    border-right: 1px solid #3d3d3d;
+}
+
+.vscode-window .explorer-title,
+.ventana .explorer-title {
+    color: #858585;
+    font-size: 11px;
+    padding: 8px 12px;
+    text-transform: uppercase;
+}
+
+.vscode-window .file-item,
+.ventana .file-item {
+    color: #d4d4d4;
+    padding: 6px 12px 6px 24px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vscode-window .file-item:hover,
+.ventana .file-item:hover {
+    background: #2a2d2e;
+}
+
+.vscode-window .file-item.active,
+.ventana .file-item.active {
+    background: #37373d;
+}
+
+.vscode-window .editor-area,
+.ventana .editor-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.vscode-window .tabs,
+.ventana .tabs {
+    display: flex;
+    background: #2d2d2d;
+}
+
+.vscode-window .tab,
+.ventana .tab {
+    background: #2d2d2d;
+    color: #969696;
+    padding: 8px 16px;
+    font-size: 13px;
+    border-right: 1px solid #1e1e1e;
+}
+
+.vscode-window .tab.active,
+.ventana .tab.active {
+    background: #1e1e1e;
+    color: #ffffff;
+}
+
+.vscode-window .code-wrapper,
+.ventana .code-wrapper {
+    flex: 1;
+    display: flex;
+    background: #1e1e1e;
+    overflow: auto;
+}
+
+.vscode-window .line-nums,
+.ventana .line-nums {
+    background: #1e1e1e;
+    color: #5a5a5a;
+    padding: 10px 8px;
+    text-align: right;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    user-select: none;
+}
+
+.vscode-window .code-input,
+.ventana .code-input {
+    flex: 1;
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border: none;
+    padding: 10px;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+}
+
+.vscode-window .terminal,
+.ventana .terminal {
+    background: #0d0d0d;
+    border-top: 1px solid #3d3d3d;
+    min-height: 80px;
+}
+
+.vscode-window .term-header,
+.ventana .term-header {
+    background: #1e1e1e;
+    color: #858585;
+    font-size: 11px;
+    padding: 4px 12px;
+}
+
+.vscode-window .term-output,
+.ventana .term-output {
+    color: #22c55e;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    padding: 8px 12px;
+    white-space: pre-wrap;
+}
+
+.vscode-window .term-output.error,
+.ventana .term-output.error {
+    color: #f87171;
+}
+
+.vscode-window .term-output.info,
+.ventana .term-output.info {
+    color: #fbbf24;
+}
+
+.vscode-window .status-bar,
+.ventana .status-bar {
+    background: #007acc;
+    color: white;
+    font-size: 12px;
+    padding: 3px 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONTROL PANEL - Panel de control inicial
+   ═══════════════════════════════════════════════════════════ */
+
+.control-panel {
+    background: #1f1f1f;
+    border: 1px solid #3d3d3d;
+    border-radius: 8px;
+    padding: 32px 40px;
+    max-width: 700px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.control-panel h2 {
+    color: #ffffff;
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.control-panel p {
+    color: #999999;
+    font-size: 14px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INPUT ESTÁNDAR
+   ═══════════════════════════════════════════════════════════ */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+textarea.code-input {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+    color: #cccccc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Segoe UI', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+textarea.code-input:focus {
+    border-color: #0078d4;
+}
+
+input[readonly] {
+    background: #1a1a1a;
+    color: #888888;
+}
