@@ -338,6 +338,8 @@
             justify-content: center;
             padding: 24px;
             overflow: auto;
+            pointer-events: auto;
+            cursor: text;
         }
 
         .document-page {
@@ -352,6 +354,8 @@
             line-height: 1.8;
             color: #000;
             cursor: text;
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         .document-page:focus {
@@ -365,6 +369,8 @@
             border-radius: 2px;
             min-height: 20px;
             transition: background 0.1s;
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         .document-page p:hover {
@@ -893,7 +899,7 @@
             </div>
 
             <!-- Document Area -->
-            <div class="document-area">
+            <div class="document-area" onclick="focusDocument()">
                 <div class="document-page" id="documento" contenteditable="true">
                     <p>Querido amigo/a:</p>
                     <p>Hoy te escribo para contarte sobre los amazing atajos de teclado.</p>
@@ -1257,7 +1263,14 @@
             document.getElementById('ventana').classList.add('visible');
             wordVisible = true;
             document.getElementById('taskbar-word').classList.add('active');
-            document.getElementById('documento').focus();
+            focusDocument();
+        }
+
+        function focusDocument() {
+            const doc = document.getElementById('documento');
+            if (doc) {
+                doc.focus();
+            }
         }
 
         // ========== REINICIAR ==========
