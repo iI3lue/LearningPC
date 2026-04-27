@@ -96,164 +96,257 @@
         
         .ventana {
             position: absolute;
-            width: 600px;
-            height: 400px;
+            width: 800px;
+            height: 560px;
             background: #fff;
-            border-radius: 4px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             display: none;
+            flex-direction: column;
             overflow: hidden;
         }
-        
+
         .ventana.visible {
-            display: block;
+            display: flex;
         }
-        
+
         .title-bar {
             background: #f3f3f3;
-            padding: 8px 12px;
+            padding: 0;
             display: flex;
             align-items: center;
+            height: 32px;
             border-bottom: 1px solid #e0e0e0;
         }
-        
-        .title-bar .icono {
-            width: 20px;
-            height: 20px;
+
+        .title-bar .app-icon {
+            width: 28px;
+            height: 28px;
             background: #2b579a;
-            border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 8px;
         }
-        
-        .title-bar .icono span {
+
+        .title-bar .app-icon span {
             color: #fff;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
         }
-        
-        .title-bar .titulo {
+
+        .title-bar .doc-name {
             flex: 1;
+            font-size: 12px;
             color: #333;
-            font-size: 13px;
         }
-        
+
         .window-controls {
             display: flex;
-            gap: 4px;
+            gap: 2px;
         }
-        
+
         .window-btn {
-            width: 28px;
-            height: 24px;
+            width: 32px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border-radius: 3px;
+            background: transparent;
+            border: none;
         }
-        
+
         .window-btn:hover {
             background: #e5e5e5;
         }
-        
+
         .window-btn.close:hover {
             background: #e81123;
         }
-        
-        .window-btn.close:hover span {
-            color: #fff;
+
+        .window-btn.close:hover svg line {
+            stroke: #fff;
         }
-        
-        .window-btn span {
-            font-size: 10px;
-            color: #333;
-        }
-        
-        .toolbar {
+
+        .qat {
             background: #fafafa;
-            padding: 6px 12px;
+            padding: 4px 12px;
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 4px;
             border-bottom: 1px solid #e0e0e0;
+            height: 32px;
         }
-        
-        .toolbar-btn {
-            padding: 4px 8px;
-            font-size: 12px;
-            color: #333;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        
-        .toolbar-btn:hover {
-            background: #e5e5e5;
-        }
-        
-        .documento-area {
-            padding: 24px;
-            min-height: 280px;
-            font-size: 14px;
-            line-height: 1.8;
-            color: #333;
-        }
-        
-        .documento-area .linea {
-            padding: 4px 8px;
-            border-radius: 2px;
-            margin-bottom: 4px;
+
+        .qat-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
             cursor: pointer;
             transition: background 0.15s;
         }
-        
-        .documento-area .linea.eliminada {
-            text-decoration: line-through;
-            color: #999;
-            background: #f5f5f5;
+
+        .qat-btn:hover {
+            background: #e5e5e5;
         }
-        
-        .documento-area .linea.eliminada:hover {
-            background: #eee;
+
+        .qat-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #444;
         }
-        
-        .historial-panel {
-            position: fixed;
-            top: 60px;
-            right: 20px;
-            background: #1f1f1f;
-            border: 1px solid #3d3d3d;
-            border-radius: 6px;
-            padding: 12px 16px;
-            width: 220px;
+
+        .ribbon {
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .ribbon-tabs {
+            display: flex;
+            background: #f3f3f3;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .ribbon-tab {
+            padding: 8px 16px;
+            font-size: 12px;
+            color: #444;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: all 0.15s;
+        }
+
+        .ribbon-tab:hover {
+            background: #e5e5e5;
+        }
+
+        .ribbon-tab.active {
+            background: #fff;
+            border-bottom: 2px solid #0078d4;
+            color: #0078d4;
+        }
+
+        .ribbon-content {
             display: none;
-            z-index: 100;
+            padding: 12px 16px;
         }
-        
-        .historial-panel.visible {
+
+        .ribbon-content.active {
             display: block;
         }
-        
-        .historial-panel h4 {
-            color: #fff;
-            font-size: 12px;
+
+        .ribbon-group {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 24px;
+        }
+
+        .ribbon-group-items {
+            display: flex;
+            gap: 4px;
+        }
+
+        .ribbon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .ribbon-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .ribbon-btn.active {
+            background: #cce4f7;
+        }
+
+        .ribbon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #444;
+        }
+
+        .ribbon-group-title {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .document-area {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+            pointer-events: auto;
+            cursor: text;
+        }
+
+        .document-page {
+            width: 100%;
+            max-width: 650px;
+            min-height: 400px;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 48px 56px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 11pt;
+            line-height: 1.8;
+            color: #000;
+            cursor: text;
+            user-select: text;
+            -webkit-user-select: text;
+            outline: none;
+        }
+
+        .document-page:focus {
+            border-color: #0078d4;
+            caret-color: #0078d4;
+        }
+
+        .document-page p {
             margin: 0 0 8px 0;
-            border-bottom: 1px solid #3d3d3d;
-            padding-bottom: 8px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            min-height: 20px;
+            transition: background 0.1s;
+            user-select: text;
+            -webkit-user-select: text;
         }
-        
-        .historial-panel .historial-item {
-            color: #9e9e9e;
+
+        .document-page p:hover {
+            background: #f8f8f8;
+        }
+
+        .document-page ::selection {
+            background: #0078d4;
+            color: #fff;
+        }
+
+        .status-bar {
+            background: #f3f3f3;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             font-size: 11px;
-            padding: 4px 0;
-            border-bottom: 1px solid #2d2d2d;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
         }
         
-        .historial-panel .historial-item.actual {
-            color: #60cdff;
-            font-weight: bold;
-        }
+
         
         .instrucciones {
             position: fixed;
@@ -470,38 +563,65 @@
         
         <div class="ventana" id="ventana">
             <div class="title-bar">
-                <div class="icono"><span>W</span></div>
-                <span class="titulo">Documento1 - Word</span>
+                <div class="app-icon"><span>W</span></div>
+                <span class="doc-name">Documento1 - Word</span>
                 <div class="window-controls">
                     <div class="window-btn" onclick="minimizarWord()">
-                        <svg viewBox="0 0 10 1" width="10" height="10"><rect width="10" height="1" fill="#333"/></svg>
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="#333"/></svg>
                     </div>
                     <div class="window-btn" onclick="maximizarWord()">
-                        <svg viewBox="0 0 10 10" width="10" height="10"><rect width="10" height="10" fill="none" stroke="#333" stroke-width="1"/></svg>
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#333" stroke-width="1"/></svg>
                     </div>
                     <div class="window-btn close" onclick="cerrarWord()">
-                        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="0" y1="0" x2="10" y2="10" stroke="#333" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#333" stroke-width="1"/></svg>
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#333" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#333" stroke-width="1"/></svg>
                     </div>
                 </div>
             </div>
-            <div class="toolbar">
-                <span class="toolbar-btn">Archivo</span>
-                <span class="toolbar-btn">Editar</span>
-                <span class="toolbar-btn">Ver</span>
+            <div class="qat">
+                <div class="qat-btn" title="Guardar (Ctrl+G)">
+                    <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                </div>
+                <div class="qat-btn" id="qat-deshacer" title="Deshacer (Ctrl+Z)">
+                    <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                </div>
+                <div class="qat-btn" id="qat-rehacer" title="Rehacer (Ctrl+Y)">
+                    <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                </div>
             </div>
-            <div class="documento-area" id="documento">
-                <div class="linea" id="linea-0">Querido amigo/a:</div>
-                <div class="linea" id="linea-1">Este es un documento con algunas líneas.</div>
-                <div class="linea" id="linea-2">Voy a eliminar algunas para practicar.</div>
-                <div class="linea" id="linea-3">Puedes deshacer y rehacer.</div>
-                <div class="linea" id="linea-4">¡ Pruébalo !</div>
+            <div class="ribbon">
+                <div class="ribbon-tabs">
+                    <button class="ribbon-tab active">Inicio</button>
+                </div>
+                <div class="ribbon-content active">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" id="btn-deshacer" title="Deshacer (Ctrl+Z)">
+                                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-rehacer" title="Rehacer (Ctrl+Y)">
+                                <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Portapapeles</div>
+                    </div>
+                </div>
+            </div>
+            <div class="document-area" onclick="focusDocument()">
+                <div class="document-page" id="documento" contenteditable="true">
+                    <p>Querido amigo/a:</p>
+                    <p>Este es un documento para practicar deshacer y rehacer.</p>
+                    <p>Escribe algo y presiona Ctrl+Z para deshacer.</p>
+                    <p>También puedes usar Ctrl+Y para rehacer.</p>
+                    <p>¡ Pruébalo !</p>
+                </div>
+            </div>
+            <div class="status-bar">
+                <span>Página 1 de 1</span>
+                <span>Español</span>
             </div>
         </div>
         
-        <div class="historial-panel" id="historial-panel">
-            <h4>Historial de acciones</h4>
-            <div id="historial-lista"></div>
-        </div>
+        
         
         <div class="instrucciones" id="instrucciones" style="display: none;">
             <h3>Paso a paso</h3>
@@ -539,10 +659,11 @@
     
     <script>
         let wordVisible = false;
-        let historial = [];
-        let historialIndex = -1;
+        let historialStack = [];
+        let redoStack = [];
         let estado = 'inicio';
         let nivelCompletado = false;
+        let contenidoInicial = '';
         
         function completarNivel() {
             if (nivelCompletado) return;
@@ -556,117 +677,106 @@
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('ventana').classList.add('visible');
             document.getElementById('instrucciones').style.display = 'block';
-            document.getElementById('historial-panel').classList.add('visible');
             document.getElementById('taskbar-word').classList.add('active');
             wordVisible = true;
             
-            actualizarHistorial();
-            estado = 'esperando-eliminar';
+            const doc = document.getElementById('documento');
+            contenidoInicial = doc.innerHTML;
+            
+            doc.focus();
+            estado = 'esperando-escribir';
             actualizarInstrucciones();
         }
         
-        // Eliminar línea (simula acción del usuario)
-        function eliminarLinea(indice) {
-            const linea = document.getElementById('linea-' + indice);
-            if (linea && !linea.classList.contains('eliminada')) {
-                linea.classList.add('eliminada');
-                
-                // Agregar al historial
-                historial = historial.slice(0, historialIndex + 1);
-                historial.push({ tipo: 'eliminar', indice: indice, texto: linea.textContent });
-                historialIndex = historial.length - 1;
-                
-                actualizarHistorial();
-                actualizarInstrucciones();
-            }
+        function focusDocument() {
+            document.getElementById('documento').focus();
         }
         
-        // Capturar atajos de teclado
-        document.addEventListener('keydown', function(e) {
-            if (!wordVisible) return;
-            
-            // Ctrl+Z = Deshacer
-            if (e.ctrlKey && e.key === 'z') {
-                e.preventDefault();
-                if (historialIndex >= 0) {
-                    const accion = historial[historialIndex];
-                    if (accion.tipo === 'eliminar') {
-                        const linea = document.getElementById('linea-' + accion.indice);
-                        linea.classList.remove('eliminada');
-                    }
-                    historialIndex--;
-                    actualizarHistorial();
-                    mostrarToast('↩️ Deshacer');
-                    actualizarInstrucciones();
-                }
-            }
-            
-            // Ctrl+Y = Rehacer
-            if (e.ctrlKey && e.key === 'y') {
-                e.preventDefault();
-                if (historialIndex < historial.length - 1) {
-                    historialIndex++;
-                    const accion = historial[historialIndex];
-                    if (accion.tipo === 'eliminar') {
-                        const linea = document.getElementById('linea-' + accion.indice);
-                        linea.classList.add('eliminada');
-                    }
-                    actualizarHistorial();
-                    mostrarToast('↪️ Rehacer');
-                    actualizarInstrucciones();
-                }
+        function focusWord() {
+            document.getElementById('ventana').classList.add('visible');
+            wordVisible = true;
+            document.getElementById('taskbar-word').classList.add('active');
+            focusDocument();
+        }
+        
+        document.getElementById('btn-deshacer').addEventListener('click', () => {
+            if (wordVisible) {
+                document.execCommand('undo', false, null);
+                mostrarToast('↩️ Deshacer');
             }
         });
         
-        function actualizarHistorial() {
-            const lista = document.getElementById('historial-lista');
-            lista.innerHTML = '';
+        document.getElementById('btn-rehacer').addEventListener('click', () => {
+            if (wordVisible) {
+                document.execCommand('redo', false, null);
+                mostrarToast('↪️ Rehacer');
+            }
+        });
+        
+        document.getElementById('qat-deshacer').addEventListener('click', () => {
+            if (wordVisible) {
+                document.execCommand('undo', false, null);
+                mostrarToast('↩️ Deshacer');
+            }
+        });
+        
+        document.getElementById('qat-rehacer').addEventListener('click', () => {
+            if (wordVisible) {
+                document.execCommand('redo', false, null);
+                mostrarToast('↪️ Rehacer');
+            }
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (!wordVisible) return;
             
-            // Mostrar todas las acciones
-            historial.forEach((accion, i) => {
-                const item = document.createElement('div');
-                item.className = 'historial-item' + (i === historialIndex ? ' actual' : '');
-                item.textContent = (i + 1) + '. ' + (accion.tipo === 'eliminar' ? 'Eliminar: ' + accion.texto.substring(0, 15) + '...' : '');
-                lista.appendChild(item);
-            });
-            
-            // Estado actual
-            if (historialIndex < 0) {
-                const item = document.createElement('div');
-                item.className = 'historial-item actual';
-                item.textContent = 'Estado actual (sin cambios)';
-                lista.appendChild(item);
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                document.execCommand('undo', false, null);
+                mostrarToast('↩️ Deshacer');
+                verificarCompletado();
             }
             
-            // Verificar si completamos el ejercicio
-            const todasEliminadas = [0,1,2,3,4].every(i => {
-                const l = document.getElementById('linea-' + i);
-                return l.classList.contains('eliminada');
-            });
+            if (e.ctrlKey && e.key === 'y') {
+                e.preventDefault();
+                document.execCommand('redo', false, null);
+                mostrarToast('↪️ Rehacer');
+            }
             
-            if (todasEliminadas && historialIndex === historial.length - 1) {
+            if ((e.ctrlKey && e.key === 'Z') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+                e.preventDefault();
+                document.execCommand('redo', false, null);
+                mostrarToast('↪️ Rehacer');
+            }
+        });
+        
+        function verificarCompletado() {
+            if (estado === 'completado') return;
+            
+            const doc = document.getElementById('documento');
+            const textoActual = doc.textContent || '';
+            const textoSinContenidoInicial = textoActual.replace(contenidoInicial.replace(/<[^>]*>/g, ''), '').trim();
+            
+            if (textoSinContenidoInicial.length > 0) {
                 estado = 'completado';
-                document.getElementById('btn-reiniciar').classList.add('visible');
+                mostrarToast('🎉 ¡Felicidades! Has practicado deshacer y rehacer', 'exito');
                 actualizarInstrucciones();
+                document.getElementById('btn-reiniciar').classList.add('visible');
                 completarNivel();
             }
         }
         
+        document.getElementById('documento').addEventListener('input', verificarCompletado);
+        
         function actualizarInstrucciones() {
             const instr = document.getElementById('instruccion-texto');
             switch(estado) {
-                case 'esperando-eliminar':
-                    instr.innerHTML = 'Haz click en los botones para eliminar líneas, luego usa <span class="key combo">Ctrl+Z</span> para deshacer';
+                case 'esperando-escribir':
+                    instr.innerHTML = 'Escribe algo en el documento, luego usa <span class="key combo">Ctrl+Z</span> para deshacer';
                     break;
                 case 'completado':
-                    instr.textContent = '🎉 ¡Felicidades! Has completado la práctica de deshacer/rehacer';
+                    instr.innerHTML = '🎉 ¡Felicidades! Has practicado <span class="key combo">Ctrl+Z</span> y <span class="key combo">Ctrl+Y</span>';
                     break;
-                default:
-                    if (historialIndex >= 0) {
-                        instr.innerHTML = 'Ahora prueba <span class="key combo">Ctrl+Y</span> para rehacer';
-                    } else {
-                        instr.textContent = 'Usa los botones para eliminar más líneas';
-                    }
             }
         }
         
@@ -694,22 +804,18 @@
         function maximizarWord() {
             const win = document.getElementById('ventana');
             if (win.style.width === '100%') {
-                win.style.width = '600px';
-                win.style.height = '400px';
+                win.style.width = '800px';
+                win.style.height = '560px';
                 win.style.top = '60px';
                 win.style.left = '80px';
+                win.style.transform = 'none';
             } else {
                 win.style.width = '100%';
                 win.style.height = 'calc(100vh - 48px)';
                 win.style.top = '0';
                 win.style.left = '0';
+                win.style.transform = 'none';
             }
-        }
-        
-        function focusWord() {
-            document.getElementById('ventana').classList.add('visible');
-            wordVisible = true;
-            document.getElementById('taskbar-word').classList.add('active');
         }
         
         function reiniciarSimulacion() {
