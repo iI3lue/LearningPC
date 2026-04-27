@@ -197,7 +197,7 @@ ipcMain.handle('data:getSubcategoriasPorCategoria', (event, idCategoria) => {
 ipcMain.handle('data:getNivelesPorSubcategoria', (event, idSubcategoria) => {
     const db = getDatabase();
     const nivs = db.prepare(`
-        SELECT n.*, s.id_categoria
+        SELECT n.*, s.id_categoria AS categoria_id
         FROM niveles n
         JOIN subcategorias s ON n.id_subcategoria = s.id_subcategoria
         WHERE n.id_subcategoria = ?

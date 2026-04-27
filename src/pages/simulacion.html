@@ -448,14 +448,22 @@
                 
                 if (Array.isArray(nivelesData)) {
                     niveles = nivelesData;
-                    if (niveles.length > 0 && niveles[0].id_categoria) {
+                    if (niveles.length > 0 && niveles[0].categoria_id) {
+                        idCategoria = niveles[0].categoria_id;
+                    } else if (niveles.length > 0 && niveles[0].id_categoria) {
+                        // Fallback: esquema antiguo
                         idCategoria = niveles[0].id_categoria;
                     }
+                    console.log('[DEBUG] idCategoria desde niveles (array):', idCategoria);
                 } else if (nivelesData.niveles) {
                     niveles = nivelesData.niveles;
-                    if (niveles.length > 0 && niveles[0].id_categoria) {
+                    if (niveles.length > 0 && niveles[0].categoria_id) {
+                        idCategoria = niveles[0].categoria_id;
+                    } else if (niveles.length > 0 && niveles[0].id_categoria) {
+                        // Fallback: esquema antiguo
                         idCategoria = niveles[0].id_categoria;
                     }
+                    console.log('[DEBUG] idCategoria desde niveles (object):', idCategoria);
                 } else {
                     console.log('Formato inesperado, usando modo legacy');
                     niveles = [];
@@ -742,33 +750,70 @@ function actualizarUI() {
 
             cerrarSubcatModal();
 
+            console.log('[SUBNAV] continuarSiguienteSubcat() iniciado');
+            console.log('[SUBNAV] idCategoria actual:', idCategoria);
+            console.log('[SUBNAV] idSubcategoria actual:', idSubcategoria);
+
+            // Fallback: si idCategoria es null, intentar obtenerlo desde la subcategoría
+            if (!idCategoria && idSubcategoria) {
+                try {
+                    const subcatData = await window.api.getSubcategoriasPorCategoria(idSubcategoria);
+                    // getSubcategoriasPorCategoria puede devolver la subcategoría específica si le pasamos id directamente
+                    // Pero si no funciona, intentamos obtener las subcategorías de cualquier forma
+                    console.log('[SUBNAV] Fallback: intentamos obtener idCategoria desde otras fuentes');
+                } catch(e) {
+                    console.log('[SUBNAV] Fallback no funcionó:', e);
+                }
+            }
+
+            if (!idCategoria) {
+                console.error('[SUBNAV] ERROR: idCategoria es null, imposible continuar');
+                mostrarToast('ERROR: No se pudo determinar la categoría. Volviendo al menú.', 'error');
+                setTimeout(() => window.api.irA('home'), 2000);
+                return;
+            }
+
             try {
                 // Obtener todas las subcategorías ordenadas
                 const subcats = await window.api.getSubcategoriasPorCategoria(idCategoria);
+                console.log('[SUBNAV] Subcategorías obtenidas:', subcats.length);
+                
                 if (!subcats || subcats.length === 0) {
-                    window.api.irA('home');
+                    console.warn('[SUBNAV] No hay subcategorías para esta categoría');
+                    mostrarToast('No hay más subcategorías en esta categoría.', 'info');
+                    setTimeout(() => window.api.irA('home'), 1500);
                     return;
                 }
 
                 // Encontrar el índice de la subcategoría actual
                 const currentIdx = subcats.findIndex(s => s.id_subcategoria == idSubcategoria);
+                console.log('[SUBNAV] Índice actual:', currentIdx, 'de', subcats.length);
+                
                 const nextIdx = currentIdx + 1;
 
                 if (nextIdx >= subcats.length) {
                     // No hay siguiente subcategoría
-                    window.api.irA('home');
+                    console.log('[SUBNAV] No hay siguiente subcategoría');
+                    mostrarToast('¡Has completado todas las subcategorías!', 'exito');
+                    setTimeout(() => window.api.irA('home'), 1500);
                     return;
                 }
 
                 const siguiente = subcats[nextIdx];
+                console.log('[SUBNAV] Siguiente subcategoría:', siguiente.nombre, 'ID:', siguiente.id_subcategoria);
+                
                 const nivelesSig = await window.api.getNivelesPorSubcategoria(siguiente.id_subcategoria);
+                console.log('[SUBNAV] Niveles de siguiente subcategoría:', nivelesSig.length);
 
                 if (!nivelesSig || nivelesSig.length === 0) {
-                    window.api.irA('home');
+                    console.warn('[SUBNAV] La siguiente subcategoría no tiene niveles');
+                    mostrarToast('La siguiente subcategoría no tiene niveles disponibles.', 'info');
+                    setTimeout(() => window.api.irA('home'), 1500);
                     return;
                 }
 
                 const primerNivel = nivelesSig[0];
+                console.log('[SUBNAV] Primer nivel:', primerNivel.titulo, 'Ruta:', primerNivel.ruta_archivo);
 
                 // Actualizar sessionStorage con el primer nivel de la siguiente subcategoría
                 sessionStorage.setItem('simulacion_id', primerNivel.id_nivel);
@@ -776,12 +821,15 @@ function actualizarUI() {
                 sessionStorage.setItem('simulacion_titulo', primerNivel.titulo);
                 sessionStorage.setItem('simulacion_id_subcategoria', siguiente.id_subcategoria);
 
+                console.log('[SUBNAV] Navegando a:', siguiente.nombre, '->', primerNivel.titulo);
+                
                 // Recargar la página para cargar el nuevo nivel
                 window.location.reload();
 
             } catch(e) {
-                console.error('Error al continuar subcategoría:', e);
-                window.api.irA('home');
+                console.error('[SUBNAV] Error completo:', e);
+                mostrarToast('Error al continuar: ' + e.message, 'error');
+                setTimeout(() => window.api.irA('home'), 2000);
             }
         }
 
