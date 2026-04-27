@@ -593,29 +593,32 @@
         document.getElementById('tour-1').addEventListener('click', () => { pasoCompletado[1] = true; });
         document.getElementById('tour-2').addEventListener('click', () => { pasoCompletado[2] = true; });
 
-        let funcWritten = false;
+        // Paso 3: validar código exacto línea por línea
+        const expectedLines = [
+            'def suma(a, b):',
+            '    return a + b',
+            'resultado = suma(3, 5)',
+            'print(resultado)'
+        ];
+        let codeExactMatchDone = false;
         document.getElementById('code').addEventListener('input', (e) => {
-            const code = e.target.value;
-            const codeLower = code.toLowerCase();
-            const lines = code.split('\n').filter(l => l.trim());
-            
-            const hasDef = codeLower.includes('def ') && codeLower.includes('(') && codeLower.includes('):');
-            const hasReturn = codeLower.includes('    return') || codeLower.includes('\treturn');
-            const hasAssignment = code.includes('=') && code.includes('suma');
-            const hasPrint = codeLower.includes('    print(') || codeLower.includes('\tprint(');
-            const hasAllLines = lines.length >= 4;
-            
-            if(hasDef && hasReturn && hasAssignment && hasPrint && hasAllLines) {
-                pasoCompletado[3] = true;
-                
-                if(tourStep === 3 && !funcWritten) {
-                    funcWritten = true;
-                    clearTimeout(window.tourTimeout);
-                    document.getElementById('tour-3').style.display = 'none';
-                    document.getElementById('tour-4').style.display = 'block';
-                    tourStep = 4;
-                    document.getElementById('term').innerHTML = '<span class="info">✅ 4 líneas completas detectado - Avanza</span>';
-                    window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+            const userLines = e.target.value.split('\n').map(l => l.replace(/\r$/, ''));
+            if (userLines.length !== expectedLines.length) return;
+            const match = userLines.every((line, i) => line === expectedLines[i]);
+            if (match) {
+                if (!codeExactMatchDone) {
+                    codeExactMatchDone = true;
+                    pasoCompletado[3] = true;
+                    if (tourStep === 3) {
+                        clearTimeout(window.tourTimeout);
+                        document.getElementById('tour-3').style.display = 'none';
+                        document.getElementById('tour-4').style.display = 'block';
+                        tourStep = 4;
+                        document.getElementById('term').innerHTML = '<span class="info">✅ código exacto detectado - Avanza al siguiente paso</span>';
+                        if (typeof nextTourStep === 'function') {
+                            window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                        }
+                    }
                 }
             }
         });

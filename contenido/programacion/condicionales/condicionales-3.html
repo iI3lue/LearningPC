@@ -141,8 +141,11 @@
             line-height: 1.5; 
             resize: none; 
             outline: none;
-            height: auto;
+            height: 100%;
+            min-height: 100px;
+            box-sizing: border-box;
             flex-shrink: 0;
+        }
         }
         .vscode-window .terminal { background: #0d0d0d; border-top: 1px solid #3d3d3d; min-height: 80px; }
         .vscode-window .term-header { background: #1e1e1e; color: #858585; font-size: 11px; padding: 4px 12px; }
@@ -620,29 +623,35 @@
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: detectar if + elif + else + indentación correcta + auto-avance
-        let elifWritten = false;
+        // Paso 3: validar código exacto línea por línea
+        const expectedLines = [
+            'nota = 85',
+            'if nota >= 90:',
+            '    print("A")',
+            'elif nota >= 80:',
+            '    print("B")',
+            'else:',
+            '    print("C")'
+        ];
+        let codeExactMatchDone = false;
         document.getElementById('code').addEventListener('input', (e) => {
-            const code = e.target.value;
-            const codeLower = code.toLowerCase();
-            
-            // Debe tener: if, elif, else, y al menos un print indentado
-            const hasIf = codeLower.includes('if ') && codeLower.includes(':');
-            const hasElif = codeLower.includes('elif ') && codeLower.includes(':');
-            const hasElse = codeLower.includes('else') && codeLower.includes(':');
-            const hasIndentedPrint = codeLower.includes('    print(') || codeLower.includes('\tprint(');
-            
-            if(hasIf && hasElif && hasElse && hasIndentedPrint) {
-                pasoCompletado[3] = true;
-                
-                if(tourStep === 3 && !elifWritten) {
-                    elifWritten = true;
-                    clearTimeout(window.tourTimeout);
-                    document.getElementById('tour-3').style.display = 'none';
-                    document.getElementById('tour-4').style.display = 'block';
-                    tourStep = 4;
-                    document.getElementById('term').innerHTML = '<span class="info">✅ if/elif/else con indentación detectado - Avanza</span>';
-                    window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+            const userLines = e.target.value.split('\n').map(l => l.replace(/\r$/, ''));
+            if (userLines.length !== expectedLines.length) return;
+            const match = userLines.every((line, i) => line === expectedLines[i]);
+            if (match) {
+                if (!codeExactMatchDone) {
+                    codeExactMatchDone = true;
+                    pasoCompletado[3] = true;
+                    if (tourStep === 3) {
+                        clearTimeout(window.tourTimeout);
+                        document.getElementById('tour-3').style.display = 'none';
+                        document.getElementById('tour-4').style.display = 'block';
+                        tourStep = 4;
+                        document.getElementById('term').innerHTML = '<span class="info">✅ código exacto detectado - Avanza al siguiente paso</span>';
+                        if (typeof nextTourStep === 'function') {
+                            window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                        }
+                    }
                 }
             }
         });

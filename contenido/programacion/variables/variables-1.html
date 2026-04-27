@@ -627,28 +627,27 @@ function updateLines() {
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: detectar print() + asignación de variable + auto-avance
-        let codeWritten = false;
+        // Paso 3: validar código exacto
+        const expectedSnippet = `x = 5\nprint(x)`;
+        let codeExactMatchDone = false;
         document.getElementById('code').addEventListener('input', (e) => {
-            const code = e.target.value.toLowerCase().replace(/\s/g, '');
-            
-            // Debe tener: variable = valor Y print(variable)
-            const hasAssignment = code.includes('=');  // asignación como x = 5
-            const hasPrint = code.includes('print(') && code.includes(')');
-            
-            if(hasAssignment && hasPrint) {
-                pasoCompletado[3] = true;
-                
-                // Si estamos en paso 3 y escribe código correcto, avanzar automáticamente
-                if(tourStep === 3 && !codeWritten) {
-                    codeWritten = true;
-                    clearTimeout(window.tourTimeout);
-                    document.getElementById('tour-3').style.display = 'none';
-                    document.getElementById('tour-4').style.display = 'block';
-                    tourStep = 4;
-                    // Mostrar mensaje de éxito
-                    document.getElementById('term').innerHTML = '<span class="info">✅ variable + print() detectado - Avanza al siguiente paso</span>';
-                    window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+            const codeRaw = e.target.value;
+            const normalizedUser = codeRaw.replace(/\s/g, '').toLowerCase();
+            const normalizedExpected = expectedSnippet.replace(/\s/g, '').toLowerCase();
+            if (normalizedUser === normalizedExpected) {
+                if (!codeExactMatchDone) {
+                    codeExactMatchDone = true;
+                    pasoCompletado[3] = true;
+                    if (tourStep === 3) {
+                        clearTimeout(window.tourTimeout);
+                        document.getElementById('tour-3').style.display = 'none';
+                        document.getElementById('tour-4').style.display = 'block';
+                        tourStep = 4;
+                        document.getElementById('term').innerHTML = '<span class="info">✅ código exacto detectado - Avanza al siguiente paso</span>';
+                        if (typeof nextTourStep === 'function') {
+                            window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                        }
+                    }
                 }
             }
         });

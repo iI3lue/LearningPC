@@ -98,7 +98,7 @@
         }
 
         /* Ventana Word 365 */
-        .ventana-word {
+        .ventana {
             position: absolute;
             width: 800px;
             height: 560px;
@@ -111,7 +111,7 @@
             font-family: 'Segoe UI', sans-serif;
         }
 
-        .ventana-word.visible {
+        .ventana.visible {
             display: flex;
         }
 
@@ -711,7 +711,7 @@
         </div>
 
         <!-- Ventana Word 365 -->
-        <div class="ventana-word" id="ventana-word">
+        <div class="ventana" id="ventana">
             <!-- Title Bar (arriba del todo en Word 365) -->
             <div class="title-bar">
                 <div class="app-icon"><span>W</span></div>
@@ -1091,7 +1091,7 @@
         // ========== INICIAR SIMULACIÓN ==========
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
-            document.getElementById('ventana-word').classList.add('visible');
+            document.getElementById('ventana').classList.add('visible');
             document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('taskbar-word').classList.add('active');
             wordVisible = true;
@@ -1226,18 +1226,18 @@
 
         // ========== CONTROLES DE VENTANA ==========
         function cerrarWord() {
-            document.getElementById('ventana-word').classList.remove('visible');
+            document.getElementById('ventana').classList.remove('visible');
             document.getElementById('taskbar-word').classList.remove('active');
             wordVisible = false;
         }
 
         function minimizarWord() {
-            document.getElementById('ventana-word').classList.remove('visible');
+            document.getElementById('ventana').classList.remove('visible');
             wordVisible = false;
         }
 
         function maximizarWord() {
-            const win = document.getElementById('ventana-word');
+            const win = document.getElementById('ventana');
             if (win.style.width === '100%') {
                 win.style.width = '800px';
                 win.style.height = '560px';
@@ -1254,7 +1254,7 @@
         }
 
         function focusWord() {
-            document.getElementById('ventana-word').classList.add('visible');
+            document.getElementById('ventana').classList.add('visible');
             wordVisible = true;
             document.getElementById('taskbar-word').classList.add('active');
             document.getElementById('documento').focus();

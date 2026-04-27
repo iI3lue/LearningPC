@@ -541,6 +541,14 @@
         let done = false;
         let tourStep = 0;
 
+        // === MODO STEP-BY-STEP: Solo avanza si completaste la acción ===
+        let pasoCompletado = {
+            1: false, // Explorar archivos
+            2: false, // Escribir código
+            3: false, // Ejecutar código
+            4: false  // Ver verificación
+        };
+
         async function loadPy() {
             try {
                 const s = document.createElement('script');
@@ -598,6 +606,13 @@
 
         function nextTourStep() {
             clearTimeout(window.tourTimeout);
+            // Validar que el paso actual esté completado ANTES de avanzar
+            if (tourStep > 0 && !pasoCompletado[tourStep]) {
+                mostrarToastFallo();
+                // Mantener el popup actual y dejar que intente de nuevo
+                window.tourTimeout = setTimeout(() => nextTourStep(), 5000);
+                return;
+            }
             if(tourStep < 4) {
                 showTourStep(tourStep + 1);
             } else {
@@ -606,13 +621,38 @@
             }
         }
 
-function skipTour() {
+        function puedeAvanzar(paso) {
+            // Solo puede avanzar si el paso actual está completado
+            if (!pasoCompletado[paso]) {
+                mostrarToastFallo();
+                return false;
+            }
+            return true;
+        }
+
+        function mostrarToastFallo() {
+            const mensajes = [
+                "📁 Explora los archivos primero",
+                "✏️ Escribe el código primero",
+                "▶️ Ejecuta el código primero",
+                "👀 Verifica el resultado primero"
+            ];
+            const msg = mensajes[tourStep - 1] || "Completa esta acción primero";
+            const term = document.getElementById('term');
+            term.innerHTML = '<span class="error">' + msg + '</span>';
+        }
+
+ function skipTour() {
             clearTimeout(window.tourTimeout);
             for(let i = 1; i <= 4; i++) {
                 const popup = document.getElementById('tour-' + i);
                 if(popup) popup.style.display = 'none';
             }
             tourStep = 0;
+            // Auto-avanzar si todo completado
+            if(pasoCompletado[1] && pasoCompletado[2] && pasoCompletado[3] && pasoCompletado[4]) {
+                setTimeout(() => autoNext(), 500);
+            }
         }
 
         let autoNextCalled = false;
@@ -657,10 +697,15 @@ function skipTour() {
                 const res = py.runPython('sys.stdout.getvalue()');
                 term.textContent = res || '(sin output)';
                 
-                if(!done && (res.includes('Hola') || res.includes('Mundo'))) {
-                    done = true;
-                    term.textContent += '\n\n✅ ¡Correcto!';
-                    setTimeout(() => autoNext(), 1000);
+                // Paso 3: Código ejecutado
+                pasoCompletado[3] = true;
+                
+                // Verificar que contiene "Hola" o "Mundo"
+                if(res.includes('Hola') || res.includes('Mundo')) {
+                    pasoCompletado[4] = true; // Paso 4: Resultado verificado
+                    term.textContent += '\n\n🎉 ¡Tu primer programa!';
+                    // Ocultar popup y mostrar success
+                    skipTour();
                 }
             } catch(e) {
                 term.innerHTML = '<span class="error">❌ ' + e.message + '</span>';
@@ -673,6 +718,46 @@ function skipTour() {
 
         function onVentanaAbierta(t) {}
         function onVentanaCerrada(t) {}
+
+        // === REGISTRAR ACCIONES PARA CADA PASO ===
+
+        // Paso 1: Click en archivo del explorer
+        document.querySelectorAll('.file-item').forEach(item => {
+            item.addEventListener('click', () => {
+                pasoCompletado[1] = true;
+                document.getElementById('term').textContent = '📁 Archivo seleccionado\nAhora escribe tu código';
+            });
+        });
+
+        // Paso 2: Input en el editor de código
+        document.getElementById('code').addEventListener('input', () => {
+            pasoCompletado[2] = true;
+        });
+
+        // Paso 3: validar código exacto
+        const expectedSnippet = `print("¡Hola, Mundo!")`;
+        let codeExactMatchDone = false;
+        document.getElementById('code').addEventListener('input', (e) => {
+            const codeRaw = e.target.value;
+            const normalizedUser = codeRaw.replace(/\s/g, '').toLowerCase();
+            const normalizedExpected = expectedSnippet.replace(/\s/g, '').toLowerCase();
+            if (normalizedUser === normalizedExpected) {
+                if (!codeExactMatchDone) {
+                    codeExactMatchDone = true;
+                    pasoCompletado[3] = true;
+                    if (tourStep === 3) {
+                        clearTimeout(window.tourTimeout);
+                        document.getElementById('tour-3').style.display = 'none';
+                        document.getElementById('tour-4').style.display = 'block';
+                        tourStep = 4;
+                        document.getElementById('term').innerHTML = '<span class="info">✅ código exacto detectado - Avanza al siguiente paso</span>';
+                        if (typeof nextTourStep === 'function') {
+                            window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                        }
+                    }
+                }
+            }
+        });
 
         document.getElementById('code').addEventListener('input', updateLines);
         document.getElementById('code').addEventListener('scroll', syncScroll);

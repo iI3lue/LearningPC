@@ -730,6 +730,31 @@ function updateLines() {
         document.getElementById('code').addEventListener('scroll', syncScroll);
         document.addEventListener('keydown', e => { if(e.key === 'F5') { e.preventDefault(); runCode(); } });
         
+        // Paso 3: validar código exacto
+        const expectedSnippet = `print("¡Hola, Mundo!")`;
+        let codeExactMatchDone = false;
+        document.getElementById('code').addEventListener('input', (e) => {
+            const codeRaw = e.target.value;
+            const normalizedUser = codeRaw.replace(/\s/g, '').toLowerCase();
+            const normalizedExpected = expectedSnippet.replace(/\s/g, '').toLowerCase();
+            if (normalizedUser === normalizedExpected) {
+                if (!codeExactMatchDone) {
+                    codeExactMatchDone = true;
+                    pasoCompletado[3] = true;
+                    if (tourStep === 3) {
+                        clearTimeout(window.tourTimeout);
+                        document.getElementById('tour-3').style.display = 'none';
+                        document.getElementById('tour-4').style.display = 'block';
+                        tourStep = 4;
+                        document.getElementById('term').innerHTML = '<span class="info">✅ código exacto detectado - Avanza al siguiente paso</span>';
+                        if (typeof nextTourStep === 'function') {
+                            window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+                        }
+                    }
+                }
+            }
+        });
+        
         // Inicializar líneas al cargar
         updateLines();
     </script>
