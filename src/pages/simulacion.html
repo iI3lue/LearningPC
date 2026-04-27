@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulación - Learning PC</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <script src="../js/user-settings.js"></script>
     <style>
         body {
             margin: 0;
@@ -244,6 +245,71 @@
             color: #aaa;
             font-family: monospace;
         }
+        #subcat-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #subcat-modal.open { display: flex; }
+        #subcat-modal .subcat-modal-box {
+            background: #2d2d2d;
+            padding: 28px 32px;
+            border-radius: 12px;
+            min-width: 380px;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+            border: 1px solid #454545;
+        }
+        #subcat-modal h3 {
+            color: #fff;
+            font-size: 18px;
+            margin: 0 0 10px 0;
+        }
+        #subcat-modal p {
+            color: #aaa;
+            font-size: 13px;
+            margin: 0 0 24px 0;
+            line-height: 1.6;
+        }
+        #subcat-modal .subcat-btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        #subcat-modal button {
+            padding: 10px 22px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        #subcat-modal .subcat-btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+        #subcat-modal .subcat-btn-primary:hover { background: #1084d8; }
+        #subcat-modal .subcat-btn-secondary {
+            background: #3d3d3d;
+            color: #ccc;
+        }
+        #subcat-modal .subcat-btn-secondary:hover { background: #555; }
+        #subcat-modal .subcat-remember {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #subcat-modal .subcat-remember input { width: 16px; height: 16px; cursor: pointer; }
+        #subcat-modal .subcat-remember label { color: #888; font-size: 12px; cursor: pointer; }
     </style>
 </head>
 
@@ -304,16 +370,34 @@
         <span><kbd>Esc</kbd> Salir</span>
     </div>
 
+    <!-- Subcategory continuation modal -->
+    <div id="subcat-modal">
+        <div class="subcat-modal-box">
+            <h3>Continuar con la siguiente subcategoría?</h3>
+            <p>Has completado todos los niveles de esta subcategoría.<br>¿Deseas continuar con la siguiente?</p>
+            <div class="subcat-btn-row">
+                <button class="subcat-btn-primary" onclick="continuarSiguienteSubcat()">Continuar</button>
+                <button class="subcat-btn-secondary" onclick="cerrarSubcatModal()">Cancelar</button>
+            </div>
+            <div class="subcat-remember">
+                <input type="checkbox" id="subcat-no-preguntar"/>
+                <label for="subcat-no-preguntar">No volver a preguntar</label>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Datos del nivel actual
         let idNivel = sessionStorage.getItem('simulacion_id');
         let rutaArchivo = sessionStorage.getItem('simulacion_ruta');
         let titulo = sessionStorage.getItem('simulacion_titulo');
         let idSubcategoria = sessionStorage.getItem('simulacion_id_subcategoria');
+        let idCategoria = null; // Se obtiene al cargar niveles
 
         // Datos de niveles
         let niveles = [];
         let nivelActualIndex = 0;
+        let subcatNavDone = false;
 
         // Elementos del DOM
         const tituloEl = document.getElementById('titulo-nivel');
@@ -364,8 +448,14 @@
                 
                 if (Array.isArray(nivelesData)) {
                     niveles = nivelesData;
+                    if (niveles.length > 0 && niveles[0].id_categoria) {
+                        idCategoria = niveles[0].id_categoria;
+                    }
                 } else if (nivelesData.niveles) {
                     niveles = nivelesData.niveles;
+                    if (niveles.length > 0 && niveles[0].id_categoria) {
+                        idCategoria = niveles[0].id_categoria;
+                    }
                 } else {
                     console.log('Formato inesperado, usando modo legacy');
                     niveles = [];
@@ -603,26 +693,95 @@ function actualizarUI() {
 
         // Función para completar nivel desde iframe (auto-completar)
         async function completarNivelYAvanzar() {
+            if (subcatNavDone) return false;
             const usuario = JSON.parse(sessionStorage.getItem('usuario'));
             if (usuario && idNivel) {
                 const resultado = await window.api.marcarNivelCompletado(usuario.id_usuario, parseInt(idNivel));
                 if (resultado.ok) {
                     mostrarToast('¡Nivel completado! Progreso: ' + resultado.progreso_total + '%', 'exito');
                     
-                    //auto-navegar al siguiente nivel
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         if (nivelActualIndex < niveles.length - 1) {
                             nivelSiguiente();
                         } else {
-                            // Fin de la subcategoría
-                            sessionStorage.removeItem('simulacion_id');
-                            sessionStorage.removeItem('simulacion_ruta');
-                            sessionStorage.removeItem('simulacion_titulo');
-                            sessionStorage.removeItem('simulacion_id_subcategoria');
-                            window.api.irA('home');
+                            subcatNavDone = true;
+                            const autoEnabled = window.LearningPCSettings && window.LearningPCSettings.isAutoContinueEnabled();
+                            if (autoEnabled) {
+                                await continuarSiguienteSubcat();
+                            } else {
+                                abrirSubcatModal();
+                            }
                         }
                     }, 1500);
+                    return true;
                 }
+            }
+            return false;
+        }
+
+        function abrirSubcatModal() {
+            const modal = document.getElementById('subcat-modal');
+            if (modal) modal.classList.add('open');
+        }
+
+        function cerrarSubcatModal() {
+            const modal = document.getElementById('subcat-modal');
+            if (modal) modal.classList.remove('open');
+            sessionStorage.removeItem('simulacion_id');
+            sessionStorage.removeItem('simulacion_ruta');
+            sessionStorage.removeItem('simulacion_titulo');
+            sessionStorage.removeItem('simulacion_id_subcategoria');
+            window.api.irA('home');
+        }
+
+        async function continuarSiguienteSubcat() {
+            const remember = document.getElementById('subcat-no-preguntar');
+            if (remember && remember.checked) {
+                if (window.LearningPCSettings) window.LearningPCSettings.setShowPrompt(false);
+            }
+
+            cerrarSubcatModal();
+
+            try {
+                // Obtener todas las subcategorías ordenadas
+                const subcats = await window.api.getSubcategoriasPorCategoria(idCategoria);
+                if (!subcats || subcats.length === 0) {
+                    window.api.irA('home');
+                    return;
+                }
+
+                // Encontrar el índice de la subcategoría actual
+                const currentIdx = subcats.findIndex(s => s.id_subcategoria == idSubcategoria);
+                const nextIdx = currentIdx + 1;
+
+                if (nextIdx >= subcats.length) {
+                    // No hay siguiente subcategoría
+                    window.api.irA('home');
+                    return;
+                }
+
+                const siguiente = subcats[nextIdx];
+                const nivelesSig = await window.api.getNivelesPorSubcategoria(siguiente.id_subcategoria);
+
+                if (!nivelesSig || nivelesSig.length === 0) {
+                    window.api.irA('home');
+                    return;
+                }
+
+                const primerNivel = nivelesSig[0];
+
+                // Actualizar sessionStorage con el primer nivel de la siguiente subcategoría
+                sessionStorage.setItem('simulacion_id', primerNivel.id_nivel);
+                sessionStorage.setItem('simulacion_ruta', primerNivel.ruta_archivo);
+                sessionStorage.setItem('simulacion_titulo', primerNivel.titulo);
+                sessionStorage.setItem('simulacion_id_subcategoria', siguiente.id_subcategoria);
+
+                // Recargar la página para cargar el nuevo nivel
+                window.location.reload();
+
+            } catch(e) {
+                console.error('Error al continuar subcategoría:', e);
+                window.api.irA('home');
             }
         }
 

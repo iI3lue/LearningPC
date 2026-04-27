@@ -196,9 +196,13 @@ ipcMain.handle('data:getSubcategoriasPorCategoria', (event, idCategoria) => {
 // Obtener niveles por subcategoría
 ipcMain.handle('data:getNivelesPorSubcategoria', (event, idSubcategoria) => {
     const db = getDatabase();
-    const nivs = db.prepare(
-        'SELECT * FROM niveles WHERE id_subcategoria = ? ORDER BY nivel_ordinal ASC, orden ASC'
-    ).all(idSubcategoria);
+    const nivs = db.prepare(`
+        SELECT n.*, s.id_categoria
+        FROM niveles n
+        JOIN subcategorias s ON n.id_subcategoria = s.id_subcategoria
+        WHERE n.id_subcategoria = ?
+        ORDER BY n.nivel_ordinal ASC, n.orden ASC
+    `).all(idSubcategoria);
     console.log('[MAIN] getNivelesPorSubcategoria(', idSubcategoria, '):', nivs.length, 'niveles');
     return nivs;
 });

@@ -146,7 +146,9 @@
             line-height: 1.5; 
             resize: none; 
             outline: none;
-            height: auto;
+            height: 100%;
+            min-height: 100px;
+            box-sizing: border-box;
         }
         .vscode-window .terminal { background: #0d0d0d; border-top: 1px solid #3d3d3d; min-height: 80px; }
         .vscode-window .term-header { background: #1e1e1e; color: #858585; font-size: 11px; padding: 4px 12px; }
@@ -236,6 +238,84 @@
         }
         .success-msg h3 { color: #22c55e; font-size: 20px; margin-bottom: 8px; }
         .success-msg p { color: #ccc; font-size: 13px; margin: 0; }
+    </style>
+    <style>
+        #subcat-continue-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        #subcat-continue-modal .modal-content {
+            background: #2d2d2d;
+            padding: 24px 28px;
+            border-radius: 12px;
+            min-width: 360px;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            border: 1px solid #454545;
+        }
+        #subcat-continue-modal h3 {
+            color: #fff;
+            font-size: 18px;
+            margin: 0 0 8px 0;
+        }
+        #subcat-continue-modal p {
+            color: #aaa;
+            font-size: 13px;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+        #subcat-continue-modal .btn-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        #subcat-continue-modal button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        #subcat-continue-modal button.primary {
+            background: #0078d4;
+            color: white;
+        }
+        #subcat-continue-modal button.primary:hover {
+            background: #1084d8;
+        }
+        #subcat-continue-modal button.secondary {
+            background: #3d3d3d;
+            color: #ccc;
+        }
+        #subcat-continue-modal button.secondary:hover {
+            background: #4d4d4d;
+        }
+        #subcat-continue-modal .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #subcat-continue-modal .remember-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        #subcat-continue-modal .remember-row label {
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -402,7 +482,7 @@
                         <div class="line-nums" id="lines">1</div>
                         <textarea class="code-input" id="code" spellcheck="false" placeholder="Crea variables y usa type()"></textarea>
                     </div>
-                    <div class="terminal">
+    <div class="terminal">
                         <div class="term-header">🔶 TERMINAL</div>
                         <pre class="term-output" id="term"><span class="info">⏳ Cargando Python...</span></pre>
                     </div>
@@ -422,6 +502,22 @@
         </div>
     </div>
 
+    <!-- Subcategory continuation modal -->
+    <div id="subcat-continue-modal">
+        <div class="modal-content">
+            <h3>Continuar con la siguiente subcategoría?</h3>
+            <p>Has completado todos los niveles de esta subcategoría.<br>¿Deseas continuar con la siguiente?</p>
+            <div class="btn-row">
+                <button class="primary" onclick="continueToNextSubcat()">Continuar</button>
+                <button class="secondary" onclick="goToHomeFromSubcat()">Cancelar</button>
+            </div>
+            <div class="remember-row">
+                <input type="checkbox" id="remember-subcat"/>
+                <label for="remember-subcat">No volver a preguntar</label>
+            </div>
+        </div>
+    </div>
+
     <!-- Taskbar -->
     <div class="taskbar">
         <div class="start-button"><div class="start-icon"></div></div>
@@ -438,6 +534,7 @@
     </div>
 
     <script src="../../simulacion-core.js"></script>
+    <script src="../../../src/js/user-settings.js"></script>
     <script>
         let pyReady = false;
         let py = null;
@@ -546,11 +643,16 @@
 
         async function autoNext() {
             document.getElementById('success').style.display = 'block';
-            if(window.parent && window.parent.completarNivelYAvanzar) {
-                try { await window.parent.completarNivelYAvanzar(); }
-                catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+            const autoEnabled = typeof window.LearningPCSettings !== 'undefined' && window.LearningPCSettings.isAutoContinueEnabled();
+            if (autoEnabled) {
+                if(window.parent && window.parent.completarNivelYAvanzar) {
+                    try { await window.parent.completarNivelYAvanzar(); }
+                    catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
+                } else {
+                    setTimeout(() => window.parent.location.reload(), 2500);
+                }
             } else {
-                setTimeout(() => window.parent.location.reload(), 2500);
+                showSubcatContinueModal();
             }
         }
 
@@ -635,25 +737,24 @@
             pasoCompletado[2] = true;
         });
 
-        // Paso 3: detectar print() + type() + auto-avance
-        let typeWritten = false;
+        // Paso 3: validar código exacto de la solución antes de avanzar
+        const expectedSnippet = 'nombre = "Maria"\nedad = 20\nprint(type(nombre))\nprint(type(edad))';
+        let codeExactMatchDone = false;
         document.getElementById('code').addEventListener('input', (e) => {
-            const code = e.target.value.toLowerCase();
-            // Debe tener print() Y type()
-            const hasPrint = code.includes('print(');
-            const hasType = code.includes('type(');
-            
-            if(hasPrint && hasType) {
-                pasoCompletado[3] = true;
-                
-                if(tourStep === 3 && !typeWritten) {
-                    typeWritten = true;
-                    clearTimeout(window.tourTimeout);
-                    document.getElementById('tour-3').style.display = 'none';
-                    document.getElementById('tour-4').style.display = 'block';
-                    tourStep = 4;
-                    document.getElementById('term').innerHTML = '<span class="info">✅ print() + type() detectado - Avanza al siguiente paso</span>';
-                    window.tourTimeout = setTimeout(() => nextTourStep(), 10000);
+            const codeRaw = e.target.value;
+            const normalizedUser = codeRaw.replace(/\s/g, '').toLowerCase();
+            const normalizedExpected = expectedSnippet.replace(/\s/g, '').toLowerCase();
+            if (normalizedUser === normalizedExpected) {
+                if (!codeExactMatchDone) {
+                    codeExactMatchDone = true;
+                    pasoCompletado[3] = true;
+                    if (tourStep === 3) {
+                        clearTimeout(window.tourTimeout);
+                        document.getElementById('tour-3').style.display = 'none';
+                        document.getElementById('tour-4').style.display = 'block';
+                        tourStep = 4;
+                        document.getElementById('term').innerHTML = '<span class="info">✅ código exacto detectado - Presiona F5 para ejecutar</span>';
+                    }
                 }
             }
         });
@@ -667,6 +768,26 @@
         
         // Inicializar líneas al cargar
         updateLines();
+
+        // Subcategoría: show/hide continuation modal (basic wiring)
+        function showSubcatContinueModal() {
+            const m = document.getElementById('subcat-continue-modal');
+            if (m) m.style.display = 'flex';
+        }
+        function hideSubcatContinueModal() {
+            const m = document.getElementById('subcat-continue-modal');
+            if (m) m.style.display = 'none';
+        }
+        window.continueToNextSubcat = function() {
+            const remember = document.getElementById('remember-subcat')?.checked;
+            if (remember) {
+                // Persist preference to avoid future prompts (shared with main settings)
+                if (window.LearningPCSettings) window.LearningPCSettings.setShowPrompt(false);
+            }
+            // For now, navigate to home (hook later to next subcategory)
+            window.location.href = 'home.html';
+        };
+        window.goToHomeFromSubcat = function() { window.location.href = 'home.html'; };
     </script>
 </body>
 </html>
