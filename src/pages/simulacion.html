@@ -448,25 +448,46 @@
                 
                 if (Array.isArray(nivelesData)) {
                     niveles = nivelesData;
-                    if (niveles.length > 0 && niveles[0].categoria_id) {
+                    if (niveles.length > 0 && niveles[0].categoria_id !== undefined && niveles[0].categoria_id !== null) {
                         idCategoria = niveles[0].categoria_id;
-                    } else if (niveles.length > 0 && niveles[0].id_categoria) {
-                        // Fallback: esquema antiguo
+                        console.log('[DEBUG] idCategoria desde categoria_id (array):', idCategoria);
+                    } else if (niveles.length > 0 && niveles[0].id_categoria !== undefined && niveles[0].id_categoria !== null) {
                         idCategoria = niveles[0].id_categoria;
+                        console.log('[DEBUG] idCategoria desde id_categoria (array):', idCategoria);
                     }
-                    console.log('[DEBUG] idCategoria desde niveles (array):', idCategoria);
+                    if (!idCategoria) {
+                        console.log('[DEBUG] idCategoria sigue null, intentaremos obtener desde getSubcategoria');
+                    }
                 } else if (nivelesData.niveles) {
                     niveles = nivelesData.niveles;
-                    if (niveles.length > 0 && niveles[0].categoria_id) {
+                    if (niveles.length > 0 && niveles[0].categoria_id !== undefined && niveles[0].categoria_id !== null) {
                         idCategoria = niveles[0].categoria_id;
-                    } else if (niveles.length > 0 && niveles[0].id_categoria) {
-                        // Fallback: esquema antiguo
+                        console.log('[DEBUG] idCategoria desde categoria_id (object):', idCategoria);
+                    } else if (niveles.length > 0 && niveles[0].id_categoria !== undefined && niveles[0].id_categoria !== null) {
                         idCategoria = niveles[0].id_categoria;
+                        console.log('[DEBUG] idCategoria desde id_categoria (object):', idCategoria);
                     }
-                    console.log('[DEBUG] idCategoria desde niveles (object):', idCategoria);
+                    if (!idCategoria) {
+                        console.log('[DEBUG] idCategoria sigue null, intentaremos obtener desde getSubcategoria');
+                    }
                 } else {
                     console.log('Formato inesperado, usando modo legacy');
                     niveles = [];
+                }
+                
+                // Fallback: si idCategoria sigue null, obtenerlo desde la subcategoría directamente
+                if (!idCategoria && idSubcategoria) {
+                    try {
+                        const subcat = await window.api.getSubcategoria(parseInt(idSubcategoria));
+                        if (subcat && subcat.id_categoria !== undefined && subcat.id_categoria !== null) {
+                            idCategoria = subcat.id_categoria;
+                            console.log('[DEBUG] idCategoria obtenido desde getSubcategoria:', idCategoria, '(subcat:', subcat.nombre, ')');
+                        } else {
+                            console.log('[DEBUG] getSubcategoria no devolvió id_categoria válido:', subcat);
+                        }
+                    } catch(e) {
+                        console.log('[DEBUG] Fallback getSubcategoria falló:', e);
+                    }
                 }
                 
                 console.log('Niveles asignados:', niveles.length);
@@ -757,12 +778,15 @@ function actualizarUI() {
             // Fallback: si idCategoria es null, intentar obtenerlo desde la subcategoría
             if (!idCategoria && idSubcategoria) {
                 try {
-                    const subcatData = await window.api.getSubcategoriasPorCategoria(idSubcategoria);
-                    // getSubcategoriasPorCategoria puede devolver la subcategoría específica si le pasamos id directamente
-                    // Pero si no funciona, intentamos obtener las subcategorías de cualquier forma
-                    console.log('[SUBNAV] Fallback: intentamos obtener idCategoria desde otras fuentes');
+                    const subcat = await window.api.getSubcategoria(parseInt(idSubcategoria));
+                    if (subcat && subcat.id_categoria !== undefined && subcat.id_categoria !== null) {
+                        idCategoria = subcat.id_categoria;
+                        console.log('[SUBNAV] Fallback exitoso - idCategoria obtenido:', idCategoria);
+                    } else {
+                        console.log('[SUBNAV] Fallback getSubcategoria no devolvió id_categoria:', subcat);
+                    }
                 } catch(e) {
-                    console.log('[SUBNAV] Fallback no funcionó:', e);
+                    console.log('[SUBNAV] Fallback getSubcategoria falló:', e);
                 }
             }
 

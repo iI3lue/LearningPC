@@ -193,6 +193,14 @@ ipcMain.handle('data:getSubcategoriasPorCategoria', (event, idCategoria) => {
     return subs;
 });
 
+// Obtener una subcategoría específica por ID (para obtener id_categoria)
+ipcMain.handle('data:getSubcategoria', (event, idSubcategoria) => {
+    const db = getDatabase();
+    const sub = db.prepare('SELECT * FROM subcategorias WHERE id_subcategoria = ?').get(idSubcategoria);
+    console.log('[MAIN] getSubcategoria(', idSubcategoria, '):', sub ? sub.nombre : 'null');
+    return sub;
+});
+
 // Obtener niveles por subcategoría
 ipcMain.handle('data:getNivelesPorSubcategoria', (event, idSubcategoria) => {
     const db = getDatabase();

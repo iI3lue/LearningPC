@@ -33,6 +33,9 @@ contextBridge.exposeInMainWorld('api', {
     getSubcategoriasPorCategoria: (idCategoria) =>
         ipcRenderer.invoke('data:getSubcategoriasPorCategoria', idCategoria),
 
+    getSubcategoria: (idSubcategoria) =>
+        ipcRenderer.invoke('data:getSubcategoria', idSubcategoria),
+
     // Niveles (Nivel 2)
     getNivelesPorSubcategoria: (idSubcategoria) =>
         ipcRenderer.invoke('data:getNivelesPorSubcategoria', idSubcategoria),
