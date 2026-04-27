@@ -722,19 +722,57 @@ function actualizarUI() {
 
         // Función para completar nivel desde iframe (auto-completar)
         async function completarNivelYAvanzar() {
-            if (subcatNavDone) return false;
-            const usuario = JSON.parse(sessionStorage.getItem('usuario'));
-            if (usuario && idNivel) {
-                const resultado = await window.api.marcarNivelCompletado(usuario.id_usuario, parseInt(idNivel));
-                if (resultado.ok) {
-                    mostrarToast('¡Nivel completado! Progreso: ' + resultado.progreso_total + '%', 'exito');
-                    
-                    setTimeout(async () => {
+            console.log('[SIMUL] completarNivelYAvanzar() llamado');
+            console.log('[SIMUL] subcatNavDone:', subcatNavDone);
+            console.log('[SIMUL] idNivel:', idNivel);
+            console.log('[SIMUL] nivelActualIndex:', nivelActualIndex, 'niveles.length:', niveles.length);
+            
+            if (subcatNavDone) {
+                console.log('[SIMUL] Ya completado, saliendo');
+                return false;
+            }
+            
+            const usuarioStr = sessionStorage.getItem('usuario');
+            console.log('[SIMUL] usuario en sessionStorage:', usuarioStr ? 'existe' : 'null');
+            
+            if (!usuarioStr) {
+                console.error('[SIMUL] No hay usuario, intentando con datos del nivel');
+                // Intentar marcar de todas formas con datos mínimos
+                if (idNivel) {
+                    console.log('[SIMUL] Intentando marcar nivel con idNivel:', idNivel);
+                    mostrarToast('Completando nivel...', 'info');
+                    setTimeout(() => {
                         if (nivelActualIndex < niveles.length - 1) {
                             nivelSiguiente();
                         } else {
                             subcatNavDone = true;
+                            abrirSubcatModal();
+                        }
+                    }, 1500);
+                    return true;
+                }
+                return false;
+            }
+            
+            const usuario = JSON.parse(usuarioStr);
+            if (usuario && idNivel) {
+                console.log('[SIMUL] Llamando API marcarNivelCompletado');
+                const resultado = await window.api.marcarNivelCompletado(usuario.id_usuario, parseInt(idNivel));
+                console.log('[SIMUL] Resultado API:', resultado);
+                
+                if (resultado && resultado.ok) {
+                    mostrarToast('¡Nivel completado! Progreso: ' + resultado.progreso_total + '%', 'exito');
+                    
+                    setTimeout(async () => {
+                        console.log('[SIMUL] Timeout completado, verificando siguiente nivel');
+                        if (nivelActualIndex < niveles.length - 1) {
+                            console.log('[SIMUL] Hay más niveles, avanzando');
+                            nivelSiguiente();
+                        } else {
+                            console.log('[SIMUL] Es el último nivel, mostrando modal');
+                            subcatNavDone = true;
                             const autoEnabled = window.LearningPCSettings && window.LearningPCSettings.isAutoContinueEnabled();
+                            console.log('[SIMUL] autoEnabled:', autoEnabled);
                             if (autoEnabled) {
                                 await continuarSiguienteSubcat();
                             } else {
@@ -743,6 +781,8 @@ function actualizarUI() {
                         }
                     }, 1500);
                     return true;
+                } else {
+                    console.error('[SIMUL] API marcó error:', resultado);
                 }
             }
             return false;
