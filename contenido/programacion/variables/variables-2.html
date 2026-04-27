@@ -643,16 +643,17 @@
 
         async function autoNext() {
             document.getElementById('success').style.display = 'block';
-            const autoEnabled = typeof window.LearningPCSettings !== 'undefined' && window.LearningPCSettings.isAutoContinueEnabled();
-            if (autoEnabled) {
-                if(window.parent && window.parent.completarNivelYAvanzar) {
-                    try { await window.parent.completarNivelYAvanzar(); }
-                    catch(e) { setTimeout(() => window.parent.location.reload(), 2000); }
-                } else {
-                    setTimeout(() => window.parent.location.reload(), 2500);
+            // SIEMPRE delegar al padre - la lógica de modal vs auto-continuar está en simulacion.html
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                try {
+                    await window.parent.completarNivelYAvanzar();
+                } catch(e) {
+                    console.error('[VAR2] Error al llamar completaronNivelYAvanzar:', e);
+                    setTimeout(() => window.parent.location.reload(), 2000);
                 }
             } else {
-                showSubcatContinueModal();
+                // Fallback: reload padre si no existe la función
+                setTimeout(() => window.parent.location.reload(), 2500);
             }
         }
 
