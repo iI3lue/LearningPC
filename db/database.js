@@ -167,6 +167,61 @@ function aplicarMigraciones() {
                 (19, 'Retornar valores', 'Funciones con salidas', 'programacion/funciones/funciones-3.html', 3, 3, 15);
             `);
         }
+
+        // Verificar si Office ya tiene subcategorías de Word/Excel/PowerPoint
+        const officeSubcats = db.prepare(`
+            SELECT id_subcategoria, nombre FROM subcategorias
+            WHERE id_categoria = 1 AND nombre LIKE '%Comandos%'
+        `).all();
+
+        if (officeSubcats.length === 0) {
+            console.log('[DB] Insertando subcategorías de Office...');
+            // Insertar subcategorías de Office
+            db.exec(`
+                INSERT INTO subcategorias (id_categoria, nombre, descripcion, icono, orden) VALUES
+                (1, 'Word - Comandos', 'Formatos y comandos útiles de Word', '📝', 2),
+                (1, 'Excel - Comandos', 'Fórmulas y formato de celdas', '📊', 3),
+                (1, 'PowerPoint - Comandos', 'Diseño y formato de presentaciones', '📽️', 4)
+            `);
+
+            // Obtener los IDs asignados a las nuevas subcategorías de Office
+            const nuevasSubcats = db.prepare(`
+                SELECT id_subcategoria, nombre FROM subcategorias
+                WHERE id_categoria = 1 AND nombre LIKE '%Comandos%'
+            `).all();
+
+            // Crear mapa de nombre -> id
+            const subcatMap = {};
+            nuevasSubcats.forEach(s => { subcatMap[s.nombre] = s.id_subcategoria; });
+
+            // Insertar niveles de Office
+            const wordId = subcatMap['Word - Comandos'];
+            const excelId = subcatMap['Excel - Comandos'];
+            const pptId = subcatMap['PowerPoint - Comandos'];
+
+            if (wordId && excelId && pptId) {
+                db.exec(`
+                    -- Word Comandos
+                    INSERT INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
+                    (${wordId}, 'Formato de texto', 'Negrita, cursiva y subrayado', 'office/word/word-comandos-1.html', 1, 1, 15),
+                    (${wordId}, 'Alineación de párrafos', 'Izquierda, centrar, derecha y justificar', 'office/word/word-comandos-2.html', 2, 2, 15),
+                    (${wordId}, 'Combinación de comandos', 'Combinar múltiples formatos', 'office/word/word-comandos-3.html', 3, 3, 20),
+                    -- Excel Comandos
+                    (${excelId}, 'Formato de celdas', 'Negrita, cursiva y color de fuente', 'office/excel/excel-comandos-1.html', 1, 1, 15),
+                    (${excelId}, 'Bordes y alineación', 'Agregar bordes y centrar contenido', 'office/excel/excel-comandos-2.html', 2, 2, 15),
+                    (${excelId}, 'Fórmulas básicas', 'SUMA, PROMEDIO y otras fórmulas', 'office/excel/excel-comandos-3.html', 3, 3, 20),
+                    -- PowerPoint Comandos
+                    (${pptId}, 'Formato de texto', 'Negrita, cursiva y tamaño', 'office/powerpoint/powerpoint-comandos-1.html', 1, 1, 15),
+                    (${pptId}, 'Diseño de diapositiva', 'Cambiar diseño y fondo', 'office/powerpoint/powerpoint-comandos-2.html', 2, 2, 15),
+                    (${pptId}, 'Insertar elementos', 'Imágenes, formas y tablas', 'office/powerpoint/powerpoint-comandos-3.html', 3, 3, 20);
+                `);
+                console.log('[DB] Niveles de Office insertados:', 9);
+            } else {
+                console.log('[DB] ERROR: No se pudieron obtener los IDs de subcategorías de Office');
+            }
+        } else {
+            console.log('[DB] Las subcategorías de Office ya existen:', officeSubcats.length);
+        }
         
         // 5. Si no hay subcategorías, crear por defecto
         const countSubcategorias = db.prepare("SELECT COUNT(*) as total FROM subcategorias").get();

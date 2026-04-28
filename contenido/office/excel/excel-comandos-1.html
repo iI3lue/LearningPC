@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formato de celdas - Excel Comandos</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #217346; overflow: hidden; }
+        .desktop { width: 100vw; height: calc(100vh - 48px); position: relative; background: linear-gradient(135deg, #217346 0%, #1a5c38 100%); }
+
+        .control-panel { background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 24px; max-width: 480px; margin: 40px auto; text-align: center; position: relative; z-index: 10; }
+        .control-panel h2 { color: #fff; font-size: 18px; margin-bottom: 12px; }
+        .control-panel p { color: #9e9e9e; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+        .btn-iniciar { background: #217346; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.15s; }
+        .btn-iniciar:hover { background: #2d8c4e; }
+        .hint-box { background: #2d2d2d; border: 1px solid #217346; border-radius: 6px; padding: 16px; margin-top: 16px; text-align: left; }
+        .hint-box h4 { color: #60cdff; font-size: 12px; margin: 0 0 8px 0; }
+        .hint-box p { color: #ccc; font-size: 12px; margin: 4px 0; }
+        .hint-box .key { background: #333; padding: 2px 8px; border-radius: 3px; border: 1px solid #555; color: #fff; font-family: 'Consolas', monospace; font-size: 11px; }
+        .hint-box .key.combo { background: #107c10; border-color: #107c10; color: #fff; }
+
+        .ventana { position: absolute; width: 900px; height: 580px; background: #fff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: none; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', sans-serif; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .ventana.visible { display: flex; }
+
+        .title-bar { background: #217346; padding: 0; display: flex; align-items: center; height: 32px; border-bottom: 1px solid #1a5c38; }
+        .title-bar .app-icon { width: 28px; height: 28px; background: #fff; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+        .title-bar .app-icon span { color: #217346; font-size: 14px; font-weight: bold; }
+        .title-bar .doc-name { flex: 1; font-size: 12px; color: #fff; }
+        .window-controls { display: flex; gap: 2px; }
+        .window-btn { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; }
+        .window-btn:hover { background: rgba(255,255,255,0.2); }
+        .window-btn.close:hover { background: #c42b1c; }
+        .window-btn svg line { stroke: #fff; }
+
+        .ribbon { background: #f3f3f3; border-bottom: 1px solid #ddd; }
+        .ribbon-tabs { display: flex; background: #f3f3f3; border-bottom: 1px solid #ddd; }
+        .ribbon-tab { padding: 8px 16px; font-size: 12px; color: #444; cursor: pointer; border: none; background: transparent; transition: all 0.15s; }
+        .ribbon-tab:hover { background: #e5e5e5; }
+        .ribbon-tab.active { background: #fff; border-bottom: 2px solid #217346; color: #217346; }
+        .ribbon-content { display: none; padding: 12px 16px; background: #fff; }
+        .ribbon-content.active { display: block; }
+        .ribbon-group { display: inline-block; vertical-align: top; margin-right: 24px; }
+        .ribbon-group-items { display: flex; gap: 4px; }
+        .ribbon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; border: none; background: transparent; }
+        .ribbon-btn:hover { background: #e5e5e5; }
+        .ribbon-btn.active { background: #d4edda; }
+        .ribbon-btn svg { width: 20px; height: 20px; fill: #444; }
+        .ribbon-group-title { font-size: 10px; color: #666; margin-top: 4px; text-align: center; }
+
+        .formula-bar { background: #fff; padding: 4px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #ddd; }
+        .cell-reference { background: #f3f3f3; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; min-width: 60px; }
+        .formula-input { flex: 1; background: #fff; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; font-family: 'Consolas', monospace; }
+
+        .spreadsheet-area { flex: 1; display: flex; overflow: auto; background: #fff; pointer-events: auto; }
+        .row-headers { background: #f3f3f3; display: flex; flex-direction: column; min-width: 40px; }
+        .row-header { height: 25px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #ddd; font-size: 11px; color: #666; }
+        .row-header:first-child { background: #e5e5e5; }
+
+        .col-headers { display: flex; background: #f3f3f3; height: 25px; }
+        .col-header { width: 100px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd; font-size: 11px; color: #666; }
+
+        .spreadsheet { display: flex; flex: 1; overflow: auto; }
+        .cells-container { flex: 1; }
+
+        .cell { width: 100px; height: 25px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; display: flex; align-items: center; padding: 0 4px; font-size: 11px; cursor: cell; user-select: text; background: #fff; transition: background 0.1s; }
+        .cell:hover { background: #f5f5f5; }
+        .cell.selected { background: #d4edda; outline: 2px solid #217346; }
+        .cell.editing { background: #fff; outline: 2px solid #217346; }
+        .cell.bold { font-weight: bold; }
+        .cell.italic { font-style: italic; }
+        .cell.underline { text-decoration: underline; }
+
+        .status-bar { background: #217346; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fff; }
+
+        .instrucciones { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 16px 24px; text-align: center; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+        .instrucciones p { color: #9e9e9e; font-size: 13px; margin: 0; }
+        .instrucciones .key { background: #333; padding: 2px 8px; border-radius: 3px; color: #fff; font-family: 'Consolas', monospace; font-size: 11px; }
+        .instrucciones .key.combo { background: #107c10; color: #fff; }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 6px; padding: 12px 20px; z-index: 1000; display: none; animation: slideDown 0.3s ease; }
+        .toast.visible { display: block; }
+        .toast.exito { border-color: #217346; }
+        .toast.exito .toast-mensaje { color: #6ccb5f; }
+        .toast-mensaje { color: #fff; font-size: 13px; }
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        .btn-reiniciar { position: fixed; top: 20px; left: 20px; background: #2d2d2d; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; z-index: 100; display: none; }
+        .btn-reiniciar.visible { display: block; }
+        .btn-reiniciar:hover { background: #444; }
+
+        .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #202020; display: flex; align-items: center; padding: 0 8px; z-index: 500; }
+        .start-button { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
+        .start-button:hover { background: #383838; }
+        .start-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #217346 0%, #1a5c38 100%); border-radius: 2px; }
+        .taskbar-icons { display: flex; gap: 4px; margin-left: 8px; flex: 1; }
+        .taskbar-icon { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+        .taskbar-icon:hover { background: #383838; }
+        .taskbar-icon.active { background: #383838; border-bottom: 2px solid #217346; }
+        .taskbar-icon .icono { width: 16px; height: 16px; background: #217346; border-radius: 2px; }
+        .taskbar-icon span { color: #fff; font-size: 12px; }
+        .tray { display: flex; align-items: center; gap: 12px; padding-right: 12px; color: #fff; font-size: 12px; }
+        .tray-icons { display: flex; gap: 8px; }
+        .clock { text-align: right; }
+        .clock-hora { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-inicio">
+            <h2>Formato de celdas en Excel</h2>
+            <p>Aprende a dar formato a las celdas:<br><span class="key">Ctrl+B</span> negrita, <span class="key">Ctrl+I</span> cursiva, <span class="key">Ctrl+U</span> subrayado</p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
+            <div class="hint-box">
+                <h4>📊 ¿Para qué sirve?</h4>
+                <p><span class="key">Ctrl+B</span> aplica negrita a la celda seleccionada</p>
+                <p><span class="key">Ctrl+I</span> aplica cursiva</p>
+                <p><span class="key">Ctrl+U</span> aplica subrayado</p>
+                <p>Aplica al menos 2 formatos diferentes para completar</p>
+            </div>
+        </div>
+
+        <div class="ventana" id="ventana">
+            <div class="title-bar">
+                <div class="app-icon"><span>X</span></div>
+                <span class="doc-name">Libro1 - Excel</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarExcel()">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="#fff"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarExcel()">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarExcel()">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ribbon">
+                <div class="ribbon-tabs">
+                    <button class="ribbon-tab active">Inicio</button>
+                </div>
+                <div class="ribbon-content active">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" id="btn-negrita" title="Negrita (Ctrl+B)" onclick="aplicarNegrita()">
+                                <svg viewBox="0 0 24 24"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-cursiva" title="Cursiva (Ctrl+I)" onclick="aplicarCursiva()">
+                                <svg viewBox="0 0 24 24"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-subrayado" title="Subrayado (Ctrl+U)" onclick="aplicarSubrayado()">
+                                <svg viewBox="0 0 24 24"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Fuente</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="formula-bar">
+                <div class="cell-reference" id="cell-reference">A1</div>
+                <div class="formula-input" id="formula-input" contenteditable="true">Dato 1</div>
+            </div>
+
+            <div class="spreadsheet-area">
+                <div class="row-headers">
+                    <div class="row-header" style="background: #e5e5e5;"></div>
+                    <div class="row-header">1</div>
+                    <div class="row-header">2</div>
+                    <div class="row-header">3</div>
+                    <div class="row-header">4</div>
+                    <div class="row-header">5</div>
+                </div>
+                <div class="spreadsheet">
+                    <div class="col-headers">
+                        <div class="col-header" style="width: 40px;"></div>
+                        <div class="col-header">A</div>
+                        <div class="col-header">B</div>
+                        <div class="col-header">C</div>
+                        <div class="col-header">D</div>
+                        <div class="col-header">E</div>
+                    </div>
+                    <div class="cells-container" id="cells-container">
+                        <!-- Row 1 -->
+                        <div class="cell-row" data-row="1">
+                            <div class="cell" data-cell="A1" onclick="selectCell('A1')">Dato 1</div>
+                            <div class="cell" data-cell="B1" onclick="selectCell('B1')">Valor</div>
+                            <div class="cell" data-cell="C1" onclick="selectCell('C1')">Total</div>
+                            <div class="cell" data-cell="D1" onclick="selectCell('D1')">Fecha</div>
+                            <div class="cell" data-cell="E1" onclick="selectCell('E1')">Estado</div>
+                        </div>
+                        <!-- Row 2 -->
+                        <div class="cell-row" data-row="2">
+                            <div class="cell" data-cell="A2" onclick="selectCell('A2')">Producto A</div>
+                            <div class="cell" data-cell="B2" onclick="selectCell('B2')">100</div>
+                            <div class="cell" data-cell="C2" onclick="selectCell('C2')">=B2*1.1</div>
+                            <div class="cell" data-cell="D2" onclick="selectCell('D2')">27/04/2026</div>
+                            <div class="cell" data-cell="E2" onclick="selectCell('E2')">Activo</div>
+                        </div>
+                        <!-- Row 3 -->
+                        <div class="cell-row" data-row="3">
+                            <div class="cell" data-cell="A3" onclick="selectCell('A3')">Producto B</div>
+                            <div class="cell" data-cell="B3" onclick="selectCell('B3')">200</div>
+                            <div class="cell" data-cell="C3" onclick="selectCell('C3')">=B3*1.1</div>
+                            <div class="cell" data-cell="D3" onclick="selectCell('D3')">27/04/2026</div>
+                            <div class="cell" data-cell="E3" onclick="selectCell('E3')">Activo</div>
+                        </div>
+                        <!-- Row 4 -->
+                        <div class="cell-row" data-row="4">
+                            <div class="cell" data-cell="A4" onclick="selectCell('A4')">Producto C</div>
+                            <div class="cell" data-cell="B4" onclick="selectCell('B4')">150</div>
+                            <div class="cell" data-cell="C4" onclick="selectCell('C4')">=B4*1.1</div>
+                            <div class="cell" data-cell="D4" onclick="selectCell('D4')">27/04/2026</div>
+                            <div class="cell" data-cell="E4" onclick="selectCell('E4')">Inactivo</div>
+                        </div>
+                        <!-- Row 5 -->
+                        <div class="cell-row" data-row="5">
+                            <div class="cell" data-cell="A5" onclick="selectCell('A5')">Total</div>
+                            <div class="cell" data-cell="B5" onclick="selectCell('B5')">450</div>
+                            <div class="cell" data-cell="C5" onclick="selectCell('C5')">495</div>
+                            <div class="cell" data-cell="D5" onclick="selectCell('D5')"></div>
+                            <div class="cell" data-cell="E5" onclick="selectCell('E5')"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <span>Listo</span>
+                <span>Hoja1</span>
+            </div>
+        </div>
+
+        <div class="instrucciones" id="instrucciones" style="display: none;">
+            <p id="instruccion-texto">Selecciona una celda y usa <span class="key combo">Ctrl+B</span>, <span class="key combo">Ctrl+I</span> o <span class="key combo">Ctrl+U</span></p>
+        </div>
+
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
+
+        <div class="toast" id="toast">
+            <span class="toast-mensaje" id="toast-mensaje"></span>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-excel" onclick="focusExcel()">
+                <div class="icono"></div>
+                <span>Excel</span>
+            </div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let excelVisible = false;
+        let nivelCompletado = false;
+        let selectedCell = null;
+        let formatosAplicados = { negrita: false, cursiva: false, subrayado: false };
+
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            document.getElementById('ventana').classList.add('visible');
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('taskbar-excel').classList.add('active');
+            excelVisible = true;
+            selectCell('A1');
+        }
+
+        function focusExcel() {
+            document.getElementById('ventana').classList.add('visible');
+            excelVisible = true;
+            document.getElementById('taskbar-excel').classList.add('active');
+        }
+
+        function selectCell(cellRef) {
+            if (selectedCell) {
+                document.querySelector('[data-cell="' + selectedCell + '"]').classList.remove('selected');
+            }
+            selectedCell = cellRef;
+            const cell = document.querySelector('[data-cell="' + cellRef + '"]');
+            cell.classList.add('selected');
+            document.getElementById('cell-reference').textContent = cellRef;
+            document.getElementById('formula-input').textContent = cell.textContent;
+            cell.focus();
+        }
+
+        function aplicarNegrita() {
+            if (!selectedCell) return;
+            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            cell.classList.toggle('bold');
+            cell.style.fontWeight = cell.classList.contains('bold') ? 'bold' : '';
+            formatosAplicados.negrita = true;
+            actualizarEstadoBotones();
+            verificarCompletado();
+            mostrarToast('Negrita');
+        }
+
+        function aplicarCursiva() {
+            if (!selectedCell) return;
+            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            cell.classList.toggle('italic');
+            cell.style.fontStyle = cell.classList.contains('italic') ? 'italic' : '';
+            formatosAplicados.cursiva = true;
+            actualizarEstadoBotones();
+            verificarCompletado();
+            mostrarToast('Cursiva');
+        }
+
+        function aplicarSubrayado() {
+            if (!selectedCell) return;
+            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            cell.classList.toggle('underline');
+            cell.style.textDecoration = cell.classList.contains('underline') ? 'underline' : '';
+            formatosAplicados.subrayado = true;
+            actualizarEstadoBotones();
+            verificarCompletado();
+            mostrarToast('Subrayado');
+        }
+
+        function actualizarEstadoBotones() {
+            if (!selectedCell) return;
+            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            document.getElementById('btn-negrita').classList.toggle('active', cell.classList.contains('bold'));
+            document.getElementById('btn-cursiva').classList.toggle('active', cell.classList.contains('italic'));
+            document.getElementById('btn-subrayado').classList.toggle('active', cell.classList.contains('underline'));
+        }
+
+        function verificarCompletado() {
+            if (nivelCompletado) return;
+            const formatosCount = [formatosAplicados.negrita, formatosAplicados.cursiva, formatosAplicados.subrayado].filter(Boolean).length;
+            if (formatosCount >= 2) {
+                nivelCompletado = true;
+                mostrarToast('🎉 ¡Felicidades! Aplicaste ' + formatosCount + ' formatos', 'exito');
+                document.getElementById('btn-reiniciar').classList.add('visible');
+                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
+                completarNivel();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (!excelVisible) return;
+            if (e.ctrlKey && e.key === 'b') { e.preventDefault(); aplicarNegrita(); }
+            if (e.ctrlKey && e.key === 'i') { e.preventDefault(); aplicarCursiva(); }
+            if (e.ctrlKey && e.key === 'u') { e.preventDefault(); aplicarSubrayado(); }
+        });
+
+        function cerrarExcel() {
+            document.getElementById('ventana').classList.remove('visible');
+            document.getElementById('taskbar-excel').classList.remove('active');
+            excelVisible = false;
+        }
+
+        function minimizarExcel() {
+            document.getElementById('ventana').classList.remove('visible');
+            excelVisible = false;
+        }
+
+        function maximizarExcel() {
+            const win = document.getElementById('ventana');
+            if (win.style.width === '100%') {
+                win.style.width = '900px';
+                win.style.height = '580px';
+                win.style.transform = 'translate(-50%, -50%)';
+            } else {
+                win.style.width = '100%';
+                win.style.height = 'calc(100vh - 48px)';
+                win.style.transform = 'none';
+                win.style.left = '0';
+                win.style.top = '0';
+            }
+        }
+
+        function reiniciarSimulacion() {
+            location.reload();
+        }
+
+        function mostrarToast(mensaje, tipo) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            toastMensaje.textContent = mensaje;
+            toast.className = 'toast visible ' + (tipo || '');
+            setTimeout(() => { toast.classList.remove('visible'); }, 2000);
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-hora').textContent =
+                now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>

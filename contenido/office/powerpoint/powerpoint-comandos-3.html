@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insertar elementos - PowerPoint Comandos</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #d24726; overflow: hidden; }
+        .desktop { width: 100vw; height: calc(100vh - 48px); position: relative; background: linear-gradient(135deg, #d24726 0%, #b33a1d 100%); }
+
+        .control-panel { background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 24px; max-width: 480px; margin: 40px auto; text-align: center; position: relative; z-index: 10; }
+        .control-panel h2 { color: #fff; font-size: 18px; margin-bottom: 12px; }
+        .control-panel p { color: #9e9e9e; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+        .btn-iniciar { background: #d24726; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.15s; }
+        .btn-iniciar:hover { background: #e55a30; }
+        .hint-box { background: #2d2d2d; border: 1px solid #d24726; border-radius: 6px; padding: 16px; margin-top: 16px; text-align: left; }
+        .hint-box h4 { color: #60cdff; font-size: 12px; margin: 0 0 8px 0; }
+        .hint-box p { color: #ccc; font-size: 12px; margin: 4px 0; }
+
+        .ventana { position: absolute; width: 900px; height: 620px; background: #fff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: none; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', sans-serif; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .ventana.visible { display: flex; }
+
+        .title-bar { background: #d24726; padding: 0; display: flex; align-items: center; height: 32px; border-bottom: 1px solid #b33a1d; }
+        .title-bar .app-icon { width: 28px; height: 28px; background: #fff; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+        .title-bar .app-icon span { color: #d24726; font-size: 14px; font-weight: bold; }
+        .title-bar .doc-name { flex: 1; font-size: 12px; color: #fff; }
+        .window-controls { display: flex; gap: 2px; }
+        .window-btn { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; }
+        .window-btn:hover { background: rgba(255,255,255,0.2); }
+        .window-btn.close:hover { background: #c42b1c; }
+        .window-btn svg line { stroke: #fff; }
+
+        .ribbon { background: #f3f3f3; border-bottom: 1px solid #ddd; }
+        .ribbon-tabs { display: flex; background: #f3f3f3; border-bottom: 1px solid #ddd; }
+        .ribbon-tab { padding: 8px 16px; font-size: 12px; color: #444; cursor: pointer; border: none; background: transparent; transition: all 0.15s; }
+        .ribbon-tab:hover { background: #e5e5e5; }
+        .ribbon-tab.active { background: #fff; border-bottom: 2px solid #d24726; color: #d24726; }
+        .ribbon-content { display: none; padding: 12px 16px; background: #fff; }
+        .ribbon-content.active { display: block; }
+        .ribbon-group { display: inline-block; vertical-align: top; margin-right: 24px; }
+        .ribbon-group-items { display: flex; gap: 4px; }
+        .ribbon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; border: none; background: transparent; }
+        .ribbon-btn:hover { background: #e5e5e5; }
+        .ribbon-btn.active { background: #fde8df; }
+        .ribbon-btn svg { width: 20px; height: 20px; fill: #444; }
+        .ribbon-group-title { font-size: 10px; color: #666; margin-top: 4px; text-align: center; }
+
+        .slide-area { flex: 1; display: flex; overflow: hidden; background: #525659; }
+        .slides-panel { width: 120px; background: #2d2d2d; padding: 8px; overflow-y: auto; }
+        .slide-thumb { width: 100px; height: 56px; background: #fff; border: 2px solid #666; border-radius: 4px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #333; transition: all 0.15s; }
+        .slide-thumb.active { border-color: #d24726; box-shadow: 0 0 8px rgba(210,71,38,0.5); }
+        .slide-canvas { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; pointer-events: auto; }
+        .slide { width: 720px; height: 405px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border-radius: 4px; padding: 48px; display: flex; flex-direction: column; justify-content: center; }
+        .slide-content { outline: none; user-select: text; }
+        .slide h1 { font-size: 44px; color: #333; margin: 0 0 24px 0; text-align: center; }
+        .slide h2 { font-size: 32px; color: #444; margin: 0 0 16px 0; }
+        .slide p { font-size: 18px; color: #666; line-height: 1.6; }
+        .inserted-image { display: inline-block; margin: 16px; padding: 8px; border: 2px dashed #d24726; border-radius: 4px; text-align: center; color: #d24726; font-size: 12px; }
+        .inserted-shape { display: inline-block; width: 80px; height: 40px; background: #d24726; margin: 8px; border-radius: 4px; }
+        .inserted-table { display: table; border-collapse: collapse; margin: 16px 0; }
+        .inserted-table td, .inserted-table th { border: 1px solid #ddd; padding: 8px 16px; font-size: 12px; }
+        .inserted-table th { background: #f5f5f5; font-weight: bold; }
+
+        .status-bar { background: #d24726; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fff; }
+
+        .instrucciones { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 16px 24px; text-align: center; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+        .instrucciones p { color: #9e9e9e; font-size: 13px; margin: 0; }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 6px; padding: 12px 20px; z-index: 1000; display: none; animation: slideDown 0.3s ease; }
+        .toast.visible { display: block; }
+        .toast.exito { border-color: #d24726; }
+        .toast.exito .toast-mensaje { color: #6ccb5f; }
+        .toast-mensaje { color: #fff; font-size: 13px; }
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        .btn-reiniciar { position: fixed; top: 20px; left: 20px; background: #2d2d2d; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; z-index: 100; display: none; }
+        .btn-reiniciar.visible { display: block; }
+        .btn-reiniciar:hover { background: #444; }
+
+        .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #202020; display: flex; align-items: center; padding: 0 8px; z-index: 500; }
+        .start-button { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
+        .start-button:hover { background: #383838; }
+        .start-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #d24726 0%, #b33a1d 100%); border-radius: 2px; }
+        .taskbar-icons { display: flex; gap: 4px; margin-left: 8px; flex: 1; }
+        .taskbar-icon { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+        .taskbar-icon:hover { background: #383838; }
+        .taskbar-icon.active { background: #383838; border-bottom: 2px solid #d24726; }
+        .taskbar-icon .icono { width: 16px; height: 16px; background: #d24726; border-radius: 2px; }
+        .taskbar-icon span { color: #fff; font-size: 12px; }
+        .tray { display: flex; align-items: center; gap: 12px; padding-right: 12px; color: #fff; font-size: 12px; }
+        .tray-icons { display: flex; gap: 8px; }
+        .clock { text-align: right; }
+        .clock-hora { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-inicio">
+            <h2>Insertar elementos</h2>
+            <p>Aprende a insertar imágenes, formas y tablas en tus presentaciones</p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
+            <div class="hint-box">
+                <h4>📽️ ¿Qué vas a practicar?</h4>
+                <p>Insertar una imagen</p>
+                <p>Insertar una forma</p>
+                <p>Insertar una tabla</p>
+                <p>Inserta al menos 2 elementos diferentes</p>
+            </div>
+        </div>
+
+        <div class="ventana" id="ventana">
+            <div class="title-bar">
+                <div class="app-icon"><span>P</span></div>
+                <span class="doc-name">Presentación1 - PowerPoint</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarPpt()">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="#fff"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarPpt()">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarPpt()">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ribbon">
+                <div class="ribbon-tabs">
+                    <button class="ribbon-tab active">Insertar</button>
+                </div>
+                <div class="ribbon-content active">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" id="btn-imagen" title="Imagen" onclick="insertarImagen()">
+                                <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-forma" title="Forma" onclick="insertarForma()">
+                                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-tabla" title="Tabla" onclick="insertarTabla()">
+                                <svg viewBox="0 0 24 24"><path d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h15v14z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Insertar</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-area">
+                <div class="slides-panel">
+                    <div class="slide-thumb active">Diapositiva 1</div>
+                </div>
+                <div class="slide-canvas">
+                    <div class="slide" id="slide">
+                        <div class="slide-content" id="slide-content">
+                            <h1>Mi presentación</h1>
+                            <p>Usa los botones de arriba para insertar elementos aquí.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <span>Diapositiva 1 de 1</span>
+                <span>Listo</span>
+            </div>
+        </div>
+
+        <div class="instrucciones" id="instrucciones" style="display: none;">
+            <p id="instruccion-texto">Usa los botones de Insertar: Imagen, Forma o Tabla</p>
+        </div>
+
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
+
+        <div class="toast" id="toast">
+            <span class="toast-mensaje" id="toast-mensaje"></span>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-ppt" onclick="focusPpt()">
+                <div class="icono"></div>
+                <span>PowerPoint</span>
+            </div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pptVisible = false;
+        let nivelCompletado = false;
+        let elementosInsertados = new Set();
+
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            document.getElementById('ventana').classList.add('visible');
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('taskbar-ppt').classList.add('active');
+            pptVisible = true;
+        }
+
+        function focusPpt() {
+            document.getElementById('ventana').classList.add('visible');
+            pptVisible = true;
+            document.getElementById('taskbar-ppt').classList.add('active');
+        }
+
+        function insertarImagen() {
+            const content = document.getElementById('slide-content');
+            const imagen = document.createElement('div');
+            imagen.className = 'inserted-image';
+            imagen.innerHTML = '📷 Imagen insertada';
+            content.appendChild(imagen);
+            elementosInsertados.add('imagen');
+            document.getElementById('btn-imagen').classList.add('active');
+            mostrarToast('Imagen insertada');
+            verificarCompletado();
+        }
+
+        function insertarForma() {
+            const content = document.getElementById('slide-content');
+            const forma = document.createElement('div');
+            forma.className = 'inserted-shape';
+            content.appendChild(forma);
+            elementosInsertados.add('forma');
+            document.getElementById('btn-forma').classList.add('active');
+            mostrarToast('Forma insertada');
+            verificarCompletado();
+        }
+
+        function insertarTabla() {
+            const content = document.getElementById('slide-content');
+            const tabla = document.createElement('div');
+            tabla.className = 'inserted-table';
+            tabla.innerHTML = `
+                <table>
+                    <tr><th>Nombre</th><th>Edad</th></tr>
+                    <tr><td>Ana</td><td>25</td></tr>
+                    <tr><td>Juan</td><td>30</td></tr>
+                </table>
+            `;
+            content.appendChild(tabla);
+            elementosInsertados.add('tabla');
+            document.getElementById('btn-tabla').classList.add('active');
+            mostrarToast('Tabla insertada');
+            verificarCompletado();
+        }
+
+        function verificarCompletado() {
+            if (nivelCompletado) return;
+            if (elementosInsertados.size >= 2) {
+                nivelCompletado = true;
+                mostrarToast('🎉 ¡Felicidades! Insertaste ' + elementosInsertados.size + ' elementos', 'exito');
+                document.getElementById('btn-reiniciar').classList.add('visible');
+                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
+                completarNivel();
+            }
+        }
+
+        function cerrarPpt() {
+            document.getElementById('ventana').classList.remove('visible');
+            pptVisible = false;
+        }
+
+        function minimizarPpt() {
+            document.getElementById('ventana').classList.remove('visible');
+            pptVisible = false;
+        }
+
+        function maximizarPpt() {
+            const win = document.getElementById('ventana');
+            if (win.style.width === '100%') {
+                win.style.width = '900px';
+                win.style.height = '620px';
+                win.style.transform = 'translate(-50%, -50%)';
+            } else {
+                win.style.width = '100%';
+                win.style.height = 'calc(100vh - 48px)';
+                win.style.transform = 'none';
+                win.style.left = '0';
+                win.style.top = '0';
+            }
+        }
+
+        function reiniciarSimulacion() {
+            location.reload();
+        }
+
+        function mostrarToast(mensaje, tipo) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            toastMensaje.textContent = mensaje;
+            toast.className = 'toast visible ' + (tipo || '');
+            setTimeout(() => { toast.classList.remove('visible'); }, 2000);
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-hora').textContent =
+                now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bordes y alineación - Excel Comandos</title>
+    <link rel="stylesheet" href="../../simulacion-core.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #217346; overflow: hidden; }
+        .desktop { width: 100vw; height: calc(100vh - 48px); position: relative; background: linear-gradient(135deg, #217346 0%, #1a5c38 100%); }
+
+        .control-panel { background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 24px; max-width: 480px; margin: 40px auto; text-align: center; position: relative; z-index: 10; }
+        .control-panel h2 { color: #fff; font-size: 18px; margin-bottom: 12px; }
+        .control-panel p { color: #9e9e9e; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+        .btn-iniciar { background: #217346; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.15s; }
+        .btn-iniciar:hover { background: #2d8c4e; }
+        .hint-box { background: #2d2d2d; border: 1px solid #217346; border-radius: 6px; padding: 16px; margin-top: 16px; text-align: left; }
+        .hint-box h4 { color: #60cdff; font-size: 12px; margin: 0 0 8px 0; }
+        .hint-box p { color: #ccc; font-size: 12px; margin: 4px 0; }
+        .hint-box .key { background: #333; padding: 2px 8px; border-radius: 3px; border: 1px solid #555; color: #fff; font-family: 'Consolas', monospace; font-size: 11px; }
+        .hint-box .key.combo { background: #107c10; border-color: #107c10; color: #fff; }
+
+        .ventana { position: absolute; width: 900px; height: 580px; background: #fff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: none; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', sans-serif; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .ventana.visible { display: flex; }
+
+        .title-bar { background: #217346; padding: 0; display: flex; align-items: center; height: 32px; border-bottom: 1px solid #1a5c38; }
+        .title-bar .app-icon { width: 28px; height: 28px; background: #fff; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+        .title-bar .app-icon span { color: #217346; font-size: 14px; font-weight: bold; }
+        .title-bar .doc-name { flex: 1; font-size: 12px; color: #fff; }
+        .window-controls { display: flex; gap: 2px; }
+        .window-btn { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; }
+        .window-btn:hover { background: rgba(255,255,255,0.2); }
+        .window-btn.close:hover { background: #c42b1c; }
+        .window-btn svg line { stroke: #fff; }
+
+        .ribbon { background: #f3f3f3; border-bottom: 1px solid #ddd; }
+        .ribbon-tabs { display: flex; background: #f3f3f3; border-bottom: 1px solid #ddd; }
+        .ribbon-tab { padding: 8px 16px; font-size: 12px; color: #444; cursor: pointer; border: none; background: transparent; transition: all 0.15s; }
+        .ribbon-tab:hover { background: #e5e5e5; }
+        .ribbon-tab.active { background: #fff; border-bottom: 2px solid #217346; color: #217346; }
+        .ribbon-content { display: none; padding: 12px 16px; background: #fff; }
+        .ribbon-content.active { display: block; }
+        .ribbon-group { display: inline-block; vertical-align: top; margin-right: 24px; }
+        .ribbon-group-items { display: flex; gap: 4px; }
+        .ribbon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; border: none; background: transparent; }
+        .ribbon-btn:hover { background: #e5e5e5; }
+        .ribbon-btn.active { background: #d4edda; }
+        .ribbon-btn svg { width: 20px; height: 20px; fill: #444; }
+        .ribbon-group-title { font-size: 10px; color: #666; margin-top: 4px; text-align: center; }
+
+        .formula-bar { background: #fff; padding: 4px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #ddd; }
+        .cell-reference { background: #f3f3f3; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; min-width: 60px; }
+        .formula-input { flex: 1; background: #fff; padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; font-family: 'Consolas', monospace; }
+
+        .spreadsheet-area { flex: 1; display: flex; overflow: auto; background: #fff; pointer-events: auto; }
+        .row-headers { background: #f3f3f3; display: flex; flex-direction: column; min-width: 40px; }
+        .row-header { height: 25px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #ddd; font-size: 11px; color: #666; }
+        .row-header:first-child { background: #e5e5e5; }
+        .col-headers { display: flex; background: #f3f3f3; height: 25px; }
+        .col-header { width: 100px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #ddd; font-size: 11px; color: #666; }
+        .spreadsheet { display: flex; flex: 1; overflow: auto; }
+        .cells-container { flex: 1; }
+        .cell { width: 100px; height: 25px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; display: flex; align-items: center; padding: 0 4px; font-size: 11px; cursor: cell; user-select: text; background: #fff; transition: background 0.1s; }
+        .cell:hover { background: #f5f5f5; }
+        .cell.selected { background: #d4edda; outline: 2px solid #217346; }
+        .cell.border-top { border-top: 2px solid #000; }
+        .cell.border-bottom { border-bottom: 2px solid #000; }
+        .cell.border-left { border-left: 2px solid #000; }
+        .cell.border-right { border-right: 2px solid #000; }
+        .cell.border-all { border: 2px solid #000; }
+        .cell.center { justify-content: center; text-align: center; }
+        .cell.right { justify-content: flex-end; text-align: right; }
+        .cell.left { justify-content: flex-start; text-align: left; }
+        .cell-header { background: #217346; color: #fff; font-weight: bold; }
+        .cell-total { background: #e8f5e9; font-weight: bold; }
+
+        .status-bar { background: #217346; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fff; }
+
+        .instrucciones { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 16px 24px; text-align: center; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+        .instrucciones p { color: #9e9e9e; font-size: 13px; margin: 0; }
+        .instrucciones .key { background: #333; padding: 2px 8px; border-radius: 3px; color: #fff; font-family: 'Consolas', monospace; font-size: 11px; }
+        .instrucciones .key.combo { background: #107c10; color: #fff; }
+
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 6px; padding: 12px 20px; z-index: 1000; display: none; animation: slideDown 0.3s ease; }
+        .toast.visible { display: block; }
+        .toast.exito { border-color: #217346; }
+        .toast.exito .toast-mensaje { color: #6ccb5f; }
+        .toast-mensaje { color: #fff; font-size: 13px; }
+        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+        .btn-reiniciar { position: fixed; top: 20px; left: 20px; background: #2d2d2d; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; z-index: 100; display: none; }
+        .btn-reiniciar.visible { display: block; }
+        .btn-reiniciar:hover { background: #444; }
+
+        .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #202020; display: flex; align-items: center; padding: 0 8px; z-index: 500; }
+        .start-button { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
+        .start-button:hover { background: #383838; }
+        .start-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #217346 0%, #1a5c38 100%); border-radius: 2px; }
+        .taskbar-icons { display: flex; gap: 4px; margin-left: 8px; flex: 1; }
+        .taskbar-icon { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+        .taskbar-icon:hover { background: #383838; }
+        .taskbar-icon.active { background: #383838; border-bottom: 2px solid #217346; }
+        .taskbar-icon .icono { width: 16px; height: 16px; background: #217346; border-radius: 2px; }
+        .taskbar-icon span { color: #fff; font-size: 12px; }
+        .tray { display: flex; align-items: center; gap: 12px; padding-right: 12px; color: #fff; font-size: 12px; }
+        .tray-icons { display: flex; gap: 8px; }
+        .clock { text-align: right; }
+        .clock-hora { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="control-panel" id="panel-inicio">
+            <h2>Bordes y alineación</h2>
+            <p>Aprende a agregar bordes y alinear contenido:<br>Usa los botones para aplicar bordes y centrar texto</p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
+            <div class="hint-box">
+                <h4>📊 ¿Qué vas a practicar?</h4>
+                <p>Agregar bordes a las celdas</p>
+                <p>Centrar el contenido</p>
+                <p>Selecciona la fila de encabezado y aplica ambos</p>
+            </div>
+        </div>
+
+        <div class="ventana" id="ventana">
+            <div class="title-bar">
+                <div class="app-icon"><span>X</span></div>
+                <span class="doc-name">Tabla1 - Excel</span>
+                <div class="window-controls">
+                    <div class="window-btn" onclick="minimizarExcel()">
+                        <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="#fff"/></svg>
+                    </div>
+                    <div class="window-btn" onclick="maximizarExcel()">
+                        <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                    <div class="window-btn close" onclick="cerrarExcel()">
+                        <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ribbon">
+                <div class="ribbon-tabs">
+                    <button class="ribbon-tab active">Inicio</button>
+                </div>
+                <div class="ribbon-content active">
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" id="btn-borde" title="Bordes" onclick="toggleBorde()">
+                                <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm1 1v16h16V4H4zm6 6h8v8h-8V10z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Bordes</div>
+                    </div>
+                    <div class="ribbon-group">
+                        <div class="ribbon-group-items">
+                            <div class="ribbon-btn" id="btn-centrar" title="Centrar" onclick="centrarCelda()">
+                                <svg viewBox="0 0 24 24"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-izquierda" title="Izquierda" onclick="izquierdaCelda()">
+                                <svg viewBox="0 0 24 24"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
+                            </div>
+                            <div class="ribbon-btn" id="btn-derecha" title="Derecha" onclick="derechaCelda()">
+                                <svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
+                            </div>
+                        </div>
+                        <div class="ribbon-group-title">Alineación</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="formula-bar">
+                <div class="cell-reference" id="cell-reference">A1</div>
+                <div class="formula-input" id="formula-input" contenteditable="true">Encabezado</div>
+            </div>
+
+            <div class="spreadsheet-area">
+                <div class="row-headers">
+                    <div class="row-header" style="background: #e5e5e5;"></div>
+                    <div class="row-header">1</div>
+                    <div class="row-header">2</div>
+                    <div class="row-header">3</div>
+                </div>
+                <div class="spreadsheet">
+                    <div class="col-headers">
+                        <div class="col-header" style="width: 40px;"></div>
+                        <div class="col-header">A</div>
+                        <div class="col-header">B</div>
+                        <div class="col-header">C</div>
+                    </div>
+                    <div class="cells-container">
+                        <div class="cell-row" data-row="1">
+                            <div class="cell cell-header" data-cell="A1" onclick="selectCell('A1')">Nombre</div>
+                            <div class="cell cell-header" data-cell="B1" onclick="selectCell('B1')">Apellido</div>
+                            <div class="cell cell-header" data-cell="C1" onclick="selectCell('C1')">Edad</div>
+                        </div>
+                        <div class="cell-row" data-row="2">
+                            <div class="cell" data-cell="A2" onclick="selectCell('A2')">María</div>
+                            <div class="cell" data-cell="B2" onclick="selectCell('B2')">García</div>
+                            <div class="cell" data-cell="C2" onclick="selectCell('C2')">28</div>
+                        </div>
+                        <div class="cell-row" data-row="3">
+                            <div class="cell" data-cell="A3" onclick="selectCell('A3')">Juan</div>
+                            <div class="cell" data-cell="B3" onclick="selectCell('B3')">Pérez</div>
+                            <div class="cell" data-cell="C3" onclick="selectCell('C3')">35</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <span>Listo</span>
+                <span>Hoja1</span>
+            </div>
+        </div>
+
+        <div class="instrucciones" id="instrucciones" style="display: none;">
+            <p id="instruccion-texto">Selecciona celdas del encabezado y usa los botones de bordes y centrar</p>
+        </div>
+
+        <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
+
+        <div class="toast" id="toast">
+            <span class="toast-mensaje" id="toast-mensaje"></span>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <div class="start-button"><div class="start-icon"></div></div>
+        <div class="taskbar-icons">
+            <div class="taskbar-icon" id="taskbar-excel" onclick="focusExcel()">
+                <div class="icono"></div>
+                <span>Excel</span>
+            </div>
+        </div>
+        <div class="tray">
+            <div class="tray-icons">🔊 📶</div>
+            <div class="clock">
+                <div class="clock-hora" id="clock-hora">12:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let excelVisible = false;
+        let nivelCompletado = false;
+        let selectedCells = [];
+        let tareasCompletadas = { bordes: false, centrar: false };
+
+        function completarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
+        }
+
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            document.getElementById('ventana').classList.add('visible');
+            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('taskbar-excel').classList.add('active');
+            excelVisible = true;
+            selectAllHeaderCells();
+        }
+
+        function focusExcel() {
+            document.getElementById('ventana').classList.add('visible');
+            excelVisible = true;
+            document.getElementById('taskbar-excel').classList.add('active');
+        }
+
+        function selectAllHeaderCells() {
+            selectedCells = ['A1', 'B1', 'C1'];
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
+            selectedCells.forEach(ref => {
+                const cell = document.querySelector('[data-cell="' + ref + '"]');
+                if (cell) cell.classList.add('selected');
+            });
+            document.getElementById('cell-reference').textContent = 'A1:C1';
+            document.getElementById('instruccion-texto').innerHTML = 'Usa los botones de <b>Bordes</b> y <b>Centrar</b> en el encabezado';
+        }
+
+        function toggleBorde() {
+            selectedCells.forEach(ref => {
+                const cell = document.querySelector('[data-cell="' + ref + '"]');
+                if (cell) {
+                    cell.classList.toggle('border-all');
+                }
+            });
+            tareasCompletadas.bordes = true;
+            verificarCompletado();
+            mostrarToast('Bordes aplicados');
+        }
+
+        function centrarCelda() {
+            selectedCells.forEach(ref => {
+                const cell = document.querySelector('[data-cell="' + ref + '"]');
+                if (cell) {
+                    cell.classList.remove('left', 'right');
+                    cell.classList.add('center');
+                }
+            });
+            document.getElementById('btn-centrar').classList.add('active');
+            tareasCompletadas.centrar = true;
+            verificarCompletado();
+            mostrarToast('Centrado');
+        }
+
+        function izquierdaCelda() {
+            selectedCells.forEach(ref => {
+                const cell = document.querySelector('[data-cell="' + ref + '"]');
+                if (cell) {
+                    cell.classList.remove('center', 'right');
+                    cell.classList.add('left');
+                }
+            });
+            verificarCompletado();
+            mostrarToast('Alineado a la izquierda');
+        }
+
+        function derechaCelda() {
+            selectedCells.forEach(ref => {
+                const cell = document.querySelector('[data-cell="' + ref + '"]');
+                if (cell) {
+                    cell.classList.remove('center', 'left');
+                    cell.classList.add('right');
+                }
+            });
+            verificarCompletado();
+            mostrarToast('Alineado a la derecha');
+        }
+
+        function verificarCompletado() {
+            if (nivelCompletado) return;
+            if (tareasCompletadas.bordes && tareasCompletadas.centrar) {
+                nivelCompletado = true;
+                mostrarToast('🎉 ¡Felicidades! Aplicaste bordes y centraiste', 'exito');
+                document.getElementById('btn-reiniciar').classList.add('visible');
+                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
+                completarNivel();
+            }
+        }
+
+        function cerrarExcel() {
+            document.getElementById('ventana').classList.remove('visible');
+            excelVisible = false;
+        }
+
+        function minimizarExcel() {
+            document.getElementById('ventana').classList.remove('visible');
+            excelVisible = false;
+        }
+
+        function maximizarExcel() {
+            const win = document.getElementById('ventana');
+            if (win.style.width === '100%') {
+                win.style.width = '900px';
+                win.style.height = '580px';
+                win.style.transform = 'translate(-50%, -50%)';
+            } else {
+                win.style.width = '100%';
+                win.style.height = 'calc(100vh - 48px)';
+                win.style.transform = 'none';
+                win.style.left = '0';
+                win.style.top = '0';
+            }
+        }
+
+        function reiniciarSimulacion() {
+            location.reload();
+        }
+
+        function mostrarToast(mensaje, tipo) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            toastMensaje.textContent = mensaje;
+            toast.className = 'toast visible ' + (tipo || '');
+            setTimeout(() => { toast.classList.remove('visible'); }, 2000);
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock-hora').textContent =
+                now.getHours().toString().padStart(2, '0') + ':' +
+                now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
+    </script>
+</body>
+</html>
