@@ -215,7 +215,11 @@
 
             let subcategoriasHtml = '';
             if (cat.subcategorias) {
-                subcategoriasHtml = cat.subcategorias.map(sub => {
+                // Filtrar solo subcategorías que tienen niveles
+                const subcategoriasConNiveles = cat.subcategorias.filter(sub => 
+                    sub.niveles && sub.niveles.length > 0
+                );
+                subcategoriasHtml = subcategoriasConNiveles.map(sub => {
                     const subCompletados = sub.niveles ? sub.niveles.filter(n => 
                         progresoData.some(p => p.id_nivel === n.id_nivel && p.completado)
                     ).length : 0;
@@ -252,8 +256,21 @@
         return icons[nombre] || '📚';
     }
 
-// Toggle niveles
+// Toggle niveles - abrir overlay modal
+    let overlayActivo = null;
+    
     async function toggleNiveles(idCategoria, cardElement) {
+        // Si ya hay un overlay activo para esta categoría, cerrarlo
+        if (overlayActivo === idCategoria) {
+            cerrarOverlay();
+            return;
+        }
+        
+        // Cerrar cualquier overlay anterior
+        if (overlayActivo !== null) {
+            cerrarOverlay();
+        }
+        
         try {
             const progreso = await window.api.getProgreso(usuario.id_usuario);
             const completados = new Set(progreso.filter(p => p.completado).map(p => p.id_nivel));
@@ -264,43 +281,131 @@
                 sub.niveles = await window.api.getNivelesPorSubcategoria(sub.id_subcategoria);
             }
 
-            const container = document.createElement('div');
-            container.className = 'niveles-expandidos';
-            container.style.cssText = 'margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);';
+            // Filtrar solo subcategorías con niveles
+            const subcategoriasConNiveles = subcategorias.filter(sub => 
+                sub.niveles && sub.niveles.length > 0
+            );
 
-            if (subcategorias.length === 0) {
-                container.innerHTML = '<p>No hay subcategorías disponibles.</p>';
-            } else {
-                let html = '';
-                subcategorias.forEach(sub => {
-                    html += `<div style="font-weight: 600; color: var(--accent-solid); margin: 16px 0 8px 0;">${sub.nombre}</div>`;
-                    if (sub.niveles && sub.niveles.length > 0) {
-                        sub.niveles.forEach(nivel => {
-                            const estaCompletado = completados.has(nivel.id_nivel);
-                            const ruta = nivel.ruta_archivo || '';
-                            const tiempo = nivel.tiempo_estimado_min ? `(${nivel.tiempo_estimado_min} min)` : '';
-                            
-                            html += `
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px;">
-                                    <div>
-                                        <strong style="font-size: 13px; color: var(--text-color);">Nivel ${nivel.nivel_ordinal}: ${nivel.titulo}</strong>
-                                        <div style="font-size: 12px; color: var(--text-secondary);">${nivel.descripcion || ''} ${tiempo}</div>
-                                        ${estaCompletado ? '<span style="display: inline-block; margin-left: 8px; padding: 2px 8px; background: var(--accent-pastel); color: var(--accent-solid); border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
-                                    </div>
-                                    <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" data-idsub="${sub.id_subcategoria}" style="padding: 8px 16px; background: var(--accent-solid); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
-                                </div>
-                            `;
-                        });
-                    } else {
-                        html += '<p style="font-size: 12px; color: var(--text-secondary);">No hay niveles en esta subcategoría.</p>';
-                    }
-                });
-                container.innerHTML = html;
+            if (subcategoriasConNiveles.length === 0) {
+                showToast('No hay niveles disponibles en esta categoría.', 'info');
+                return;
             }
 
-            cardElement.appendChild(container);
+            // Crear overlay
+            const overlay = document.createElement('div');
+            overlay.id = 'niveles-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: fadeIn 0.3s ease;
+                backdrop-filter: blur(4px);
+            `;
 
-            container.querySelectorAll('.btn-iniciar').forEach(btn => {
+            // Obtener nombre de categoría para el título
+            const categorias = await window.api.getCategorias();
+            const categoria = categorias.find(c => c.id_categoria === idCategoria);
+            const catNombre = categoria ? categoria.nombre : 'Niveles';
+
+            let html = `
+                <style>
+                    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+                    @keyframes slideUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+                </style>
+                <div style="
+                    background: var(--bg-secondary);
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 600px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                    padding: 24px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+                    animation: slideDown 0.3s ease;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                        <h3 style="margin: 0; color: var(--text-color); font-size: 18px;">${catNombre}</h3>
+                        <button id="btn-cerrar-overlay" style="
+                            background: transparent;
+                            border: none;
+                            color: var(--text-secondary);
+                            font-size: 24px;
+                            cursor: pointer;
+                            padding: 4px 8px;
+                            line-height: 1;
+                        ">×</button>
+                    </div>
+            `;
+
+            subcategoriasConNiveles.forEach(sub => {
+                html += `<div style="font-weight: 600; color: var(--accent-solid); margin: 20px 0 12px 0; font-size: 14px;">${sub.nombre}</div>`;
+                sub.niveles.forEach(nivel => {
+                    const estaCompletado = completados.has(nivel.id_nivel);
+                    const ruta = nivel.ruta_archivo || '';
+                    const tiempo = nivel.tiempo_estimado_min ? `(${nivel.tiempo_estimado_min} min)` : '';
+                    
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; transition: all 0.15s;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="background: var(--accent-solid); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${nivel.nivel_ordinal}</span>
+                                    <strong style="color: var(--text-color); font-size: 13px;">${nivel.titulo}</strong>
+                                </div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; margin-left: 36px;">${nivel.descripcion || ''} ${tiempo}</div>
+                                ${estaCompletado ? '<span style="display: inline-block; margin-left: 36px; margin-top: 4px; padding: 2px 8px; background: var(--accent-pastel); color: var(--accent-solid); border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
+                            </div>
+                            <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" data-idsub="${sub.id_subcategoria}" style="
+                                padding: 8px 20px;
+                                background: ${estaCompletado ? 'var(--accent-pastel)' : 'var(--accent-solid)'};
+                                color: ${estaCompletado ? 'var(--accent-solid)' : 'white'};
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 13px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                white-space: nowrap;
+                            ">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
+                        </div>
+                    `;
+                });
+            });
+
+            html += `
+                    <button id="btn-ocultar-niveles" style="
+                        width: 100%;
+                        margin-top: 20px;
+                        padding: 12px;
+                        background: transparent;
+                        color: var(--text-secondary);
+                        border: 1px solid var(--border-color);
+                        border-radius: 6px;
+                        font-size: 13px;
+                        cursor: pointer;
+                    ">Ocultar niveles</button>
+                </div>
+            `;
+
+            overlay.innerHTML = html;
+            document.body.appendChild(overlay);
+            overlayActivo = idCategoria;
+
+            // Event listeners
+            overlay.querySelector('#btn-cerrar-overlay').addEventListener('click', cerrarOverlay);
+            overlay.querySelector('#btn-ocultar-niveles').addEventListener('click', cerrarOverlay);
+            
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) cerrarOverlay();
+            });
+
+            overlay.querySelectorAll('.btn-iniciar').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = e.target.dataset.id;
                     const ruta = decodeURIComponent(e.target.dataset.ruta);
@@ -318,9 +423,22 @@
                     }
                 });
             });
+
         } catch (error) {
-            // Error loading levels
+            console.error('Error:', error);
+            showToast('Error al cargar niveles.', 'error');
         }
+    }
+
+    function cerrarOverlay() {
+        const overlay = document.getElementById('niveles-overlay');
+        if (overlay) {
+            overlay.style.animation = 'slideUp 0.2s ease';
+            setTimeout(() => {
+                overlay.remove();
+            }, 200);
+        }
+        overlayActivo = null;
     }
 
     // Load all data
