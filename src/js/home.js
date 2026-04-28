@@ -300,13 +300,13 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0, 0, 0, 0.7);
+                background: rgba(0, 0, 0, 0.75);
                 z-index: 10000;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                animation: fadeIn 0.3s ease;
-                backdrop-filter: blur(4px);
+                animation: fadeIn 0.25s ease;
+                backdrop-filter: blur(8px);
             `;
 
             // Obtener nombre de categoría para el título
@@ -319,59 +319,69 @@
                     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
                     @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
                     @keyframes slideUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
+                    #overlay-content::-webkit-scrollbar { width: 6px; }
+                    #overlay-content::-webkit-scrollbar-track { background: transparent; }
+                    #overlay-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+                    #overlay-content::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
                 </style>
-                <div style="
+                <div id="overlay-content" style="
                     background: var(--bg-secondary);
                     border-radius: 12px;
                     width: 90%;
-                    max-width: 600px;
-                    max-height: 80vh;
+                    max-width: 720px;
+                    max-height: 85vh;
                     overflow-y: auto;
-                    padding: 24px;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-                    animation: slideDown 0.3s ease;
+                    padding: 28px;
+                    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+                    animation: slideDown 0.25s ease;
                 ">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
-                        <h3 style="margin: 0; color: var(--text-color); font-size: 18px;">${catNombre}</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                        <h3 style="margin: 0; color: var(--text-color); font-size: 22px; font-weight: 600;">${catNombre}</h3>
                         <button id="btn-cerrar-overlay" style="
-                            background: transparent;
-                            border: none;
-                            color: var(--text-secondary);
-                            font-size: 24px;
+                            background: var(--bg-color);
+                            border: 1px solid var(--border-color);
+                            color: var(--text-color);
+                            font-size: 18px;
+                            width: 32px;
+                            height: 32px;
                             cursor: pointer;
-                            padding: 4px 8px;
-                            line-height: 1;
-                        ">×</button>
+                            border-radius: 6px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            transition: all 0.15s;
+                        " onmouseover="this.style.background='var(--accent-pastel)'; this.style.borderColor='var(--accent-solid)'" onmouseout="this.style.background='var(--bg-color)'; this.style.borderColor='var(--border-color)'">×</button>
                     </div>
             `;
 
             subcategoriasConNiveles.forEach(sub => {
-                html += `<div style="font-weight: 600; color: var(--accent-solid); margin: 20px 0 12px 0; font-size: 14px;">${sub.nombre}</div>`;
+                html += `<div style="font-weight: 600; color: var(--accent-solid); margin: 24px 0 14px 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px;">${sub.nombre}</div>`;
                 sub.niveles.forEach(nivel => {
                     const estaCompletado = completados.has(nivel.id_nivel);
                     const ruta = nivel.ruta_archivo || '';
                     const tiempo = nivel.tiempo_estimado_min ? `(${nivel.tiempo_estimado_min} min)` : '';
                     
                     html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; transition: all 0.15s;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 12px; transition: all 0.2s ease;">
                             <div style="flex: 1;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="background: var(--accent-solid); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">${nivel.nivel_ordinal}</span>
-                                    <strong style="color: var(--text-color); font-size: 13px;">${nivel.titulo}</strong>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="background: var(--accent-solid); color: white; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 600;">${nivel.nivel_ordinal}</span>
+                                    <strong style="color: var(--text-color); font-size: 15px; font-weight: 500;">${nivel.titulo}</strong>
                                 </div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; margin-left: 36px;">${nivel.descripcion || ''} ${tiempo}</div>
-                                ${estaCompletado ? '<span style="display: inline-block; margin-left: 36px; margin-top: 4px; padding: 2px 8px; background: var(--accent-pastel); color: var(--accent-solid); border-radius: 4px; font-size: 11px;">✓ Completado</span>' : ''}
+                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 6px; margin-left: 44px;">${nivel.descripcion || ''} ${tiempo}</div>
+                                ${estaCompletado ? '<span style="display: inline-block; margin-left: 44px; margin-top: 6px; padding: 3px 10px; background: var(--accent-pastel); color: var(--accent-solid); border-radius: 5px; font-size: 12px; font-weight: 600;">✓ Completado</span>' : ''}
                             </div>
                             <button class="btn-iniciar" data-id="${nivel.id_nivel}" data-ruta="${encodeURIComponent(ruta)}" data-titulo="${encodeURIComponent(nivel.titulo)}" data-idsub="${sub.id_subcategoria}" style="
-                                padding: 8px 20px;
-                                background: ${estaCompletado ? 'var(--accent-pastel)' : 'var(--accent-solid)'};
+                                padding: 10px 24px;
+                                background: ${estaCompletado ? 'transparent' : 'var(--accent-solid)'};
                                 color: ${estaCompletado ? 'var(--accent-solid)' : 'white'};
-                                border: none;
-                                border-radius: 6px;
-                                font-size: 13px;
+                                border: 2px solid ${estaCompletado ? 'var(--accent-solid)' : 'var(--accent-solid)'};
+                                border-radius: 8px;
+                                font-size: 14px;
                                 font-weight: 600;
                                 cursor: pointer;
                                 white-space: nowrap;
+                                transition: all 0.2s ease;
                             ">${estaCompletado ? 'Repetir' : 'Iniciar'}</button>
                         </div>
                     `;
@@ -381,14 +391,16 @@
             html += `
                     <button id="btn-ocultar-niveles" style="
                         width: 100%;
-                        margin-top: 20px;
-                        padding: 12px;
+                        margin-top: 28px;
+                        padding: 14px;
                         background: transparent;
                         color: var(--text-secondary);
                         border: 1px solid var(--border-color);
-                        border-radius: 6px;
-                        font-size: 13px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        font-weight: 500;
                         cursor: pointer;
+                        transition: all 0.2s ease;
                     ">Ocultar niveles</button>
                 </div>
             `;
@@ -400,6 +412,17 @@
             // Event listeners
             overlay.querySelector('#btn-cerrar-overlay').addEventListener('click', cerrarOverlay);
             overlay.querySelector('#btn-ocultar-niveles').addEventListener('click', cerrarOverlay);
+            
+            // Hover effect for ocultar niveles button
+            const btnOcultar = overlay.querySelector('#btn-ocultar-niveles');
+            btnOcultar.addEventListener('mouseover', function() {
+                this.style.background = 'var(--bg-color)';
+                this.style.borderColor = 'var(--text-secondary)';
+            });
+            btnOcultar.addEventListener('mouseout', function() {
+                this.style.background = 'transparent';
+                this.style.borderColor = 'var(--border-color)';
+            });
             
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) cerrarOverlay();
