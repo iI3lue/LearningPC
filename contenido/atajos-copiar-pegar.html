@@ -433,16 +433,86 @@
             stroke-width: 1;
         }
 
-        /* Document Area */
+/* Document Area */
         .document-area {
             flex: 1;
-            background: #e8e8e8;
+            background: #f0f0f0;
             display: flex;
             justify-content: center;
             padding: 24px;
             overflow: auto;
             pointer-events: auto;
             cursor: text;
+        }
+
+        .document-page-container {
+            position: relative;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border: 1px solid #ccc;
+        }
+
+        /* Document margins visualization */
+        .document-margins {
+            position: relative;
+            background: #fff;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+
+        .document-page {
+            width: 100%;
+            max-width: 650px;
+            min-height: 400px;
+            background: #fff;
+            padding: 48px 56px;
+            font-size: 11pt;
+            line-height: 1.8;
+            color: #333;
+            cursor: text;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        .document-page:focus {
+            outline: none;
+            caret-color: #0078d4;
+        }
+
+        .document-page p {
+            margin: 0 0 8px 0;
+            padding: 2px 4px;
+            border-radius: 2px;
+            min-height: 20px;
+            transition: background 0.1s;
+            user-select: text;
+            -webkit-user-select: text;
+            color: #333;
+        }
+
+        .document-page p:hover {
+            background: #f5f5f5;
+        }
+
+        .document-page ::selection {
+            background: #0078d4;
+            color: #fff;
+        }
+
+        .document-page:focus {
+            caret-color: #0078d4;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #1064be;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #fff;
+            height: 24px;
         }
 
         .document-page-container {
