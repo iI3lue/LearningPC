@@ -64,17 +64,17 @@
         .ribbon-btn svg { width: 20px; height: 20px; fill: #444; }
         .ribbon-group-title { font-size: 10px; color: #666; margin-top: 4px; text-align: center; }
 
-        .document-area { flex: 1; background: #e8e8e8; display: flex; justify-content: center; padding: 24px; overflow: auto; pointer-events: auto; cursor: text; }
-        .document-page-container { position: relative; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.document-area { flex: 1; background: #f0f0f0; display: flex; justify-content: center; padding: 24px; overflow: auto; pointer-events: auto; cursor: text; }
+        .document-page-container { position: relative; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 1px solid #ccc; }
         .document-margins { position: relative; background: #fff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
-        .document-page { width: 100%; max-width: 650px; min-height: 400px; background: #fff; padding: 48px 56px; font-size: 11pt; line-height: 1.8; color: #000; cursor: text; user-select: text; -webkit-user-select: text; }
-        .document-page:focus { outline: none; caret-color: #0078d4; }
-        .document-page p { margin: 0 0 8px 0; padding: 2px 4px; border-radius: 2px; min-height: 20px; transition: background 0.1s; user-select: text; -webkit-user-select: text; }
-        .document-page p:hover { background: #f8f8f8; }
+        .document-page { width: 100%; max-width: 650px; min-height: 400px; background: #fff; padding: 48px 56px; font-size: 11pt; line-height: 1.8; color: #333; cursor: text; user-select: text; -webkit-user-select: text; }
+        .document-page:focus { caret-color: #0078d4; }
+        .document-page p { margin: 0 0 8px 0; padding: 2px 4px; border-radius: 2px; min-height: 20px; transition: background 0.1s; user-select: text; -webkit-user-select: text; color: #333; }
+        .document-page p:hover { background: #f5f5f5; }
         .document-page ::selection { background: #0078d4; color: #fff; }
-        .document-center-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #f0f0f0; pointer-events: none; }
+        .document-center-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #ddd; pointer-events: none; }
         
-        .status-bar { background: #f3f3f3; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #666; border-top: 1px solid #e0e0e0; }
+        .status-bar { background: #1064be; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fff; }
         .status-left { display: flex; align-items: center; gap: 8px; }
         .status-right { display: flex; align-items: center; gap: 8px; }
         .status-item { display: flex; align-items: center; gap: 4px; }
