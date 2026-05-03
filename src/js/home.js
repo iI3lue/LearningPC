@@ -186,9 +186,8 @@
         categoriasGrid.innerHTML = '';
 
         categoriasData.forEach((cat, index) => {
-            
             let totalNiveles = 0;
-            let completados = 0;
+            let completadosCount = 0;
             
             if (cat.subcategorias) {
                 cat.subcategorias.forEach(sub => {
@@ -196,49 +195,74 @@
                         totalNiveles += sub.niveles.length;
                         sub.niveles.forEach(nivel => {
                             if (progresoData.some(p => p.id_nivel === nivel.id_nivel && p.completado)) {
-                                completados++;
+                                completadosCount++;
                             }
                         });
                     }
                 });
             }
             
-            const percent = totalNiveles > 0 ? Math.round((completados / totalNiveles) * 100) : 0;
+            const percent = totalNiveles > 0 ? Math.round((completadosCount / totalNiveles) * 100) : 0;
+            const catClass = cat.nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
 
             const card = document.createElement('article');
-            card.className = 'categoria-card animate-scale-in';
+            card.className = `categoria-card animate-scale-in cat-${catClass}`;
             card.style.animationDelay = `${index * 100}ms`;
-            card.dataset.idCategoria = cat.id_categoria;
 
             let subcategoriasHtml = '';
             if (cat.subcategorias) {
                 const subcategoriasConNiveles = cat.subcategorias.filter(sub => 
                     sub.niveles && sub.niveles.length > 0
-                );
+                ).slice(0, 3);
+                
                 subcategoriasHtml = subcategoriasConNiveles.map(sub => {
                     const subCompletados = sub.niveles ? sub.niveles.filter(n => 
                         progresoData.some(p => p.id_nivel === n.id_nivel && p.completado)
                     ).length : 0;
                     const subTotal = sub.niveles ? sub.niveles.length : 0;
+                    const isDone = subCompletados === subTotal && subTotal > 0;
+
                     return `
-                        <li class="subcategoria">
+                        <div class="subcategoria ${isDone ? 'done' : ''}">
                             <span>${sub.nombre}</span>
                             <span class="sub-progress">${subCompletados}/${subTotal}</span>
-                        </li>`;
+                        </div>`;
                 }).join('');
             }
 
             card.innerHTML = `
-                <div class="categoria-header">
+                <div class="categoria-header" style="display: flex; align-items: center; gap: 16px;">
                     <div class="categoria-icon">${getCategoriaIcon(cat.nombre)}</div>
-                    <h4>${cat.nombre}</h4>
-                    <span class="categoria-progreso">${completados}/${totalNiveles}</span>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0; font-size: 18px;">${cat.nombre}</h4>
+                        <p style="font-size: 12px; opacity: 0.7; margin: 4px 0 0 0;">${completadosCount}/${totalNiveles} Niveles</p>
+                    </div>
                 </div>
-                <div class="categoria-progress-bar">
-                    <div class="progress-fill" style="width: ${percent}%;"></div>
+                <div class="categoria-progress-bar" style="height: 6px; background: var(--hover-bg); border-radius: 3px; margin: 16px 0; overflow: hidden;">
+                    <div class="progress-fill" style="width: ${percent}%; height: 100%; background: var(--accent-solid); border-radius: 3px; transition: width 1s ease-out;"></div>
                 </div>
-                <ul class="niveles-resumen">${subcategoriasHtml}</ul>
-                <button class="btn-expandir" data-id="${cat.id_categoria}">Ver niveles</button>
+                <div class="niveles-resumen" style="display: flex; flex-direction: column; gap: 8px;">
+                    ${subcategoriasHtml}
+                </div>
+                <button class="btn-expandir" data-id="${cat.id_categoria}" style="
+                    margin-top: 20px;
+                    width: 100%;
+                    padding: 12px;
+                    background: var(--bg-color);
+                    border: 1px solid var(--border-color);
+                    border-radius: 10px;
+                    color: var(--text-color);
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                " onmouseover="this.style.background='var(--hover-bg)'; this.style.borderColor='var(--accent-solid)'" onmouseout="this.style.background='var(--bg-color)'; this.style.borderColor='var(--border-color)'">
+                    Explorar niveles
+                    <span>→</span>
+                </button>
             `;
 
             card.querySelector('.btn-expandir').addEventListener('click', () => toggleNiveles(cat.id_categoria, card));

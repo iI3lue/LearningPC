@@ -193,7 +193,7 @@
 
         .progress-bar-fill {
             height: 100%;
-            background: white;
+            background: var(--grad-progress-fill, white);
             border-radius: 6px;
             width: 0%;
             transition: width 1s cubic-bezier(0.1, 0.9, 0.2, 1);
@@ -268,44 +268,78 @@
             gap: 20px;
         }
 
+        /* Category Cards Improvement */
         .categoria-card {
             background: var(--sidebar-bg);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 24px;
             border: 1px solid var(--border-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .categoria-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--elevation-2);
-        }
-
-        .categoria-header {
+            transition: all var(--duration-medium) var(--ease-fluent);
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .categoria-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-solid);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .categoria-card:hover::after {
+            opacity: 1;
         }
 
         .categoria-icon {
-            font-size: 24px;
-            width: 48px;
-            height: 48px;
+            font-size: 28px;
+            width: 56px;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--cat-office-bg);
-            border-radius: 12px;
-            box-shadow: var(--elevation-1);
+            background: var(--bg-color);
+            border-radius: 14px;
+            box-shadow: var(--elevation-2);
+            border: 1px solid var(--border-color);
         }
 
         .categoria-header h4 {
             flex: 1;
             margin: 0;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+
+        .niveles-resumen {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .subcategoria {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .subcategoria:hover {
+            background: var(--hover-bg);
         }
 
         .categoria-progreso {

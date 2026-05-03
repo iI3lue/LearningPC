@@ -117,9 +117,10 @@
     --cat-windows-bg: rgba(52, 211, 153, 0.2);
     --cat-trucos-bg: rgba(255, 185, 0, 0.2);
 
-    /* ── Vibrant Gradients Dark ── */
-    --grad-vibrant: linear-gradient(135deg, #47A1EB 0%, #A78BFA 100%);
-    --grad-surface: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    /* ── Vibrant Gradients Dark (Deeper colors) ── */
+    --grad-vibrant: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%); /* Slate 900 to Indigo 950 */
+    --grad-surface: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+    --grad-progress-fill: linear-gradient(90deg, #3B82F6, #8B5CF6);
 }
 
 * {
@@ -622,15 +623,25 @@ a:hover {
 /* Tarjetas de categoría con Mica y hover */
 .tarjeta-categoria.mica,
 .tarjeta-categoria {
-    transition: border-color var(--duration-fast) var(--ease-fluent),
-                box-shadow var(--duration-fast) var(--ease-fluent),
-                transform var(--duration-fast) var(--ease-fluent);
+    border-radius: 20px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border-color);
+    transition: all var(--duration-medium) var(--ease-fluent);
+    overflow: hidden;
 }
 
 .tarjeta-categoria:hover {
     border-color: var(--accent-solid);
-    box-shadow: var(--elevation-3);
-    transform: translateY(-2px);
+    box-shadow: var(--elevation-4);
+    transform: translateY(-6px) scale(1.02);
+}
+
+.categoria-icon {
+    transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.tarjeta-categoria:hover .categoria-icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
 /* Niveles con hover lift */
