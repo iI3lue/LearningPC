@@ -1,0 +1,132 @@
+/* simulacion-office.css */
+* { box-sizing: border-box; }
+body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+
+/* Desktop Background */
+.desktop { width: 100vw; height: calc(100vh - 48px); position: relative; background: linear-gradient(135deg, #1c2833 0%, #17202a 100%); }
+
+/* Window Styles */
+.ventana { position: absolute; width: 800px; height: 560px; background: #2d2d2d; border-radius: 8px; box-shadow: 0 12px 36px rgba(0,0,0,0.3); display: none; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', sans-serif; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(0,0,0,0.1); }
+.ventana.visible { display: flex; }
+
+/* Title Bar */
+.title-bar { background: #1a1a1a; padding: 0; display: flex; align-items: center; height: 32px; border-bottom: 1px solid #333; }
+.title-bar .app-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
+.title-bar .app-icon span { color: #fff; font-size: 14px; font-weight: bold; }
+.title-bar .doc-name { flex: 1; font-size: 12px; color: #e0e0e0; }
+.window-controls { display: flex; gap: 0; }
+.window-btn { width: 46px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; transition: background 0.1s; }
+.window-btn:hover { background: #333; }
+.window-btn.close:hover { background: #e81123; }
+.window-btn.close:hover svg line { stroke: #fff; }
+
+/* Quick Access Toolbar */
+.qat { background: #2d2d2d; padding: 4px 12px; display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #444; height: 36px; }
+.qat-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.qat-btn:hover { background: #444; }
+.qat-btn.active { background: #444; }
+.qat-btn svg { width: 16px; height: 16px; fill: #ccc; }
+.qat-btn-group { display: flex; align-items: center; gap: 2px; }
+.qat-separator { width: 1px; height: 20px; background: #ccc; margin: 0 8px; }
+
+/* Ribbon */
+.ribbon { background: #2d2d2d; border-bottom: 1px solid #444; }
+.ribbon-tabs { display: flex; background: #1a1a1a; border-bottom: 1px solid #333; }
+.ribbon-tab { padding: 6px 16px; font-size: 13px; color: #ccc; cursor: pointer; border: none; background: transparent; transition: all 0.15s; margin-bottom: -1px; }
+.ribbon-tab:hover { background: #333; }
+.ribbon-tab.active { background: #2d2d2d; border-top: 1px solid #444; border-left: 1px solid #444; border-right: 1px solid #444; border-bottom: 1px solid #2d2d2d; color: #185abd; font-weight: 600; }
+.ribbon-content { display: none; padding: 12px 16px; }
+.ribbon-content.active { display: block; }
+.ribbon-group { display: inline-flex; flex-direction: column; align-items: center; vertical-align: top; margin-right: 16px; padding-right: 16px; border-right: 1px solid #444; }
+.ribbon-group-items { display: flex; gap: 4px; }
+.ribbon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; border: none; background: transparent; }
+.ribbon-btn:hover { background: #444; }
+.ribbon-btn.active { background: #444; }
+.ribbon-btn svg { width: 18px; height: 18px; fill: #ccc; }
+.ribbon-group-title { font-size: 11px; color: #aaa; margin-top: 8px; text-align: center; }
+
+/* Office App Specific Colors */
+.app-word .title-bar .app-icon, .app-word .taskbar-icon .icono { background: #185abd; }
+.app-word .ribbon-tab.active { color: #185abd; }
+.app-excel .title-bar .app-icon, .app-excel .taskbar-icon .icono { background: #107c41; }
+.app-excel .ribbon-tab.active { color: #107c41; }
+.app-powerpoint .title-bar .app-icon, .app-powerpoint .taskbar-icon .icono { background: #c43e1c; }
+.app-powerpoint .ribbon-tab.active { color: #c43e1c; }
+
+/* Control Panel and Overlays */
+.control-panel { background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 32px; max-width: 480px; margin: 40px auto; text-align: center; position: relative; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.control-panel h2 { color: #fff; font-size: 20px; margin-bottom: 12px; font-weight: 600; }
+.control-panel p { color: #aaa; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+.btn-iniciar { background: #0078d4; color: #fff; border: none; padding: 12px 32px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.15s; }
+.btn-iniciar:hover { background: #005a9e; }
+.hint-box { background: #2d2d2d; border: 1px solid #444; border-left: 4px solid #0078d4; border-radius: 4px; padding: 16px; margin-top: 24px; text-align: left; }
+.hint-box h4 { color: #60cdff; font-size: 13px; margin: 0 0 12px 0; }
+.hint-box p { color: #ccc; font-size: 13px; margin: 6px 0; }
+.key { background: #fff; padding: 3px 8px; border-radius: 4px; border: 1px solid #555; color: #333; font-family: 'Consolas', monospace; font-size: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px 24px; z-index: 1000; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); animation: slideDown 0.3s ease; }
+.toast.visible { display: flex; align-items: center; gap: 8px; }
+.toast.exito { border-left: 4px solid #107c10; }
+.toast-mensaje { color: #333; font-size: 14px; font-weight: 500; }
+@keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+.btn-reiniciar { position: fixed; top: 20px; left: 20px; background: #fff; color: #333; border: 1px solid #ccc; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; z-index: 100; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.btn-reiniciar.visible { display: block; }
+.btn-reiniciar:hover { background: #f3f3f3; }
+
+/* Status Bar Shared */
+.status-bar { padding: 2px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #fff; height: 26px; }
+.app-word .status-bar { background: #185abd; }
+.app-excel .status-bar { background: #107c41; }
+.app-powerpoint .status-bar { background: #c43e1c; }
+.status-left, .status-right { display: flex; align-items: center; gap: 12px; }
+.status-item { cursor: pointer; padding: 2px 4px; border-radius: 2px; }
+.status-item:hover { background: rgba(255,255,255,0.2); }
+
+/* --- Word Specific Styles --- */
+.app-word .document-area { flex: 1; background: #1e1e1e; display: flex; justify-content: center; padding: 32px; overflow: auto; pointer-events: auto; }
+.app-word .document-page-container { position: relative; background: #1a1a1a; box-shadow: 0 4px 16px rgba(0,0,0,0.1); border: 1px solid #333; transition: transform 0.2s; }
+.app-word .document-margins { position: relative; background: #1a1a1a; }
+.app-word .document-page { width: 100%; max-width: 650px; min-height: 800px; background: #1a1a1a; padding: 64px 72px; font-size: 11pt; line-height: 1.8; color: #d0d0d0; cursor: text; outline: none; }
+.app-word .document-page:focus { caret-color: #fff; }
+.app-word .document-page p { margin: 0 0 12px 0; padding: 2px 4px; border-radius: 2px; min-height: 20px; transition: background 0.1s; }
+.app-word .document-page p:hover { background: #2d2d2d; }
+.app-word .document-page ::selection { background: #333; color: #fff; }
+
+.app-word .ruler-area { background: #2d2d2d; height: 24px; border-bottom: 1px solid #444; display: none; }
+.app-word .ruler-area.visible { display: block; }
+.app-word .ruler { position: relative; height: 20px; margin: 2px 48px 0 48px; background: repeating-linear-gradient(90deg, #555 0px, #555 1px, transparent 1px, transparent 36px); }
+.app-word .ruler-number { position: absolute; top: 2px; font-size: 9px; color: #999; transform: translateX(-50%); }
+
+/* --- Excel Specific Styles --- */
+.app-excel .formula-bar { display: flex; align-items: center; padding: 4px 12px; background: #2d2d2d; border-bottom: 1px solid #444; gap: 12px; }
+.app-excel .cell-reference { width: 80px; padding: 4px; border: 1px solid #444; text-align: center; font-size: 12px; background: #1a1a1a; }
+.app-excel .formula-input { flex: 1; padding: 4px 8px; border: 1px solid #444; font-size: 13px; font-family: 'Segoe UI', sans-serif; outline: none; }
+.app-excel .formula-input:focus { border-color: #107c41; }
+.app-excel .spreadsheet-area { flex: 1; display: flex; background: #1a1a1a; overflow: auto; }
+.app-excel .row-headers { width: 40px; background: #1e1e1e; border-right: 1px solid #444; display: flex; flex-direction: column; }
+.app-excel .row-header { height: 26px; border-bottom: 1px solid #aaa; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #444; user-select: none; }
+.app-excel .spreadsheet { flex: 1; display: flex; flex-direction: column; }
+.app-excel .col-headers { display: flex; background: #1e1e1e; border-bottom: 1px solid #444; }
+.app-excel .col-header { width: 100px; height: 26px; border-right: 1px solid #aaa; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #444; user-select: none; }
+.app-excel .cells-container { display: flex; flex-direction: column; }
+.app-excel .cell-row { display: flex; height: 26px; }
+.app-excel .cell { width: 100px; border-right: 1px solid #333; border-bottom: 1px solid #333; padding: 0 4px; display: flex; align-items: center; font-size: 13px; color: #d0d0d0; cursor: cell; outline: none; white-space: nowrap; overflow: hidden; }
+.app-excel .cell.selected { border: 2px solid #107c41; background: rgba(16, 124, 65, 0.1); position: relative; z-index: 2; outline: none; }
+.app-excel .cell.selected::after { content: ''; position: absolute; bottom: -3px; right: -3px; width: 6px; height: 6px; background: #107c41; border: 1px solid #fff; cursor: crosshair; }
+.app-excel .cell.bold { font-weight: bold; }
+.app-excel .cell.italic { font-style: italic; }
+.app-excel .cell.underline { text-decoration: underline; }
+
+/* --- PowerPoint Specific Styles --- */
+.app-powerpoint .slide-area { flex: 1; display: flex; background: #1e1e1e; overflow: hidden; }
+.app-powerpoint .slides-panel { width: 200px; background: #2d2d2d; border-right: 1px solid #444; padding: 16px; overflow-y: auto; }
+.app-powerpoint .slide-thumb { width: 100%; aspect-ratio: 16/9; background: #1a1a1a; border: 1px solid #444; border-radius: 4px; margin-bottom: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #aaa; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.app-powerpoint .slide-thumb:hover { border-color: #c43e1c; }
+.app-powerpoint .slide-thumb.active { border: 2px solid #c43e1c; font-weight: 600; color: #c43e1c; }
+.app-powerpoint .slide-canvas { flex: 1; display: flex; align-items: center; justify-content: center; background: #1a1a1a; padding: 32px; overflow: auto; }
+.app-powerpoint .slide { width: 100%; max-width: 800px; aspect-ratio: 16/9; background: #2d2d2d; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px; text-align: center; cursor: text; outline: none; }
+.app-powerpoint .slide:focus { outline: 1px solid #c43e1c; }
+.app-powerpoint .slide h1 { font-size: 36px; margin: 0 0 16px 0; color: #e0e0e0; font-weight: 300; }
+.app-powerpoint .slide h2 { font-size: 24px; margin: 0 0 24px 0; color: #ccc; font-weight: 300; }
+.app-powerpoint .slide p { font-size: 16px; margin: 8px 0; color: #bbb; }

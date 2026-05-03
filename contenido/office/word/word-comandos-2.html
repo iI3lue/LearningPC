@@ -5,119 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alineación de párrafos - Word Comandos</title>
     <link rel="stylesheet" href="../../simulacion-core.css">
-    <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #2b579a; overflow: hidden; }
-        .desktop { width: 100vw; height: calc(100vh - 48px); position: relative; background: linear-gradient(135deg, #2b579a 0%, #1e3c5f 100%); }
-
-        .control-panel { background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 24px; max-width: 480px; margin: 40px auto; text-align: center; position: relative; z-index: 10; }
-        .control-panel h2 { color: #fff; font-size: 18px; margin-bottom: 12px; }
-        .control-panel p { color: #9e9e9e; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
-        .btn-iniciar { background: #2b579a; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.15s; }
-        .btn-iniciar:hover { background: #0078d4; }
-        .hint-box { background: #2d2d2d; border: 1px solid #2b579a; border-radius: 6px; padding: 16px; margin-top: 16px; text-align: left; }
-        .hint-box h4 { color: #60cdff; font-size: 12px; margin: 0 0 8px 0; }
-        .hint-box p { color: #ccc; font-size: 12px; margin: 4px 0; }
-        .hint-box .key { background: #333; padding: 2px 8px; border-radius: 3px; border: 1px solid #555; color: #fff; font-family: 'Consolas', monospace; font-size: 11px; }
-        .hint-box .key.combo { background: #0078d4; border-color: #0078d4; color: #fff; }
-
-        .ventana { position: absolute; width: 800px; height: 560px; background: #fff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); display: none; flex-direction: column; overflow: hidden; font-family: 'Segoe UI', sans-serif; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-        .ventana.visible { display: flex; }
-
-        .title-bar { background: #f3f3f3; padding: 0; display: flex; align-items: center; height: 32px; border-bottom: 1px solid #e0e0e0; }
-        .title-bar .app-icon { width: 28px; height: 28px; background: #2b579a; display: flex; align-items: center; justify-content: center; margin-right: 8px; }
-        .title-bar .app-icon span { color: #fff; font-size: 14px; font-weight: bold; }
-        .title-bar .doc-name { flex: 1; font-size: 12px; color: #333; }
-        .window-controls { display: flex; gap: 2px; }
-        .window-btn { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; }
-        .window-btn:hover { background: #e5e5e5; }
-        .window-btn.close:hover { background: #e81123; }
-        .window-btn.close:hover svg line { stroke: #fff; }
-
-        .qat { background: #fafafa; padding: 4px 12px; display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #e0e0e0; height: 32px; }
-        .qat-btn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
-        .qat-btn:hover { background: #e5e5e5; }
-        .qat-btn.active { background: #cce4f7; }
-        .qat-btn svg { width: 16px; height: 16px; fill: #444; }
-        .qat-btn-group { display: flex; align-items: center; gap: 2px; }
-        .qat-separator { width: 1px; height: 20px; background: #ddd; margin: 0 8px; }
-
-        .ruler-area { background: #fafafa; height: 24px; border-bottom: 1px solid #ccc; display: none; }
-        .ruler-area.visible { display: block; }
-        .ruler { position: relative; height: 20px; margin: 2px 48px 0 48px; background: repeating-linear-gradient(90deg, #ccc 0px, #ccc 1px, transparent 1px, transparent 36px); }
-        .ruler-number { position: absolute; top: 2px; font-size: 9px; color: #666; transform: translateX(-50%); }
-        .margin-left-marker, .margin-right-marker { position: absolute; top: 0; width: 2px; height: 20px; background: #0078d4; }
-        .margin-left-marker::after, .margin-right-marker::after { content: ''; position: absolute; top: 14px; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #0078d4; left: -3px; }
-
-        .ribbon { background: #fafafa; border-bottom: 1px solid #e0e0e0; }
-        .ribbon-tabs { display: flex; background: #f3f3f3; border-bottom: 1px solid #ddd; }
-        .ribbon-tab { padding: 8px 16px; font-size: 12px; color: #444; cursor: pointer; border: none; background: transparent; transition: all 0.15s; }
-        .ribbon-tab:hover { background: #e5e5e5; }
-        .ribbon-tab.active { background: #fff; border-bottom: 2px solid #0078d4; color: #0078d4; }
-        .ribbon-content { display: none; padding: 12px 16px; }
-        .ribbon-content.active { display: block; }
-        .ribbon-group { display: inline-block; vertical-align: top; margin-right: 24px; }
-        .ribbon-group-items { display: flex; gap: 4px; }
-        .ribbon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: background 0.15s; border: none; background: transparent; }
-        .ribbon-btn:hover { background: #e5e5e5; }
-        .ribbon-btn.active { background: #cce4f7; }
-        .ribbon-btn svg { width: 20px; height: 20px; fill: #444; }
-        .ribbon-group-title { font-size: 10px; color: #666; margin-top: 4px; text-align: center; }
-
-        .document-area { flex: 1; background: #f0f0f0; display: flex; justify-content: center; padding: 24px; overflow: auto; pointer-events: auto; cursor: text; }
-        .document-page-container { position: relative; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 1px solid #ccc; }
-        .document-margins { position: relative; background: #fff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
-        .document-page { width: 100%; max-width: 650px; min-height: 400px; background: #fff; padding: 48px 56px; font-size: 11pt; line-height: 1.8; color: #333; cursor: text; user-select: text; -webkit-user-select: text; }
-        .document-page:focus { outline: none; caret-color: #0078d4; }
-        .document-page p { margin: 0 0 8px 0; padding: 2px 4px; border-radius: 2px; min-height: 20px; transition: background 0.1s; user-select: text; -webkit-user-select: text; color: #333; }
-        .document-page p:hover { background: #f5f5f5; }
-        .document-page ::selection { background: #0078d4; color: #fff; }
-        .document-center-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #ddd; pointer-events: none; }
-        
-        .status-bar { background: #1064be; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #fff; }
-        .status-left { display: flex; align-items: center; gap: 8px; }
-        .status-right { display: flex; align-items: center; gap: 8px; }
-        .status-item { display: flex; align-items: center; gap: 4px; }
-        .status-item:hover { background: #e5e5e5; padding: 2px 6px; border-radius: 3px; }
-        .status-separator { color: #ccc; margin: 0 4px; }
-        .word-count { font-weight: 500; }
-        .zoom-btn { width: 20px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 3px; cursor: pointer; }
-        .zoom-btn:hover { background: #e5e5e5; }
-        .zoom-controls { display: flex; align-items: center; gap: 2px; }
-
-        .instrucciones { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 8px; padding: 16px 24px; text-align: center; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
-        .instrucciones p { color: #9e9e9e; font-size: 13px; margin: 0; }
-        .instrucciones .key { background: #333; padding: 2px 8px; border-radius: 3px; color: #fff; font-family: 'Consolas', monospace; font-size: 11px; }
-        .instrucciones .key.combo { background: #0078d4; color: #fff; }
-
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1f1f1f; border: 1px solid #3d3d3d; border-radius: 6px; padding: 12px 20px; z-index: 1000; display: none; animation: slideDown 0.3s ease; }
-        .toast.visible { display: block; }
-        .toast.exito { border-color: #107c10; }
-        .toast.exito .toast-mensaje { color: #6ccb5f; }
-        .toast-mensaje { color: #fff; font-size: 13px; }
-        @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-
-        .btn-reiniciar { position: fixed; top: 20px; left: 20px; background: #2d2d2d; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; z-index: 100; display: none; }
-        .btn-reiniciar.visible { display: block; }
-        .btn-reiniciar:hover { background: #444; }
-
-        .taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #202020; display: flex; align-items: center; padding: 0 8px; z-index: 500; }
-        .start-button { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; }
-        .start-button:hover { background: #383838; }
-        .start-icon { width: 20px; height: 20px; background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); border-radius: 2px; }
-        .taskbar-icons { display: flex; gap: 4px; margin-left: 8px; flex: 1; }
-        .taskbar-icon { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
-        .taskbar-icon:hover { background: #383838; }
-        .taskbar-icon.active { background: #383838; border-bottom: 2px solid #0078d4; }
-        .taskbar-icon .icono { width: 16px; height: 16px; background: #2b579a; border-radius: 2px; }
-        .taskbar-icon span { color: #fff; font-size: 12px; }
-        .tray { display: flex; align-items: center; gap: 12px; padding-right: 12px; color: #fff; font-size: 12px; }
-        .tray-icons { display: flex; gap: 8px; }
-        .clock { text-align: right; }
-        .clock-hora { font-size: 14px; }
-    </style>
+    <link rel="stylesheet" href="../../simulacion-office.css">
 </head>
-<body>
+<body class="app-word">
     <div class="desktop">
         <div class="control-panel" id="panel-inicio">
             <h2>Alineación de párrafos</h2>
@@ -247,10 +137,7 @@
             </div>
             </div>
 
-            <div class="status-bar">
-                <span>Página 1 de 1</span>
-                <span>Español</span>
-            </div>
+            
         </div>
 
         <div class="instrucciones" id="instrucciones" style="display: none;">

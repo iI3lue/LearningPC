@@ -1432,3 +1432,20 @@ input[readonly] {
     background: #1a1a1a;
     color: #888888;
 }
+/* ═══════════════════════════════════════════════════════════
+   TASKBAR (WINDOWS 11 STYLE - DARK MODE / SHARED)
+   ═══════════════════════════════════════════════════════════ */
+.taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: #111111; display: flex; align-items: center; justify-content: center; border-top: 1px solid #2d2d2d; z-index: 500; }
+.start-button { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; transition: background 0.15s; margin-right: 4px; }
+.start-button:hover { background: #2d2d2d; }
+.start-icon { width: 22px; height: 22px; background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); border-radius: 2px; }
+.taskbar-icons { display: flex; justify-content: center; gap: 4px; }
+.taskbar-icon { display: flex; align-items: center; gap: 0; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.taskbar-icon:hover { background: #2d2d2d; }
+.taskbar-icon.active { background: #2d2d2d; border-bottom: 3px solid #0078d4; }
+.taskbar-icon .icono { width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; }
+.taskbar-icon span { display: none; }
+.tray { position: absolute; right: 16px; display: flex; align-items: center; gap: 16px; color: #ffffff; font-size: 13px; }
+.tray-icons { display: flex; gap: 8px; font-size: 14px; }
+.clock { text-align: right; }
+.clock-hora { font-size: 12px; font-weight: 600; }
