@@ -76,13 +76,20 @@
         return `${dias} dias de aprendizaje consecutivo`;
     }
 
-    // Progress ring animation
+    // Progress Bar animation (updated for new UI)
     function animateProgressRing(percent) {
+        const progressFill = getEl('progress-bar-fill');
+        if (progressFill) {
+            progressFill.style.width = `${percent}%`;
+        }
+        
+        // Mantener compatibilidad si existe el anillo legacy
         const progressRing = getEl('progress-ring');
-        if (!progressRing) return;
-        const circumference = 283;
-        const offset = circumference - (percent / 100) * circumference;
-        progressRing.style.strokeDashoffset = offset;
+        if (progressRing && progressRing.tagName === 'circle') {
+            const circumference = 283;
+            const offset = circumference - (percent / 100) * circumference;
+            progressRing.style.strokeDashoffset = offset;
+        }
     }
 
     // Render stats
@@ -199,13 +206,12 @@
             const percent = totalNiveles > 0 ? Math.round((completados / totalNiveles) * 100) : 0;
 
             const card = document.createElement('article');
-            card.className = 'categoria-card';
-            card.style.cssText = 'background: var(--sidebar-bg); border-radius: 8px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 16px; box-shadow: var(--elevation-1);';
+            card.className = 'categoria-card animate-scale-in';
+            card.style.animationDelay = `${index * 100}ms`;
             card.dataset.idCategoria = cat.id_categoria;
 
             let subcategoriasHtml = '';
             if (cat.subcategorias) {
-                // Filtrar solo subcategorías que tienen niveles
                 const subcategoriasConNiveles = cat.subcategorias.filter(sub => 
                     sub.niveles && sub.niveles.length > 0
                 );
@@ -214,21 +220,25 @@
                         progresoData.some(p => p.id_nivel === n.id_nivel && p.completado)
                     ).length : 0;
                     const subTotal = sub.niveles ? sub.niveles.length : 0;
-                    return `<li style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; color: var(--text-color);"><span>${sub.nombre}</span><span style="color: var(--accent-solid); font-weight: 600;">${subCompletados}/${subTotal}</span></li>`;
+                    return `
+                        <li class="subcategoria">
+                            <span>${sub.nombre}</span>
+                            <span class="sub-progress">${subCompletados}/${subTotal}</span>
+                        </li>`;
                 }).join('');
             }
 
             card.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                    <span style="font-size: 24px;">${getCategoriaIcon(cat.nombre)}</span>
-                    <h4 style="margin: 0; flex: 1;">${cat.nombre}</h4>
-                    <span style="font-weight: 600; color: var(--accent-solid);">${completados}/${totalNiveles}</span>
+                <div class="categoria-header">
+                    <div class="categoria-icon">${getCategoriaIcon(cat.nombre)}</div>
+                    <h4>${cat.nombre}</h4>
+                    <span class="categoria-progreso">${completados}/${totalNiveles}</span>
                 </div>
-                <div style="height: 6px; background: var(--border-color); border-radius: 3px; margin-bottom: 16px; overflow: hidden;">
-                    <div style="height: 100%; width: ${percent}%; background: var(--accent-solid); border-radius: 3px;"></div>
+                <div class="categoria-progress-bar">
+                    <div class="progress-fill" style="width: ${percent}%;"></div>
                 </div>
-                <ul style="list-style: none; padding: 0; margin: 0 0 16px 0; color: var(--text-color);">${subcategoriasHtml}</ul>
-                <button class="btn-expandir" data-id="${cat.id_categoria}" style="width: 100%; padding: 10px; background: var(--accent-pastel); color: var(--accent-solid); border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Ver niveles</button>
+                <ul class="niveles-resumen">${subcategoriasHtml}</ul>
+                <button class="btn-expandir" data-id="${cat.id_categoria}">Ver niveles</button>
             `;
 
             card.querySelector('.btn-expandir').addEventListener('click', () => toggleNiveles(cat.id_categoria, card));

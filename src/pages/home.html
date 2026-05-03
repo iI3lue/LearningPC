@@ -135,65 +135,123 @@
             opacity: 0.7;
         }
 
-        /* Progress ring */
-        .progress-container {
+        /* Progress Hero Section - Vibrant Redesign */
+        .progress-hero {
+            background: var(--grad-vibrant);
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            color: white;
             display: flex;
             align-items: center;
-            gap: 24px;
-            background: var(--sidebar-bg);
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 32px;
-        }
-
-        .progress-ring-container {
+            gap: 32px;
             position: relative;
-            width: 120px;
-            height: 120px;
+            overflow: hidden;
+            box-shadow: var(--elevation-4);
         }
 
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-
-        .progress-ring-bg {
-            fill: none;
-            stroke: var(--border-color);
-            stroke-width: 8;
-        }
-
-        .progress-ring-fill {
-            fill: none;
-            stroke: var(--accent-solid);
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 283;
-            stroke-dashoffset: 283;
-            transition: stroke-dashoffset 0.5s ease;
-        }
-
-        .progress-text {
+        .progress-hero::before {
+            content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 28px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--grad-surface);
+            pointer-events: none;
+        }
+
+        .hero-stats {
+            flex: 1;
+            z-index: 1;
+        }
+
+        .hero-stats h3 {
+            font-size: 24px;
             font-weight: 700;
-            color: var(--text-color);
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .progress-info h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin: 0 0 8px 0;
-        }
-
-        .progress-info p {
+        .hero-stats p {
             font-size: 14px;
-            color: var(--text-color);
-            opacity: 0.7;
-            margin: 0;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        /* Vibrant Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            max-width: 400px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: white;
+            border-radius: 6px;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.1, 0.9, 0.2, 1);
+            position: relative;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        .hero-percentage {
+            font-size: 48px;
+            font-weight: 800;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .hero-percentage span {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .hero-next {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 16px;
+            display: inline-flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hero-next strong {
+            font-size: 15px;
+        }
+
+        .hero-next span {
+            font-size: 11px;
+            opacity: 0.8;
         }
 
         /* Categories grid */
@@ -232,20 +290,21 @@
 
         .categoria-icon {
             font-size: 24px;
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--cat-office-bg);
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: var(--elevation-1);
         }
 
         .categoria-header h4 {
             flex: 1;
             margin: 0;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--text-color);
         }
 
@@ -510,24 +569,34 @@
                 <p class="welcome-subtitle" id="progreso-mensaje">Continúa donde lo dejaste</p>
             </div>
 
-            <div class="progress-container">
-                <div class="progress-ring-container">
-                    <svg class="progress-ring" width="120" height="120">
-                        <circle class="progress-ring-bg" cx="60" cy="60" r="45" />
-                        <circle class="progress-ring-fill" id="progress-ring" cx="60" cy="60" r="45" />
-                    </svg>
-                    <div class="progress-text" id="progreso-texto">0%</div>
-                </div>
-                <div class="progress-info">
+            <div class="progress-hero animate-slide-up stagger-1">
+                <div class="hero-stats">
                     <h3>Tu progreso</h3>
-                    <p id="periodo-mensaje">Completa niveles para comenzar tu racha</p>
-                    <p style="margin-top: 8px; font-size: 13px; color: var(--accent-solid);">
-                        Siguiente: <strong id="siguiente-nivel-nombre">-</strong>
-                    </p>
-                    <p style="margin-top: 4px; font-size: 12px; opacity: 0.7;">
-                        <span id="niveles-completados2">0</span> de <span id="niveles-total">0</span> niveles completados
-                    </p>
+                    <p id="periodo-mensaje">¡Excelente ritmo! Seguí así para alcanzar tus metas.</p>
+                    
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                    </div>
+                    
+                    <div style="font-size: 13px; font-weight: 600;">
+                        <span id="niveles-completados2">0</span> de <span id="niveles-total">0</span> niveles
+                    </div>
+
+                    <div class="hero-next">
+                        <span>SIGUIENTE NIVEL</span>
+                        <strong id="siguiente-nivel-nombre">-</strong>
+                    </div>
                 </div>
+                
+                <div class="hero-percentage">
+                    <div id="progreso-texto">0%</div>
+                    <span>COMPLETADO</span>
+                </div>
+                
+                <!-- SVG compatible con el script actual para no romper la lógica del anillo -->
+                <svg width="0" height="0" style="position: absolute;">
+                    <circle id="progress-ring" r="0" cx="0" cy="0"></circle>
+                </svg>
             </div>
 
             <div class="categories-section">

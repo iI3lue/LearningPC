@@ -67,6 +67,14 @@
     --cat-internet-bg: rgba(0, 164, 239, 0.12);
     --cat-windows-bg: rgba(16, 124, 16, 0.12);
     --cat-trucos-bg: rgba(255, 185, 0, 0.12);
+
+    /* ── Vibrant Gradients (Alegría) ── */
+    --grad-word: linear-gradient(135deg, #0078D4, #2B579A);
+    --grad-excel: linear-gradient(135deg, #107C10, #217346);
+    --grad-powerpoint: linear-gradient(135deg, #D83B01, #B7472A);
+    --grad-vibrant: linear-gradient(135deg, #0078D4 0%, #8B5CF6 100%);
+    --grad-surface: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    --grad-progress: linear-gradient(90deg, #0078D4, #8B5CF6, #0078D4);
 }
 
 [data-theme="dark"] {
@@ -108,6 +116,10 @@
     --cat-internet-bg: rgba(0, 164, 239, 0.2);
     --cat-windows-bg: rgba(52, 211, 153, 0.2);
     --cat-trucos-bg: rgba(255, 185, 0, 0.2);
+
+    /* ── Vibrant Gradients Dark ── */
+    --grad-vibrant: linear-gradient(135deg, #47A1EB 0%, #A78BFA 100%);
+    --grad-surface: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
 }
 
 * {

@@ -42,6 +42,7 @@ async function inicializarReporte() {
                 .filter(cat => cat.completados > 0)
                 .map(cat => `
                     <div class="item-diploma">
+                        <div class="diploma-badge">🎯</div>
                         <div class="diploma-info">
                             <h4>${cat.nombre.toUpperCase()}</h4>
                             <p>${cat.completados}/${cat.total} NIVELES COMPLETADOS</p>
@@ -52,6 +53,7 @@ async function inicializarReporte() {
             if (listaHabilidades.innerHTML.trim() === '') {
                 listaHabilidades.innerHTML = `
                     <div class="item-diploma">
+                        <div class="diploma-badge">🚀</div>
                         <div class="diploma-info">
                             <h4>AÚN NO HAY HABILIDADES</h4>
                             <p>COMPLETA NIVELES PARA DESBLOQUEAR HABILIDADES</p>
@@ -62,6 +64,7 @@ async function inicializarReporte() {
         } else {
             listaHabilidades.innerHTML = `
                 <div class="item-diploma">
+                    <div class="diploma-badge">🚀</div>
                     <div class="diploma-info">
                         <h4>AÚN NO HAY HABILIDADES</h4>
                         <p>COMPLETA NIVELES PARA DESBLOQUEAR HABILIDADES</p>

@@ -7,107 +7,165 @@
     <title>LearningPC - Mis Logros</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
+        /* Vibrant Reports Redesign */
         .reporte-usuario-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 48px;
+            padding: 32px;
         }
 
-        .perfil-header {
-            background-color: var(--accent-pastel);
-            color: var(--text-color);
-            padding: 48px;
-            border: 1px solid var(--border-color);
+        .perfil-hero {
+            background: var(--grad-vibrant);
+            color: white;
+            padding: 64px 48px;
+            border-radius: 24px;
             text-align: left;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--elevation-4);
         }
 
-        .perfil-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-transform: uppercase;
+        .perfil-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--grad-surface);
+            pointer-events: none;
         }
 
-        .perfil-header p {
-            font-size: 1.1rem;
-            font-weight: 400;
+        .perfil-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1;
+            position: relative;
+        }
+
+        .perfil-hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            z-index: 1;
+            position: relative;
         }
 
         .stats-reporte {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
         .card-logro {
             background: var(--bg-color);
             padding: 32px;
+            border-radius: 16px;
             border: 1px solid var(--border-color);
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            transition: border-color 0.2s;
+            align-items: center;
+            gap: 24px;
+            transition: all var(--duration-medium) var(--ease-fluent);
+            box-shadow: var(--elevation-1);
         }
 
         .card-logro:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--elevation-3);
             border-color: var(--accent-solid);
         }
 
-        .card-logro .label {
-            color: var(--text-color);
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .card-logro .value {
-            font-size: 2.5rem;
-            font-weight: 700;
+        .logro-icon {
+            font-size: 32px;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--cat-office-bg);
+            border-radius: 16px;
             color: var(--accent-solid);
         }
 
+        .logro-content {
+            flex: 1;
+        }
+
+        .card-logro .label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .card-logro .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-color);
+        }
+
         .lista-diplomas {
-            background: var(--bg-color);
-            padding: 48px;
+            background: var(--sidebar-bg);
+            padding: 40px;
+            border-radius: 24px;
             border: 1px solid var(--border-color);
         }
 
         .lista-diplomas h2 {
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 24px;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 12px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-color);
         }
 
         .item-diploma {
             display: flex;
             align-items: center;
             gap: 20px;
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            transition: all var(--duration-fast) var(--ease-fluent);
         }
 
-        .item-diploma:last-child {
-            border-bottom: none;
+        .item-diploma:hover {
+            border-color: var(--accent-solid);
+            transform: scale(1.01);
+        }
+
+        .diploma-badge {
+            font-size: 24px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-pastel);
+            border-radius: 50%;
         }
 
         .diploma-info h4 {
             margin: 0;
             font-weight: 700;
-            text-transform: uppercase;
+            font-size: 1rem;
+            color: var(--text-color);
         }
 
         .diploma-info p {
             margin: 0;
             font-size: 0.85rem;
-            color: var(--text-color);
-            opacity: 0.7;
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -124,28 +182,39 @@
     </header>
 
     <main class="reporte-usuario-container">
-        <section class="perfil-header">
+        <section class="perfil-hero animate-slide-down">
             <h1 id="user-name">Usuario</h1>
             <p>¡Vas por muy buen camino en tu aprendizaje!</p>
         </section>
 
         <section class="stats-reporte">
-            <div class="card-logro">
-                <span class="label">PROGRESO TOTAL</span>
-                <div class="value" id="progreso-texto">0%</div>
+            <div class="card-logro animate-scale-in stagger-1">
+                <div class="logro-icon">📊</div>
+                <div class="logro-content">
+                    <span class="label">PROGRESO TOTAL</span>
+                    <div class="value" id="progreso-texto">0%</div>
+                </div>
             </div>
-            <div class="card-logro">
-                <span class="label">TIEMPO DE PRÁCTICA</span>
-                <div class="value" id="tiempo-practica">2.5 HORAS</div>
+            <div class="card-logro animate-scale-in stagger-2">
+                <div class="logro-icon">⏱️</div>
+                <div class="logro-content">
+                    <span class="label">TIEMPO DE PRÁCTICA</span>
+                    <div class="value" id="tiempo-practica">2.5 HORAS</div>
+                </div>
             </div>
-            <div class="card-logro">
-                <span class="label">NIVELES SUPERADOS</span>
-                <div class="value" id="niveles-superados">0</div>
+            <div class="card-logro animate-scale-in stagger-3">
+                <div class="logro-icon">🏆</div>
+                <div class="logro-content">
+                    <span class="label">NIVELES SUPERADOS</span>
+                    <div class="value" id="niveles-superados">0</div>
+                </div>
             </div>
         </section>
 
-        <section class="lista-diplomas">
-            <h2>HABILIDADES OBTENIDAS</h2>
+        <section class="lista-diplomas animate-slide-up stagger-4">
+            <h2>
+                <span>🎓</span> HABILIDADES OBTENIDAS
+            </h2>
             <div id="lista-habilidades">
                 <!-- Se llena dinámicamente -->
             </div>
