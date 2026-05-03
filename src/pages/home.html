@@ -15,48 +15,48 @@
             min-height: 100vh;
         }
 
-        /* Profile */
+        /* Profile and Stats - Handled by styles.css mostly, but adjusting spacing */
         .profile-section {
             text-align: center;
-            padding: 20px;
-            background: var(--bg-color);
-            border-radius: 12px;
+            padding: 24px;
+            background: var(--sidebar-bg);
+            border-radius: 16px;
             margin-bottom: 24px;
+            border: 1px solid var(--border-color);
         }
 
         .profile-avatar {
-            width: 64px;
-            height: 64px;
+            width: 72px;
+            height: 72px;
             background: var(--accent-pastel);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
             color: var(--accent-solid);
-            margin: 0 auto 12px;
+            margin: 0 auto 16px;
+            border: 2px solid #FFFFFF;
+            box-shadow: var(--elevation-1);
         }
 
         .profile-name {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .profile-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
-        .badge-principiante { background: #e0f2fe; color: #0369a1; }
-        .badge-intermedio { background: #dcfce7; color: #15803d; }
-        .badge-avanzado { background: #fef3c7; color: #b45309; }
-        .badge-experto { background: #fce7f3; color: #be185d; }
 
         /* Stats */
         .stats-grid {
@@ -67,22 +67,30 @@
         }
 
         .stat-card {
-            background: var(--bg-color);
+            background: var(--sidebar-bg);
             padding: 16px;
-            border-radius: 8px;
+            border-radius: 12px;
             text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-solid);
         }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-solid);
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-color);
         }
 
         .stat-label {
-            font-size: 11px;
-            color: var(--text-color);
-            opacity: 0.7;
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
             margin-top: 4px;
         }
 
