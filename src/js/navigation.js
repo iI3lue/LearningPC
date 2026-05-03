@@ -106,7 +106,7 @@ function guardarProgreso() {
 function marcarNivelCompletado(categoria, subcategoria, nivelIndex) {
     const key = `${categoria}_${subcategoria}_${nivelIndex}`;
     if (!progresoGlobal.completados) progresoGlobal.completados = new Set();
-    if (!progresoGlobal.completados.has && progressoGlobal.completados.push) {
+    if (!progresoGlobal.completados.has && progresoGlobal.completados.push) {
         progresoGlobal.completados.push(key);
     } else if (!progresoGlobal.completados.has(key)) {
         progresoGlobal.completados.add(key);

@@ -4,21 +4,7 @@ const errorRegistro = document.getElementById('error-registro');
 const exitoRegistro = document.getElementById('exito-registro');
 const linkLogin = document.getElementById('link-login');
 
-// Función para mostrar toast
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('registro-toast');
-    const toastMessage = document.getElementById('toast-message');
-    if (!toast || !toastMessage) return;
-    
-    toast.classList.remove('success', 'error', 'info');
-    toast.classList.add(type);
-    toastMessage.textContent = message;
-    toast.classList.add('visible');
-    
-    setTimeout(() => {
-        toast.classList.remove('visible');
-    }, 3000);
-}
+// showToast viene de toast.js (módulo compartido)
 
 // Enviar formulario de registro
 formRegistro.addEventListener('submit', async (e) => {

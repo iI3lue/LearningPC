@@ -1,21 +1,8 @@
 // home.js - Dashboard Informativo Learning PC
 
 (function() {
-    // Función para mostrar toast
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('home-toast');
-        const toastMessage = toast ? toast.querySelector('.toast-message') : null;
-        if (!toast || !toastMessage) return;
-        
-        toast.classList.remove('success', 'error', 'info');
-        toast.classList.add(type);
-        toastMessage.textContent = message;
-        toast.classList.add('visible');
-        
-        setTimeout(() => {
-            toast.classList.remove('visible');
-        }, 3000);
-    }
+    // showToast viene de toast.js (módulo compartido)
+    const showToast = window.showToast || function() {};
 
     const usuario = JSON.parse(sessionStorage.getItem('usuario'));
 
@@ -38,7 +25,10 @@
     if (profileName) profileName.textContent = usuario.usuario;
     
     const profileAvatar = getEl('profile-avatar');
-    if (profileAvatar) profileAvatar.textContent = usuario.usuario.charAt(0).toUpperCase();
+    if (profileAvatar) {
+        const initial = usuario.usuario.charAt(0).toUpperCase();
+        profileAvatar.innerHTML = `<span style="font-size: 18px; font-weight: 700; color: var(--accent-solid, #0078D4);">${initial}</span>`;
+    }
 
     // Navigation
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -272,8 +262,9 @@
         }
         
         try {
-            const progreso = await window.api.getProgreso(usuario.id_usuario);
-            const completados = new Set(progreso.filter(p => p.completado).map(p => p.id_nivel));
+            const progresoResult = await window.api.getProgreso(usuario.id_usuario);
+            const progresoData = progresoResult.niveles || [];
+            const completados = new Set(progresoData.filter(p => p.completado).map(p => p.id_nivel));
 
             // Obtener subcategorías para esta categoría
             const subcategorias = await window.api.getSubcategoriasPorCategoria(idCategoria);
@@ -489,12 +480,15 @@
                 })
             );
 
-            const stats = renderStats(progreso, categoriasConDatos);
-            const siguiente = getSiguienteNivel(categoriasConDatos, progreso);
+            // Extraer la lista de niveles para compatibilidad con funciones de renderizado
+            const progresoData = progreso.niveles || [];
+
+            const stats = renderStats(progresoData, categoriasConDatos);
+            const siguiente = getSiguienteNivel(categoriasConDatos, progresoData);
             const siguienteNivelNombre = getEl('siguiente-nivel-nombre');
             if (siguienteNivelNombre) siguienteNivelNombre.textContent = siguiente;
 
-            renderCategorias(categoriasConDatos, progreso, stats);
+            renderCategorias(categoriasConDatos, progresoData, stats);
         } catch (error) {
             // Error loading dashboard
         }

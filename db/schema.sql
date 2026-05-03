@@ -77,27 +77,27 @@ INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, desc
 
 -- Niveles: IDE e Intérprete (id=16)
 INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
-    (16, '¿Qué es un IDE?', 'Introducción al entorno de desarrollo integrado', 'programacion/ide-interprete/ide-1.html', 1, 1, 10),
-    (16, 'El Intérprete', 'Cómo se ejecuta el código Python', 'programacion/ide-interprete/ide-2.html', 2, 2, 10),
-    (16, 'Tu primer programa', 'Hola Mundo tu primer código', 'programacion/ide-interprete/ide-3.html', 3, 3, 15);
+    (16, '¿Qué es un IDE?', 'Introducción al entorno de desarrollo integrado', 'contenido/programacion/ide-interprete/ide-1.html', 1, 1, 10),
+    (16, 'El Intérprete', 'Cómo se ejecuta el código Python', 'contenido/programacion/ide-interprete/ide-2.html', 2, 2, 10),
+    (16, 'Tu primer programa', 'Hola Mundo tu primer código', 'contenido/programacion/ide-interprete/ide-3.html', 3, 3, 15);
 
 -- Niveles: Variables (id=17)
 INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
-    (17, '¿Qué es una variable?', 'Guardar y usar datos', 'programacion/variables/variables-1.html', 1, 1, 10),
-    (17, 'Tipos de datos', 'str, int, float, bool', 'programacion/variables/variables-2.html', 2, 2, 15),
-    (17, 'Operaciones con tipos', 'Concatenación y conversión', 'programacion/variables/variables-3.html', 3, 3, 15);
+    (17, '¿Qué es una variable?', 'Guardar y usar datos', 'contenido/programacion/variables/variables-1.html', 1, 1, 10),
+    (17, 'Tipos de datos', 'str, int, float, bool', 'contenido/programacion/variables/variables-2.html', 2, 2, 15),
+    (17, 'Operaciones con tipos', 'Concatenación y conversión', 'contenido/programacion/variables/variables-3.html', 3, 3, 15);
 
 -- Niveles: Condicionales (id=18)
 INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
-    (18, 'Decisiones con if', 'Tomar decisiones en código', 'programacion/condicionales/condicionales-1.html', 1, 1, 10),
-    (18, 'Si no, entonces...', 'Usando else', 'programacion/condicionales/condicionales-2.html', 2, 2, 10),
-    (18, 'Múltiples condiciones', 'Usando elif', 'programacion/condicionales/condicionales-3.html', 3, 3, 15);
+    (18, 'Decisiones con if', 'Tomar decisiones en código', 'contenido/programacion/condicionales/condicionales-1.html', 1, 1, 10),
+    (18, 'Si no, entonces...', 'Usando else', 'contenido/programacion/condicionales/condicionales-2.html', 2, 2, 10),
+    (18, 'Múltiples condiciones', 'Usando elif', 'contenido/programacion/condicionales/condicionales-3.html', 3, 3, 15);
 
 -- Niveles: Funciones (id=19)
 INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
-    (19, 'Crear funciones', 'Definiendo funciones con def', 'programacion/funciones/funciones-1.html', 1, 1, 10),
-    (19, 'Parámetros', 'Funciones con entradas', 'programacion/funciones/funciones-2.html', 2, 2, 15),
-    (19, 'Retornar valores', 'Funciones con salidas', 'programacion/funciones/funciones-3.html', 3, 3, 15);
+    (19, 'Crear funciones', 'Definiendo funciones con def', 'contenido/programacion/funciones/funciones-1.html', 1, 1, 10),
+    (19, 'Parámetros', 'Funciones con entradas', 'contenido/programacion/funciones/funciones-2.html', 2, 2, 15),
+    (19, 'Retornar valores', 'Funciones con salidas', 'contenido/programacion/funciones/funciones-3.html', 3, 3, 15);
 
 -- =============================================
 -- Datos iniciales de categorías
@@ -142,19 +142,19 @@ INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, desc
 -- =============================================
 INSERT OR IGNORE INTO niveles (id_subcategoria, titulo, descripcion, ruta_archivo, nivel_ordinal, orden, tiempo_estimado_min) VALUES
     -- Subcategoría: Pantallas divididas (id=1)
-    (1, 'Comandos de teclas', 'Aprende los atajos de teclado básicos para dividir pantalla', 'trucos-dividir-pantalla.html', 1, 1, 10),
-    (1, 'Arrastre a bordes', 'Divide ventanas arrastrando a los bordes de la pantalla', 'trucos-arrastre-bordes.html', 2, 2, 15),
-    (1, 'Botones de control', 'Usa los botones de la barra de título para dividir', NULL, 3, 3, 10),
+    (1, 'Comandos de teclas', 'Aprende los atajos de teclado básicos para dividir pantalla', 'contenido/trucos-dividir-pantalla.html', 1, 1, 10),
+    (1, 'Arrastre a bordes', 'Divide ventanas arrastrando a los bordes de la pantalla', 'contenido/trucos-arrastre-bordes.html', 2, 2, 15),
+    (1, 'Botones de control', 'Usa los botones de la barra de título para dividir', 'contenido/trucos-botones-control.html', 3, 3, 10),
     
     -- Subcategoría: Atajos de teclado (id=15) - ahora en Office
-    (15, 'Copiar y pegar', 'Los atajos Ctrl+C y Ctrl+V', 'atajos-copiar-pegar.html', 1, 1, 5),
-    (15, 'Deshacer y rehacer', 'Ctrl+Z y Ctrl+Y', 'atajos-deshacer-rehacer.html', 2, 2, 8),
-    (15, 'Atajos con Win', 'Win+D, Win+E, Win+L y más', 'atajos-win.html', 3, 3, 12),
+    (15, 'Copiar y pegar', 'Los atajos Ctrl+C y Ctrl+V', 'contenido/atajos-copiar-pegar.html', 1, 1, 5),
+    (15, 'Deshacer y rehacer', 'Ctrl+Z y Ctrl+Y', 'contenido/atajos-deshacer-rehacer.html', 2, 2, 8),
+    (15, 'Atajos con Win', 'Win+D, Win+E, Win+L y más', 'contenido/atajos-win.html', 3, 3, 12),
     
     -- Subcategoría: Explorador de archivos (id=3)
-    (3, 'Abrir explorador', 'Cómo abrir el explorador de archivos', NULL, 1, 1, 5),
-    (3, 'Navegar carpetas', 'Moverse entre carpetas', NULL, 2, 2, 10),
-    (3, 'Crear y organizar', 'Crear carpetas y mover archivos', NULL, 3, 3, 15),
+    (3, 'Abrir explorador', 'Cómo abrir el explorador de archivos', 'contenido/explorador-abrir.html', 1, 1, 5),
+    (3, 'Navegar carpetas', 'Moverse entre carpetas', 'contenido/explorador-navegar.html', 2, 2, 10),
+    (3, 'Crear y organizar', 'Crear carpetas y mover archivos', 'contenido/explorador-organizar.html', 3, 3, 15),
     
     -- Subcategoría: Personalización (id=4)
     (4, 'Cambiar fondo de pantalla', 'Personalizar el fondo del escritorio', NULL, 1, 1, 5),

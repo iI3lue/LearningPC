@@ -1,5 +1,12 @@
 // gestion.js - Control de la tabla de niveles (Nueva estructura)
 
+// Verificar acceso admin
+const usuarioActual = JSON.parse(sessionStorage.getItem('usuario'));
+if (!usuarioActual || usuarioActual.usuario !== 'admin') {
+    window.api.irA('home');
+    throw new Error('Acceso no autorizado');
+}
+
 // Referencias DOM
 const tablaNiveles = document.getElementById('tabla-niveles');
 const btnVolver = document.getElementById('btn-volver');
@@ -7,21 +14,7 @@ const btnNuevo = document.getElementById('btn-nuevo');
 const btnReportes = document.getElementById('btn-reportes');
 const tituloTabla = document.getElementById('titulo-tabla') || null;
 
-// Función para mostrar toast
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('gestion-toast');
-    const toastMessage = toast ? toast.querySelector('.toast-message') : null;
-    if (!toast || !toastMessage) return;
-    
-    toast.classList.remove('success', 'error', 'info');
-    toast.classList.add(type);
-    toastMessage.textContent = message;
-    toast.classList.add('visible');
-    
-    setTimeout(() => {
-        toast.classList.remove('visible');
-    }, 3000);
-}
+// showToast viene de toast.js (módulo compartido)
 
 // Cargar niveles con nueva estructura
 async function cargarNiveles() {

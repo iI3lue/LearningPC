@@ -40,7 +40,7 @@ contextBridge.exposeInMainWorld('api', {
     getNivelesPorSubcategoria: (idSubcategoria) =>
         ipcRenderer.invoke('data:getNivelesPorSubcategoria', idSubcategoria),
 
-    // Niveles por categoría (legacy -兼容性)
+    // Niveles por categoría (legacy - compatibilidad)
     getNivelesPorCategoria: (idCategoria) =>
         ipcRenderer.invoke('data:getNivelesPorCategoria', idCategoria),
 

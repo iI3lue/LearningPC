@@ -1,5 +1,12 @@
 // formulario.js - Lógica para crear/editar niveles (Nueva estructura)
 
+// Verificar acceso admin
+const usuarioActual = JSON.parse(sessionStorage.getItem('usuario'));
+if (!usuarioActual || usuarioActual.usuario !== 'admin') {
+    window.api.irA('home');
+    throw new Error('Acceso no autorizado');
+}
+
 // Referencias DOM
 const formNivel = document.getElementById('form-nivel');
 const selectCategoria = document.getElementById('id_categoria');
@@ -7,21 +14,7 @@ const selectSubcategoria = document.getElementById('id_subcategoria');
 const btnCancelar = document.getElementById('btn-cancelar');
 const formTitle = document.getElementById('form-title');
 
-// Función para mostrar toast
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('formulario-toast');
-    const toastMessage = toast ? toast.querySelector('.toast-message') : null;
-    if (!toast || !toastMessage) return;
-    
-    toast.classList.remove('success', 'error', 'info');
-    toast.classList.add(type);
-    toastMessage.textContent = message;
-    toast.classList.add('visible');
-    
-    setTimeout(() => {
-        toast.classList.remove('visible');
-    }, 3000);
-}
+// showToast viene de toast.js (módulo compartido)
 
 // Cargar categorías
 async function cargarCategorias() {

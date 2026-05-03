@@ -4,10 +4,8 @@
  */
 
 function initTheme() {
-    const theme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-    cargarColorSecundario();
-    updateThemeButtonUI(theme);
+    // Delegado a iniciar() que se auto-ejecuta al cargar
+    iniciar();
 }
 
 function toggleTheme() {

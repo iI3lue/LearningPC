@@ -24,7 +24,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 16px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #454545; /* De #333 a #454545 */
             gap: 16px;
         }
 
@@ -133,7 +133,7 @@
             transform: translateX(-50%);
             margin-top: 8px;
             background: #2d2d2d;
-            border: 1px solid #444;
+            border: 1px solid #555; /* De #444 a #555 */
             border-radius: 8px;
             padding: 8px 0;
             min-width: 200px;
@@ -224,27 +224,7 @@
             /* Color manejado por .toast-notification.success */
         }
 
-        /* Keyboard hint */
-        .keyboard-hint {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            background: rgba(0,0,0,0.7);
-            color: #888;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 11px;
-            display: flex;
-            gap: 12px;
-        }
 
-        .keyboard-hint kbd {
-            background: #333;
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: #aaa;
-            font-family: monospace;
-        }
         #subcat-modal {
             display: none;
             position: fixed;
@@ -264,7 +244,7 @@
             max-width: 440px;
             text-align: center;
             box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-            border: 1px solid #454545;
+            border: 1px solid #666; /* De #454545 a #666 */
         }
         #subcat-modal h3 {
             color: #fff;
@@ -365,10 +345,7 @@
         <span class="toast-message" id="toast-message"></span>
     </div>
 
-    <div class="keyboard-hint">
-        <span><kbd>←</kbd> <kbd>→</kbd> Navegar</span>
-        <span><kbd>Esc</kbd> Salir</span>
-    </div>
+
 
     <!-- Subcategory continuation modal -->
     <div id="subcat-modal">
@@ -381,7 +358,7 @@
             </div>
             <div class="subcat-remember">
                 <input type="checkbox" id="subcat-no-preguntar"/>
-                <label for="subcat-no-preguntar">No volver a preguntar</label>
+                <label for="subcat-no-preguntar">Pasar automáticamente la próxima vez</label>
             </div>
         </div>
     </div>
@@ -776,7 +753,13 @@ function actualizarUI() {
                             if (autoEnabled) {
                                 await continuarSiguienteSubcat();
                             } else {
-                                abrirSubcatModal();
+                                const showPrompt = window.LearningPCSettings ? window.LearningPCSettings.shouldShowPrompt() : true;
+                                if (showPrompt) {
+                                    abrirSubcatModal();
+                                } else {
+                                    // Si no hay auto-continue y no hay prompt, solo avisamos
+                                    mostrarToast('¡Has completado todos los niveles de esta subcategoría!', 'exito');
+                                }
                             }
                         }
                     }, 1500);
@@ -806,10 +789,13 @@ function actualizarUI() {
         async function continuarSiguienteSubcat() {
             const remember = document.getElementById('subcat-no-preguntar');
             if (remember && remember.checked) {
-                if (window.LearningPCSettings) window.LearningPCSettings.setShowPrompt(false);
+                if (window.LearningPCSettings) {
+                    window.LearningPCSettings.setAutoContinue(true);
+                }
             }
 
-            cerrarSubcatModal();
+            const modal = document.getElementById('subcat-modal');
+            if (modal) modal.classList.remove('open');
 
             console.log('[SUBNAV] continuarSiguienteSubcat() iniciado');
             console.log('[SUBNAV] idCategoria actual:', idCategoria);
@@ -852,29 +838,32 @@ function actualizarUI() {
                 // Encontrar el índice de la subcategoría actual
                 const currentIdx = subcats.findIndex(s => s.id_subcategoria == idSubcategoria);
                 console.log('[SUBNAV] Índice actual:', currentIdx, 'de', subcats.length);
-                
-                const nextIdx = currentIdx + 1;
+                let nextIdx = currentIdx + 1;
+                let siguiente = null;
+                let nivelesSig = null;
 
-                if (nextIdx >= subcats.length) {
-                    // No hay siguiente subcategoría
-                    console.log('[SUBNAV] No hay siguiente subcategoría');
-                    mostrarToast('¡Has completado todas las subcategorías!', 'exito');
+                // Buscar la siguiente subcategoría que tenga niveles disponibles
+                while (nextIdx < subcats.length) {
+                    siguiente = subcats[nextIdx];
+                    nivelesSig = await window.api.getNivelesPorSubcategoria(siguiente.id_subcategoria);
+                    
+                    if (nivelesSig && nivelesSig.length > 0) {
+                        break; // Encontramos una subcategoría con contenido
+                    }
+                    console.log(`[SUBNAV] Subcategoría "${siguiente.nombre}" vacía, saltando...`);
+                    nextIdx++;
+                }
+
+                if (nextIdx >= subcats.length || !nivelesSig || nivelesSig.length === 0) {
+                    // No hay siguiente subcategoría válida
+                    console.log('[SUBNAV] No hay siguiente subcategoría con niveles');
+                    mostrarToast('¡Has completado todas las subcategorías de esta sección!', 'exito');
                     setTimeout(() => window.api.irA('home'), 1500);
                     return;
                 }
 
-                const siguiente = subcats[nextIdx];
-                console.log('[SUBNAV] Siguiente subcategoría:', siguiente.nombre, 'ID:', siguiente.id_subcategoria);
-                
-                const nivelesSig = await window.api.getNivelesPorSubcategoria(siguiente.id_subcategoria);
-                console.log('[SUBNAV] Niveles de siguiente subcategoría:', nivelesSig.length);
-
-                if (!nivelesSig || nivelesSig.length === 0) {
-                    console.warn('[SUBNAV] La siguiente subcategoría no tiene niveles');
-                    mostrarToast('La siguiente subcategoría no tiene niveles disponibles.', 'info');
-                    setTimeout(() => window.api.irA('home'), 1500);
-                    return;
-                }
+                console.log('[SUBNAV] Siguiente subcategoría válida:', siguiente.nombre, 'ID:', siguiente.id_subcategoria);
+                console.log('[SUBNAV] Niveles encontrados:', nivelesSig.length);
 
                 const primerNivel = nivelesSig[0];
                 console.log('[SUBNAV] Primer nivel:', primerNivel.titulo, 'Ruta:', primerNivel.ruta_archivo);
@@ -887,8 +876,11 @@ function actualizarUI() {
 
                 console.log('[SUBNAV] Navegando a:', siguiente.nombre, '->', primerNivel.titulo);
                 
-                // Recargar la página para cargar el nuevo nivel
-                window.location.reload();
+                // Mostrar feedback y luego recargar
+                mostrarToast('Avanzando a: ' + siguiente.nombre, 'info');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
 
             } catch(e) {
                 console.error('[SUBNAV] Error completo:', e);

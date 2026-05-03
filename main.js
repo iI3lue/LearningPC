@@ -2,6 +2,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 // Rutas de archivos
 const DB_PATH = path.join(__dirname, 'learning_pc.db');
@@ -87,6 +88,22 @@ app.whenReady().then(() => {
         console.error('[DB] ❌ Error en migración de rutas:', e.message);
     }
 
+    // Migrar contraseñas en texto plano a bcrypt
+    try {
+        const db = getDatabase();
+        const usuarios = db.prepare('SELECT id_usuario, contraseña FROM usuarios').all();
+        for (const u of usuarios) {
+            // Si la contraseña NO empieza con $2a$ o $2b$, es texto plano
+            if (u.contraseña && !u.contraseña.startsWith('$2a$') && !u.contraseña.startsWith('$2b$')) {
+                const hash = bcrypt.hashSync(u.contraseña, 10);
+                db.prepare('UPDATE usuarios SET contraseña = ? WHERE id_usuario = ?').run(hash, u.id_usuario);
+                console.log(`[DB] Contraseña hasheada para usuario ID ${u.id_usuario}`);
+            }
+        }
+    } catch (e) {
+        console.error('[DB] Error migrando contraseñas:', e.message);
+    }
+
     createWindow();
 });
 
@@ -132,6 +149,7 @@ ipcMain.on('nav:irA', (event, pagina) => {
         formulario: path.join(__dirname, 'src', 'pages', 'formulario.html'),
         reportes: path.join(__dirname, 'src', 'pages', 'reportes.html'),
         simulacion: path.join(__dirname, 'src', 'pages', 'simulacion.html'),
+        ajustes: path.join(__dirname, 'src', 'pages', 'ajustes.html'),
     };
     if (paginas[pagina]) mainWindow.loadFile(paginas[pagina]);
 });
@@ -140,33 +158,48 @@ ipcMain.on('nav:irA', (event, pagina) => {
 ipcMain.handle('auth:login', (event, { usuario, contraseña }) => {
     const db = getDatabase();
     
-    // Primero verificar si el usuario existe
-    const userExists = db.prepare(
-        'SELECT * FROM usuarios WHERE usuario = ?'
-    ).get(usuario);
-    
-    if (!userExists) {
-        return { ok: false, mensaje: 'El usuario no existe.', codigo: 'usuario_no_existe' };
-    }
-    
-    // El usuario existe, verificar contraseña
-    const user = db.prepare(
-        'SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ?'
-    ).get(usuario, contraseña);
-    
-    if (user) {
-        return { ok: true, usuario: user };
-    } else {
-        return { ok: false, mensaje: 'Contraseña incorrecta.', codigo: 'contraseña_incorrecta' };
+    try {
+        // Obtener el usuario por nombre
+        const user = db.prepare(
+            'SELECT * FROM usuarios WHERE usuario = ?'
+        ).get(usuario);
+        
+        if (!user) {
+            return { ok: false, mensaje: 'El usuario no existe.', codigo: 'usuario_no_existe' };
+        }
+        
+        // Comparar contraseña (soporta texto plano para admin inicial o hash para nuevos)
+        let passwordMatch = false;
+        if (user.contraseña === contraseña) {
+            // Caso legacy/admin inicial: texto plano
+            passwordMatch = true;
+        } else {
+            // Caso normal: hash con bcrypt
+            try {
+                passwordMatch = bcrypt.compareSync(contraseña, user.contraseña);
+            } catch (e) {
+                passwordMatch = false;
+            }
+        }
+        
+        if (passwordMatch) {
+            return { ok: true, usuario: user };
+        } else {
+            return { ok: false, mensaje: 'Contraseña incorrecta.', codigo: 'contraseña_incorrecta' };
+        }
+    } catch (err) {
+        console.error('[AUTH] Error en login:', err);
+        return { ok: false, mensaje: 'Error interno del servidor.' };
     }
 });
 
 ipcMain.handle('auth:registrar', (event, { usuario, contraseña, edad }) => {
     const db = getDatabase();
     try {
+        const hash = bcrypt.hashSync(contraseña, 10);
         db.prepare(
             'INSERT INTO usuarios (usuario, contraseña, edad) VALUES (?, ?, ?)'
-        ).run(usuario, contraseña, edad);
+        ).run(usuario, hash, edad);
         return { ok: true };
     } catch (err) {
         return { ok: false, mensaje: 'El nombre de usuario ya existe.' };
@@ -230,9 +263,42 @@ ipcMain.handle('data:getNivelesPorCategoria', (event, idCategoria) => {
 // Obtener progreso del usuario
 ipcMain.handle('data:getProgreso', (event, idUsuario) => {
     const db = getDatabase();
-    return db.prepare(
-        'SELECT * FROM progreso_usuario WHERE id_usuario = ?'
-    ).all(idUsuario);
+
+    // Totales globales
+    const resumen = db.prepare(`
+        SELECT
+            COUNT(n.id_nivel) AS total,
+            COUNT(CASE WHEN pu.completado = 1 THEN 1 END) AS completados
+        FROM niveles n
+        JOIN subcategorias s ON n.id_subcategoria = s.id_subcategoria
+        LEFT JOIN progreso_usuario pu ON n.id_nivel = pu.id_nivel AND pu.id_usuario = ?
+    `).get(idUsuario);
+
+    // Desglose por categoría
+    const categorias = db.prepare(`
+        SELECT
+            c.nombre,
+            COUNT(n.id_nivel) AS total,
+            COUNT(CASE WHEN pu.completado = 1 THEN 1 END) AS completados
+        FROM categorias c
+        JOIN subcategorias s ON c.id_categoria = s.id_categoria
+        JOIN niveles n ON s.id_subcategoria = n.id_subcategoria
+        LEFT JOIN progreso_usuario pu ON n.id_nivel = pu.id_nivel AND pu.id_usuario = ?
+        GROUP BY c.id_categoria
+        ORDER BY c.id_categoria
+    `).all(idUsuario);
+
+    // Lista cruda de niveles (para compatibilidad con home.js)
+    const nivelesRaw = db.prepare(`
+        SELECT id_nivel, completado FROM progreso_usuario WHERE id_usuario = ?
+    `).all(idUsuario);
+
+    return {
+        total: resumen.total || 0,
+        completados: resumen.completados || 0,
+        categorias: categorias,
+        niveles: nivelesRaw
+    };
 });
 
 // Marcar nivel como completado

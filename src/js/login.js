@@ -3,21 +3,7 @@ const formLogin = document.getElementById('form-login');
 const errorLogin = document.getElementById('error-login');
 const linkRegistro = document.getElementById('link-registro');
 
-// Función para mostrar toast
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('login-toast');
-    const toastMessage = document.getElementById('toast-message');
-    if (!toast || !toastMessage) return;
-    
-    toast.classList.remove('success', 'error', 'info');
-    toast.classList.add(type);
-    toastMessage.textContent = message;
-    toast.classList.add('visible');
-    
-    setTimeout(() => {
-        toast.classList.remove('visible');
-    }, 3000);
-}
+// showToast viene de toast.js (módulo compartido)
 
 // Verificar si hay sesión guardada (recordarme)
 function checkSavedSession() {
@@ -47,7 +33,7 @@ if (!window.api || !window.api.login) {
 // Enviar formulario de login
 formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
-    errorLogin.hidden = true;
+    // Los errores se muestran via toast
 
     const usuario = document.getElementById('usuario').value.trim();
     const contraseña = document.getElementById('contraseña').value;
@@ -92,8 +78,6 @@ formLogin.addEventListener('submit', async (e) => {
 });
 
 // Ir a registro
-
-
 if (linkRegistro) {
     linkRegistro.addEventListener('click', (e) => {
         e.preventDefault();

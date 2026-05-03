@@ -6,12 +6,12 @@
 :root {
     /* Tema Light Microsoft */
     --bg-color: #FFFFFF;
-    --sidebar-bg: #F8F9FA;
-    --text-color: #1F2937;
-    --text-secondary: #6B7280;
-    --accent-pastel: #D1E8FF;
-    --accent-solid: #0078D4; /* Azul Microsoft */
-    --border-color: rgba(0, 0, 0, 0.25);
+    --sidebar-bg: #F3F4F6;
+    --text-color: #111827;
+    --text-secondary: #4B5563; /* Más oscuro para mejor contraste */
+    --accent-pastel: #E0F2FE;
+    --accent-solid: #0078D4;
+    --border-color: rgba(0, 0, 0, 0.35); /* De 0.25 a 0.35 para mayor visibilidad */
     --hover-bg: #E5E7EB;
     --active-indicator: #0078D4;
     --input-bg: #FFFFFF;
@@ -57,10 +57,10 @@
     --elevation-3: 0 8px 16px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.06);
     --elevation-4: 0 16px 32px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
 
-    /* Borders */
-    --border-subtle: 1px solid rgba(0,0,0,0.10);
-    --border-weak: 1px solid rgba(0,0,0,0.15);
-    --border-strong: 1px solid rgba(0,0,0,0.25);
+    /* Borders - Increased contrast */
+    --border-subtle: 1px solid rgba(0,0,0,0.15);
+    --border-weak: 1px solid rgba(0,0,0,0.20);
+    --border-strong: 1px solid rgba(0,0,0,0.35);
 
     /* Category icon backgrounds */
     --cat-office-bg: rgba(0, 120, 212, 0.12);
@@ -79,17 +79,17 @@
     --elevation-3: 0 8px 16px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
     --elevation-4: 0 16px 32px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.35);
 
-    /* Tema Dark */
-    --bg-color: #1F1F1F;
-    --sidebar-bg: #2D2D2D;
-    --text-color: #F9FAFB;
-    --text-secondary: #9CA3AF;
+    /* Tema Dark - Mejorado */
+    --bg-color: #1A1A1A; /* Un poco más oscuro */
+    --sidebar-bg: #252525;
+    --text-color: #FFFFFF;
+    --text-secondary: #D1D5DB; /* Más claro para mejor lectura en fondo oscuro */
     --accent-pastel: #374151;
     --accent-solid: #47A1EB;
-    --border-color: rgba(255, 255, 255, 0.15);
+    --border-color: rgba(255, 255, 255, 0.25); /* De 0.15 a 0.25 */
     --hover-bg: #3F3F46;
     --active-indicator: #47A1EB;
-    --input-bg: #252525;
+    --input-bg: #2D2D2D;
     
     /* Colores secundarios - Dark */
     --secondary-1: #34D399;
