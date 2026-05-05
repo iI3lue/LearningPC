@@ -1,88 +1,96 @@
-// reporte-usuario.js - Lógica visual para el estudiante
+/**
+ * reporte-usuario.js
+ * Lógica de la vista de Reportes del dashboard SPA.
+ * Se inicializa lazy: solo cuando el router activa la vista por primera vez.
+ */
 
-const btnVolver = document.getElementById('btn-volver');
-const userNameDisplay = document.getElementById('user-name');
-const progresoTexto = document.getElementById('progreso-texto');
-const nivelesSuperados = document.getElementById('niveles-superados');
-const tiempoPractica = document.getElementById('tiempo-practica');
-const listaHabilidades = document.getElementById('lista-habilidades');
+let _reportesInitialized = false;
 
-// Obtener usuario de la sesión
-const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+async function initReportes() {
+    if (_reportesInitialized) return;
+    _reportesInitialized = true;
+    await inicializarReporte();
+}
 
 async function inicializarReporte() {
+    const usuario = JSON.parse(sessionStorage.getItem('usuario'));
     if (!usuario) {
         window.api.irA('login');
         return;
     }
 
-    userNameDisplay.textContent = usuario.usuario;
+    const userNameDisplay = document.getElementById('user-name');
+    const userNameSidebar = document.getElementById('profile-name');
+    const profileBadge = document.getElementById('profile-badge');
+    const nivelesCompletadosSidebar = document.getElementById('niveles-completados');
+    const streakCountSidebar = document.getElementById('streak-count');
+    const tiempoPractica = document.getElementById('tiempo-practica');
+    const listaHabilidades = document.getElementById('lista-habilidades');
+
+    if (userNameDisplay) userNameDisplay.textContent = usuario.usuario;
+    if (userNameSidebar) userNameSidebar.textContent = usuario.usuario;
+    if (profileBadge) profileBadge.textContent = 'Principiante';
 
     try {
-        // Obtener progreso real del usuario desde la BD
         const progresoData = await window.api.getProgreso(usuario.id_usuario);
         const totalNiveles = progresoData.total || 0;
         const completados = progresoData.completados || 0;
         const progreso = totalNiveles > 0 ? Math.round((completados / totalNiveles) * 100) : 0;
 
-        progresoTexto.textContent = `${progreso}%`;
-        nivelesSuperados.textContent = `${completados}`;
+        if (nivelesCompletadosSidebar) nivelesCompletadosSidebar.textContent = completados;
 
-        // Tiempo estimado basado en niveles completados (cada nivel ~5 min promedio)
+        const streak = usuario.racha || 0;
+        if (streakCountSidebar) streakCountSidebar.textContent = streak <= 0 ? '0 días' : `${streak} días`;
+
         const minutosEstimados = completados * 5;
-        if (minutosEstimados >= 60) {
-            tiempoPractica.textContent = `${(minutosEstimados / 60).toFixed(1)} Horas`;
-        } else {
-            tiempoPractica.textContent = `${minutosEstimados} Min`;
+        if (tiempoPractica) {
+            tiempoPractica.textContent = minutosEstimados >= 60
+                ? `${(minutosEstimados / 60).toFixed(1)} Horas`
+                : `${minutosEstimados} Min`;
         }
 
-        // Mostrar categorías completadas como habilidades
-        if (progresoData.categorias && progresoData.categorias.length > 0) {
-            listaHabilidades.innerHTML = progresoData.categorias
-                .filter(cat => cat.completados > 0)
-                .map(cat => `
-                    <div class="item-diploma">
-                        <div class="diploma-badge">🎯</div>
-                        <div class="diploma-info">
-                            <h4>${cat.nombre.toUpperCase()}</h4>
-                            <p>${cat.completados}/${cat.total} NIVELES COMPLETADOS</p>
-                        </div>
-                    </div>
-                `).join('');
+        // Actualizar niveles superados (nuevo elemento en SPA)
+        const nivelesSuperados = document.getElementById('niveles-superados');
+        if (nivelesSuperados) nivelesSuperados.textContent = completados;
 
-            if (listaHabilidades.innerHTML.trim() === '') {
-                listaHabilidades.innerHTML = `
-                    <div class="item-diploma">
-                        <div class="diploma-badge">🚀</div>
-                        <div class="diploma-info">
-                            <h4>AÚN NO HAY HABILIDADES</h4>
-                            <p>COMPLETA NIVELES PARA DESBLOQUEAR HABILIDADES</p>
+        // Progreso total
+        const progresoTexto = document.getElementById('progreso-texto');
+        if (progresoTexto) progresoTexto.textContent = `${progreso}%`;
+
+        if (listaHabilidades) {
+            if (progresoData.categorias && progresoData.categorias.length > 0) {
+                const itemsConProgreso = progresoData.categorias.filter(cat => cat.completados > 0);
+                listaHabilidades.innerHTML = itemsConProgreso.length > 0
+                    ? itemsConProgreso.map(cat => `
+                        <div class="item-diploma">
+                            <div class="diploma-badge">🎯</div>
+                            <div class="diploma-info">
+                                <h4>${cat.nombre.toUpperCase()}</h4>
+                                <p>${cat.completados}/${cat.total} NIVELES COMPLETADOS</p>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `).join('')
+                    : _emptyHabilidades();
+            } else {
+                listaHabilidades.innerHTML = _emptyHabilidades();
             }
-        } else {
-            listaHabilidades.innerHTML = `
-                <div class="item-diploma">
-                    <div class="diploma-badge">🚀</div>
-                    <div class="diploma-info">
-                        <h4>AÚN NO HAY HABILIDADES</h4>
-                        <p>COMPLETA NIVELES PARA DESBLOQUEAR HABILIDADES</p>
-                    </div>
-                </div>
-            `;
         }
     } catch (err) {
         console.error('Error cargando reporte:', err);
-        progresoTexto.textContent = '0%';
-        nivelesSuperados.textContent = '0';
-        tiempoPractica.textContent = '0 Min';
     }
 }
 
-// Navegación (volvemos al dashboard/home)
-btnVolver.addEventListener('click', () => {
-    window.api.irA('home');
-});
+function _emptyHabilidades() {
+    return `
+        <div class="item-diploma">
+            <div class="diploma-badge">🚀</div>
+            <div class="diploma-info">
+                <h4>AÚN NO HAY HABILIDADES</h4>
+                <p>COMPLETÁ NIVELES PARA DESBLOQUEAR HABILIDADES</p>
+            </div>
+        </div>
+    `;
+}
 
-inicializarReporte();
+// Exponer para el router
+window.Reportes = { init: initReportes };

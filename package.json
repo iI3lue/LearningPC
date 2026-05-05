@@ -9,7 +9,9 @@
     },
     "devDependencies": {
         "@electron/rebuild": "^4.0.3",
-        "electron": "^30.5.1"
+        "electron": "^30.5.1",
+        "eslint": "^10.3.0",
+        "globals": "^17.6.0"
     },
     "dependencies": {
         "bcryptjs": "^3.0.3",

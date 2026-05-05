@@ -4,560 +4,34 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Learning PC – Inicio</title>
+    <title>LearningPC — Inicio</title>
     <link rel="stylesheet" href="../css/styles.css" />
-    <style>
-        /* Dashboard layout - Estilo base (sidebar usado de styles.css) */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            grid-template-rows: auto 1fr;
-            min-height: 100vh;
-        }
-
-        /* Profile and Stats - Handled by styles.css mostly, but adjusting spacing */
-        .profile-section {
-            text-align: center;
-            padding: 24px;
-            background: var(--sidebar-bg);
-            border-radius: 16px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-        }
-
-        .profile-avatar {
-            width: 72px;
-            height: 72px;
-            background: var(--accent-pastel);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--accent-solid);
-            margin: 0 auto 16px;
-            border: 2px solid #FFFFFF;
-            box-shadow: var(--elevation-1);
-        }
-
-        .profile-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-
-        .profile-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--sidebar-bg);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent-solid);
-        }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--text-color);
-        }
-
-        .stat-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-
-        /* Nav */
-        .nav-menu {
-            margin-top: auto;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: var(--text-color);
-            text-decoration: none;
-            border-radius: 8px;
-            margin-bottom: 4px;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .nav-item:hover {
-            background: var(--hover-bg);
-        }
-
-        .nav-icon {
-            font-size: 18px;
-        }
-
-        /* Main content */
-        .main-content {
-            padding: 32px;
-            overflow-y: auto;
-        }
-
-        .welcome-section {
-            margin-bottom: 32px;
-        }
-
-        .welcome-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 8px;
-        }
-
-        .welcome-subtitle {
-            font-size: 14px;
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        /* Progress Hero Section - Vibrant Redesign */
-        .progress-hero {
-            background: var(--grad-vibrant);
-            padding: 32px;
-            border-radius: 16px;
-            margin-bottom: 32px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--elevation-4);
-        }
-
-        .progress-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--grad-surface);
-            pointer-events: none;
-        }
-
-        .hero-stats {
-            flex: 1;
-            z-index: 1;
-        }
-
-        .hero-stats h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .hero-stats p {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 24px;
-        }
-
-        /* Vibrant Progress Bar */
-        .progress-bar-container {
-            width: 100%;
-            max-width: 400px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 12px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: var(--grad-progress-fill, white);
-            border-radius: 6px;
-            width: 0%;
-            transition: width 1s cubic-bezier(0.1, 0.9, 0.2, 1);
-            position: relative;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-        }
-
-        .progress-bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                90deg,
-                transparent 0%,
-                rgba(255, 255, 255, 0.3) 50%,
-                transparent 100%
-            );
-            animation: shimmer 2s infinite;
-        }
-
-        .hero-percentage {
-            font-size: 48px;
-            font-weight: 800;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-
-        .hero-percentage span {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.8;
-        }
-
-        .hero-next {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 12px 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-top: 16px;
-            display: inline-flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .hero-next strong {
-            font-size: 15px;
-        }
-
-        .hero-next span {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        /* Categories grid */
-        .categories-section h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 20px;
-        }
-
-        .categorias-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        /* Category Cards Improvement */
-        .categoria-card {
-            background: var(--sidebar-bg);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid var(--border-color);
-            transition: all var(--duration-medium) var(--ease-fluent);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .categoria-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent-solid);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .categoria-card:hover::after {
-            opacity: 1;
-        }
-
-        .categoria-icon {
-            font-size: 28px;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-color);
-            border-radius: 14px;
-            box-shadow: var(--elevation-2);
-            border: 1px solid var(--border-color);
-        }
-
-        .categoria-header h4 {
-            flex: 1;
-            margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-color);
-            letter-spacing: -0.5px;
-        }
-
-        .niveles-resumen {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .subcategoria {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.2s;
-        }
-
-        .subcategoria:hover {
-            background: var(--hover-bg);
-        }
-
-        .categoria-progreso {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent-solid);
-        }
-
-        .categoria-progress-bar {
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 3px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-solid);
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        .niveles-resumen {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 16px 0;
-        }
-
-        .subcategoria {
-            font-size: 13px;
-            color: var(--text-color);
-            padding: 6px 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .subcategoria:last-child {
-            border-bottom: none;
-        }
-
-        .sub-progress {
-            color: var(--accent-solid);
-            font-weight: 600;
-        }
-
-        .btn-expandir {
-            width: 100%;
-            padding: 10px;
-            background: var(--accent-pastel);
-            color: var(--accent-solid);
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .btn-expandir:hover {
-            background: var(--accent-solid);
-            color: white;
-        }
-
-        /* Niveles expandidos */
-        .niveles-expandidos {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .subcategoria-header {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent-solid);
-            margin: 16px 0 8px 0;
-        }
-
-        .nivel-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: var(--bg-color);
-            border-radius: 6px;
-            margin-bottom: 8px;
-        }
-
-        .nivel-info {
-            flex: 1;
-        }
-
-        .nivel-info strong {
-            display: block;
-            font-size: 13px;
-            color: var(--text-color);
-            margin-bottom: 4px;
-        }
-
-        .nivel-info span {
-            font-size: 12px;
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .nivel-info .badge {
-            display: inline-block;
-            margin-left: 8px;
-            padding: 2px 8px;
-            background: #dcfce7;
-            color: #15803d;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-
-        .btn-iniciar-simulacion {
-            padding: 8px 16px;
-            background: var(--accent-solid);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: filter 0.15s;
-        }
-
-        .btn-iniciar-simulacion:hover {
-            filter: brightness(1.1);
-        }
-
-        .btn-repetir {
-            background: var(--hover-bg);
-            color: var(--text-color);
-        }
-
-        .sin-niveles {
-            font-size: 12px;
-            color: var(--text-color);
-            opacity: 0.5;
-            padding: 8px 0;
-        }
-
-        /* Header actions */
-        .header-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .header-btn {
-            flex: 1;
-            padding: 12px;
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background var(--duration-fast) var(--ease-fluent),
-                        border-color var(--duration-fast) var(--ease-fluent),
-                        transform var(--duration-fast) var(--ease-fluent);
-            color: var(--text-color);
-        }
-
-        .header-btn:hover {
-            background: var(--hover-bg);
-            border-color: var(--accent-solid);
-            transform: translateY(-1px);
-        }
-
-        .header-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                display: none;
-            }
-        }
-    </style>
 </head>
 
 <body>
     <div class="dashboard">
-        <!-- Sidebar -->
+        <!-- ═══════════════════════════════════════════
+             SIDEBAR — único, compartido por todas las vistas
+        ════════════════════════════════════════════ -->
         <aside class="sidebar">
             <div class="logo">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="margin-right: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="3" width="18" height="18" rx="2" fill="#0078D4"/>
                     <rect x="6" y="6" width="5" height="5" fill="white"/>
                     <rect x="13" y="6" width="5" height="5" fill="white"/>
                     <rect x="6" y="13" width="5" height="5" fill="white"/>
                 </svg>
                 <span>LearningPC</span>
+                <button class="nav-item-minimal" id="toggle-sidebar" title="Expandir/Contraer" style="margin-left: auto;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
 
             <div class="profile-section">
                 <div class="profile-avatar" id="profile-avatar">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#0078D4">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
                 </div>
@@ -568,85 +42,271 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="niveles-completados">0</div>
-                    <div class="stat-label">Niveles<br>completados</div>
+                    <div class="stat-label">Niveles</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="streak-count">0 días</div>
-                    <div class="stat-label">Racha<br>actual</div>
+                    <div class="stat-value" id="streak-count">0d</div>
+                    <div class="stat-label">Racha</div>
                 </div>
             </div>
-
-            <nav class="nav-menu">
-                <div class="nav-item" id="link-admin" style="display: none;" data-tooltip="Administrar contenidos">
-                    <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2v-6zm0 8h2v-2h-2v2z"/>
-                    </svg>
-                    <span>Admin</span>
-                </div>
-            </nav>
 
             <div class="header-actions">
-                <button class="header-btn" id="btn-fullscreen" data-tooltip="Pantalla completa">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <!-- id="nav-*" usados por spa-router.js para marcar active -->
+                <button class="nav-item-minimal" id="nav-home" onclick="window.SPA.goTo('home')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    <span>Inicio</span>
                 </button>
-                <button class="header-btn" id="btn-toggle-theme" data-tooltip="Cambiar tema" style="min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center;">
-                    <span id="icono-tema" style="font-size: 22px;">🌙</span>
+                <button class="nav-item-minimal" id="nav-reportes" onclick="window.SPA.goTo('reportes')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                    </svg>
+                    <span>Reportes</span>
                 </button>
-                <button class="header-btn" id="btn-reportes" data-tooltip="Reportes" onclick="window.api.irA('reportes')">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                <button class="nav-item-minimal" id="link-admin" style="display: none;" onclick="window.api.irA('gestion')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span>Admin</span>
                 </button>
-                <button class="header-btn" id="btn-ajustes" data-tooltip="Ajustes" onclick="window.api.irA('ajustes')">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                <button class="nav-item-minimal" id="nav-ajustes" onclick="window.SPA.goTo('ajustes')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    <span>Ajustes</span>
                 </button>
-                <button class="header-btn" id="btn-cerrar-sesion" data-tooltip="Cerrar sesión">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                <button class="nav-item-minimal" id="btn-toggle-theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    <span>Tema</span>
+                </button>
+                <button class="nav-item-minimal" id="btn-fullscreen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                    </svg>
+                    <span>Expandir</span>
+                </button>
+                <button class="nav-item-minimal" id="btn-cerrar-sesion" style="color: #ef4444;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    <span>Salir</span>
                 </button>
             </div>
+            <div class="sidebar-resizer"></div>
         </aside>
 
-        <!-- Main content -->
+        <!-- ═══════════════════════════════════════════
+             MAIN — header compartido + vistas SPA
+        ════════════════════════════════════════════ -->
         <main class="main-content">
-            <div class="welcome-section">
-                <h1 class="welcome-title">Bienvenido, <span id="nombre-usuario">Usuario</span></h1>
-                <p class="welcome-subtitle" id="progreso-mensaje">Continúa donde lo dejaste</p>
-            </div>
+            <!-- Header compartido: botón mobile + título dinámico -->
+            <header class="dashboard-header">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <div class="header-left">
+                    <h2 id="header-title" style="margin: 0;">Panel Principal</h2>
+                </div>
+            </header>
 
-            <div class="progress-hero animate-slide-up stagger-1">
-                <div class="hero-stats">
-                    <h3>Tu progreso</h3>
-                    <p id="periodo-mensaje">¡Excelente ritmo! Seguí así para alcanzar tus metas.</p>
-                    
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
-                    </div>
-                    
-                    <div style="font-size: 13px; font-weight: 600;">
-                        <span id="niveles-completados2">0</span> de <span id="niveles-total">0</span> niveles
+            <!-- ─── Vista: Home ─── -->
+            <section id="view-home" class="view active">
+                <div class="welcome-section">
+                    <h1 class="welcome-title">Bienvenido, <span id="nombre-usuario">Usuario</span></h1>
+                    <p class="welcome-subtitle" id="progreso-mensaje">Continuá donde lo dejaste</p>
+                </div>
+
+                <div class="progress-hero animate-slide-up stagger-1">
+                    <div class="hero-stats">
+                        <h3>Tu progreso</h3>
+                        <p id="periodo-mensaje">¡Excelente ritmo! Seguí así para alcanzar tus metas.</p>
+
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                        </div>
+
+                        <div style="font-size: 13px; font-weight: 600;">
+                            <span id="niveles-completados2">0</span> de <span id="niveles-total">0</span> niveles
+                        </div>
+
+                        <div class="hero-next">
+                            <span>SIGUIENTE NIVEL</span>
+                            <strong id="siguiente-nivel-nombre">-</strong>
+                        </div>
                     </div>
 
-                    <div class="hero-next">
-                        <span>SIGUIENTE NIVEL</span>
-                        <strong id="siguiente-nivel-nombre">-</strong>
+                    <div class="hero-percentage">
+                        <div id="progreso-porcentaje">0%</div>
+                        <span>COMPLETADO</span>
+                    </div>
+
+                    <svg width="0" height="0" style="position: absolute; pointer-events: none; z-index: -1; visibility: hidden;">
+                        <circle id="progress-ring" r="0" cx="0" cy="0"></circle>
+                    </svg>
+                </div>
+
+                <div class="categories-section">
+                    <h2>Categorías</h2>
+                    <div class="categorias-grid" id="categorias-grid">
+                        <!-- Se llena dinámicamente por home.js -->
                     </div>
                 </div>
-                
-                <div class="hero-percentage">
-                    <div id="progreso-texto">0%</div>
-                    <span>COMPLETADO</span>
-                </div>
-                
-                <!-- SVG compatible con el script actual para no romper la lógica del anillo -->
-                <svg width="0" height="0" style="position: absolute;">
-                    <circle id="progress-ring" r="0" cx="0" cy="0"></circle>
-                </svg>
-            </div>
+            </section>
 
-            <div class="categories-section">
-                <h2>Categorías</h2>
-                <div class="categorias-grid" id="categorias-grid">
-                    <!-- Se llena dinámicamente -->
+            <!-- ─── Vista: Reportes ─── -->
+            <section id="view-reportes" class="view">
+                <section class="perfil-hero animate-slide-down">
+                    <h1 id="user-name">Usuario</h1>
+                    <p>¡Vas por muy buen camino en tu aprendizaje!</p>
+                </section>
+
+                <section class="stats-reporte">
+                    <div class="card-logro animate-scale-in stagger-1">
+                        <div class="logro-icon">📊</div>
+                        <div class="logro-content">
+                            <span class="label">PROGRESO TOTAL</span>
+                            <div class="value" id="progreso-texto">0%</div>
+                        </div>
+                    </div>
+                    <div class="card-logro animate-scale-in stagger-2">
+                        <div class="logro-icon">⏱️</div>
+                        <div class="logro-content">
+                            <span class="label">TIEMPO DE PRÁCTICA</span>
+                            <div class="value" id="tiempo-practica">0 Min</div>
+                        </div>
+                    </div>
+                    <div class="card-logro animate-scale-in stagger-3">
+                        <div class="logro-icon">🏆</div>
+                        <div class="logro-content">
+                            <span class="label">NIVELES SUPERADOS</span>
+                            <div class="value" id="niveles-superados">0</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="lista-diplomas animate-slide-up stagger-4">
+                    <h2><span>🎓</span> HABILIDADES OBTENIDAS</h2>
+                    <div id="lista-habilidades">
+                        <!-- Se llena dinámicamente por reporte-usuario.js -->
+                    </div>
+                </section>
+            </section>
+
+            <!-- ─── Vista: Ajustes ─── -->
+            <section id="view-ajustes" class="view">
+                <div class="ajustes-contenido">
+                    <!-- Sección: Apariencia -->
+                    <div class="ajustes-seccion">
+                        <h2>🎨 Apariencia</h2>
+
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Tema</h3>
+                                <p>Cambiar entre modo claro y oscuro</p>
+                            </div>
+                            <div class="toggle-switch" id="toggle-tema" onclick="toggleTema()"></div>
+                        </div>
+
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Color Secundario</h3>
+                                <p>Elegí un color de acento secundario</p>
+                            </div>
+                            <div class="color-opciones" id="colores-secundarios">
+                                <div class="color-opcion" style="background: #10B981;" data-color="emerald" onclick="cambiarColorSecundario('emerald')"></div>
+                                <div class="color-opcion" style="background: #8B5CF6;" data-color="violeta" onclick="cambiarColorSecundario('violeta')"></div>
+                                <div class="color-opcion" style="background: #F59E0B;" data-color="amber" onclick="cambiarColorSecundario('amber')"></div>
+                                <div class="color-opcion" style="background: #EF4444;" data-color="rojo" onclick="cambiarColorSecundario('rojo')"></div>
+                                <div class="color-opcion" style="background: #EC4899;" data-color="rosa" onclick="cambiarColorSecundario('rosa')"></div>
+                                <div class="color-opcion" style="background: #06B6D4;" data-color="cyan" onclick="cambiarColorSecundario('cyan')"></div>
+                            </div>
+                        </div>
+
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Efectos Visuales</h3>
+                                <p>Animaciones y transiciones suaves</p>
+                            </div>
+                            <div class="toggle-switch active" id="toggle-efectos" onclick="toggleEfectos()"></div>
+                        </div>
+
+                        <div style="margin-top: 20px; text-align: right;">
+                            <button class="btn-volver" onclick="aplicarCambios()" style="background: var(--accent-solid);">
+                                Aplicar cambios
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Sonido -->
+                    <div class="ajustes-seccion">
+                        <h2>🔊 Sonido</h2>
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Sonido de Notificaciones</h3>
+                                <p>Sonido al completar niveles</p>
+                            </div>
+                            <div class="toggle-switch active" id="toggle-sonido" onclick="toggleSonido()"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Progreso -->
+                    <div class="ajustes-seccion">
+                        <h2>📊 Progreso</h2>
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Reiniciar Progreso</h3>
+                                <p>Borrar todo el progreso y comenzar desde cero</p>
+                            </div>
+                            <button class="btn-volver" style="background: #DC2626;" onclick="reiniciarProgreso()">
+                                Reiniciar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Subcategoría -->
+                    <div class="ajustes-seccion">
+                        <h2>🔁 Subcategoría</h2>
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Continuar a la siguiente subcategoría automáticamente</h3>
+                                <p>Si está activado, al terminar una subcategoría se irá directamente a la siguiente sin preguntar.</p>
+                            </div>
+                            <div class="toggle-switch" id="toggle-auto-subcat" onclick="toggleAutoSubcat()"></div>
+                        </div>
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Mostrar pregunta entre subcategorías</h3>
+                                <p>Al terminar una subcategoría, mostrar un popup para confirmar si desea continuar.</p>
+                            </div>
+                            <div class="toggle-switch" id="toggle-show-prompt" onclick="toggleShowPrompt()"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Información -->
+                    <div class="ajustes-seccion">
+                        <h2>ℹ️ Información</h2>
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Versión</h3>
+                                <p>LearningPC v1.0.0</p>
+                            </div>
+                        </div>
+                        <div class="ajuste-item">
+                            <div class="ajuste-info">
+                                <h3>Licencia</h3>
+                                <p>Uso educativo</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
@@ -658,7 +318,12 @@
         <span class="toast-message" id="toast-message"></span>
     </div>
 
+    <!-- Scripts — orden: tema → módulos de vistas → router → lógica principal -->
     <script src="../js/theme-manager.js"></script>
+    <script src="../js/user-settings.js"></script>
+    <script src="../js/reporte-usuario.js"></script>
+    <script src="../js/ajustes.js"></script>
+    <script src="../js/spa-router.js"></script>
     <script src="../js/home.js"></script>
 </body>
 

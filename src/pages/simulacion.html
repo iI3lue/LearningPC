@@ -8,222 +8,147 @@
     <link rel="stylesheet" href="../css/styles.css">
     <script src="../js/user-settings.js"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
+        .main-content {
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100vh !important;
+            width: 100% !important;
+            overflow: hidden !important;
             background: #000;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
+        }
+
+        .dashboard {
+            display: block !important;
+            grid-template-columns: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            overflow: hidden !important;
         }
 
         .simulacion-toolbar {
-            background: #1a1a1a;
-            height: 56px;
+            background: var(--card-bg);
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 16px;
-            border-bottom: 1px solid #454545; /* De #333 a #454545 */
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
             gap: 16px;
+            flex-shrink: 0;
         }
 
-        .toolbar-left {
+        .toolbar-left, .toolbar-center, .toolbar-right {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .toolbar-center {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        #simulacion-container {
             flex: 1;
-            justify-content: center;
-        }
-
-        .toolbar-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            width: 100%;
+            border: none;
+            background: #000;
         }
 
         .btn-simulacion {
-            background: #0078d4;
+            background: var(--accent-solid);
             color: #fff;
             border: none;
             padding: 8px 16px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
-            transition: background 0.15s, opacity 0.15s;
+            gap: 8px;
+            transition: all var(--duration-fast) var(--ease-fluent);
         }
 
         .btn-simulacion:hover {
-            background: #1084d8;
+            background: var(--accent-hover);
+            transform: translateY(-1px);
         }
 
         .btn-simulacion:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        .btn-simulacion:disabled:hover {
-            background: #0078d4;
-        }
-
-        .btn-volver {
-            background: #333;
-            font-size: 12px;
-            padding: 8px 12px;
-        }
-
-        .btn-volver:hover {
-            background: #444;
-        }
-
-        .btn-anterior, .btn-siguiente {
-            background: #2d2d2d;
-            padding: 8px 12px;
-            font-size: 16px;
-        }
-
-        .btn-anterior:hover, .btn-siguiente:hover {
-            background: #3d3d3d;
+            pointer-events: none;
+            filter: grayscale(1);
         }
 
         .level-indicator {
-            background: #252525;
-            padding: 6px 14px;
-            border-radius: 4px;
+            background: var(--hover-bg);
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 13px;
-            color: #ccc;
-            min-width: 80px;
-            text-align: center;
+            font-weight: 600;
+            color: var(--text-color);
         }
 
         .level-indicator strong {
-            color: #60cdff;
+            color: var(--accent-solid);
         }
 
-        /* Dropdown de niveles */
         .nivel-dropdown {
             position: relative;
-        }
-
-        .btn-nivel-menu {
-            background: #2d2d2d;
-            padding: 8px 12px;
-            font-size: 14px;
-            min-width: 32px;
-        }
-
-        .btn-nivel-menu:hover {
-            background: #3d3d3d;
+            display: flex;
+            align-items: center;
         }
 
         .dropdown-menu {
+            display: none;
             position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-top: 8px;
-            background: #2d2d2d;
-            border: 1px solid #555; /* De #444 a #555 */
-            border-radius: 8px;
-            padding: 8px 0;
-            min-width: 200px;
-            max-height: 300px;
+            top: calc(100% + 12px);
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--elevation-4);
+            min-width: 240px;
+            max-height: 400px;
             overflow-y: auto;
             z-index: 1000;
-            display: none;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            padding: 8px;
+            animation: fadeIn var(--duration-fast) var(--ease-fluent);
         }
 
         .dropdown-menu.visible {
             display: block;
-            animation: fadeIn 0.15s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         .dropdown-item {
             padding: 10px 16px;
-            color: #ccc;
-            font-size: 13px;
             cursor: pointer;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-color);
+            transition: background var(--duration-fast) var(--ease-fluent);
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: background 0.1s;
-        }
-
-        .dropdown-item:hover {
-            background: #3d3d3d;
-        }
-
-        .dropdown-item.active {
-            background: #0078d4;
-            color: #fff;
-        }
-
-        .dropdown-item.completado::before {
-            content: '✓';
-            color: #6ccb5f;
-            font-size: 12px;
-        }
-
-        .dropdown-item .nivel-num {
-            background: #444;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            min-width: 24px;
-            text-align: center;
-        }
-
-        .dropdown-item.active .nivel-num {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* Título del nivel */
-        #titulo-nivel {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
-            margin: 0;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            gap: 10px;
+            text-align: left;
             white-space: nowrap;
         }
 
-        #simulacion-container {
-            width: 100%;
-            height: calc(100vh - 56px);
-            border: none;
+        .dropdown-item:hover {
+            background: var(--hover-bg);
+        }
+        
+        .dropdown-item.active {
+            background: var(--accent-pastel);
+            color: var(--accent-solid);
+            font-weight: 600;
         }
 
-        /* Feedback toast - usando clases de styles.css */
-        #feedback-toast {
-            /* Ahora usa las clases .toast-notification de styles.css */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        #feedback-toast.visible {
-            /* Animación manejada por .toast-notification.visible */
-        }
-
-        #feedback-toast.exito {
-            /* Color manejado por .toast-notification.success */
-        }
-
 
         #subcat-modal {
             display: none;
@@ -234,26 +159,28 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            backdrop-filter: blur(4px);
         }
         #subcat-modal.open { display: flex; }
         #subcat-modal .subcat-modal-box {
-            background: #2d2d2d;
-            padding: 28px 32px;
-            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 16px;
             min-width: 380px;
             max-width: 440px;
             text-align: center;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.6);
-            border: 1px solid #666; /* De #454545 a #666 */
+            box-shadow: var(--elevation-4);
+            border: 1px solid var(--border-color);
         }
         #subcat-modal h3 {
-            color: #fff;
-            font-size: 18px;
-            margin: 0 0 10px 0;
+            color: var(--text-color);
+            font-size: 20px;
+            margin: 0 0 12px 0;
+            font-weight: 700;
         }
         #subcat-modal p {
-            color: #aaa;
-            font-size: 13px;
+            color: var(--text-secondary);
+            font-size: 14px;
             margin: 0 0 24px 0;
             line-height: 1.6;
         }
@@ -261,83 +188,137 @@
             display: flex;
             gap: 12px;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         #subcat-modal button {
-            padding: 10px 22px;
-            border-radius: 6px;
+            padding: 10px 24px;
+            border-radius: 8px;
             border: none;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: all var(--duration-fast) var(--ease-fluent);
         }
         #subcat-modal .subcat-btn-primary {
-            background: #0078d4;
+            background: var(--accent-solid);
             color: white;
         }
-        #subcat-modal .subcat-btn-primary:hover { background: #1084d8; }
-        #subcat-modal .subcat-btn-secondary {
-            background: #3d3d3d;
-            color: #ccc;
+        #subcat-modal .subcat-btn-primary:hover { 
+            background: var(--accent-hover);
+            transform: translateY(-1px);
         }
-        #subcat-modal .subcat-btn-secondary:hover { background: #555; }
+        #subcat-modal .subcat-btn-secondary {
+            background: var(--hover-bg);
+            color: var(--text-color);
+        }
+        #subcat-modal .subcat-btn-secondary:hover { 
+            background: var(--border-color);
+        }
         #subcat-modal .subcat-remember {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
         }
-        #subcat-modal .subcat-remember input { width: 16px; height: 16px; cursor: pointer; }
-        #subcat-modal .subcat-remember label { color: #888; font-size: 12px; cursor: pointer; }
+        #subcat-modal .subcat-remember input { 
+            width: 18px; 
+            height: 18px; 
+            cursor: pointer;
+            accent-color: var(--accent-solid);
+        }
+        #subcat-modal .subcat-remember label { 
+            color: var(--text-secondary); 
+            font-size: 12px; 
+            cursor: pointer; 
+        }
     </style>
 </head>
 
 <body>
-    <div class="simulacion-toolbar">
-        <!-- Izquierda: Volver -->
-        <div class="toolbar-left">
-            <button class="btn-simulacion btn-volver" id="btn-volver" title="Volver al menú">
-                ← Volver
-            </button>
-            <h2 id="titulo-nivel">Cargando...</h2>
-        </div>
+    <div class="dashboard">
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="simulacion-toolbar">
+                <!-- Izquierda: Volver -->
+                <div class="toolbar-left">
+                    <button class="btn-simulacion btn-volver" id="btn-volver" title="Volver al menú" onclick="confirmarSalida('home')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                        Volver
+                    </button>
+                    <h2 id="titulo-nivel">Cargando...</h2>
+                </div>
 
-        <!-- Centro: Navegación de niveles -->
-        <div class="toolbar-center">
-            <button class="btn-simulacion btn-anterior" id="btn-anterior" title="Nivel anterior">
-                ←
-            </button>
-            
-            <div class="level-indicator">
-                Nivel <strong id="nivel-actual">1</strong> de <span id="nivel-total">3</span>
-            </div>
-            
-            <button class="btn-simulacion btn-siguiente" id="btn-siguiente" title="Siguiente nivel">
-                →
-            </button>
+                <!-- Centro: Navegación de niveles -->
+                <div class="toolbar-center">
+                    <button class="btn-simulacion btn-anterior" id="btn-anterior" title="Nivel anterior">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="level-indicator">
+                        Nivel <strong id="nivel-actual">1</strong> de <span id="nivel-total">3</span>
+                    </div>
+                    
+                    <button class="btn-simulacion btn-siguiente" id="btn-siguiente" title="Siguiente nivel">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </button>
 
-            <div class="nivel-dropdown">
-                <button class="btn-simulacion btn-nivel-menu" id="btn-nivel-menu" title="Ver todos los niveles">
-                    ☰
-                </button>
-                <div class="dropdown-menu" id="dropdown-niveles">
-                    <!-- Se llena dinámicamente -->
+                    <div class="nivel-dropdown">
+                        <button class="btn-simulacion btn-nivel-menu" id="btn-nivel-menu" title="Ver todos los niveles">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M4 6h16M4 12h16M4 18h16"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dropdown-niveles">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Derecha: Acciones -->
+                <div class="toolbar-right">
+                    <button class="btn-simulacion" style="background: var(--hover-bg); color: var(--text-color);" onclick="confirmarSalida('reportes')" title="Ver Reportes">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </button>
+                    <button class="btn-simulacion" style="background: var(--hover-bg); color: var(--text-color);" onclick="confirmarSalida('ajustes')" title="Ajustes">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </button>
+                    <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 4px;"></div>
+                    <button class="btn-simulacion" id="btn-toggle-theme" title="Cambiar tema">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-simulacion" id="btn-fullscreen" title="Pantalla completa">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                        </svg>
+                    </button>
+                    <button class="btn-simulacion" id="btn-completar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Completar
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Derecha: Completar y Home -->
-        <div class="toolbar-right">
-            <button class="btn-simulacion" id="btn-completar">
-                ✓ Completar
-            </button>
-        </div>
+            <iframe id="simulacion-container" src=""></iframe>
+        </main>
     </div>
 
-    <iframe id="simulacion-container" src=""></iframe>
-    
-    <!-- Toast Notification - usando clases de styles.css -->
+    <!-- Toast Notification -->
     <div id="feedback-toast" class="toast-notification">
         <svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
@@ -363,6 +344,7 @@
         </div>
     </div>
 
+    <script src="../js/theme-manager.js"></script>
     <script>
         // Datos del nivel actual
         let idNivel = sessionStorage.getItem('simulacion_id');
@@ -390,23 +372,17 @@
         // Inicializar
         async function init() {
             console.log('=== INICIO SIMULACION ===');
-            console.log('idNivel:', idNivel);
-            console.log('rutaArchivo:', rutaArchivo);
-            console.log('titulo:', titulo);
-            console.log('idSubcategoria:', idSubcategoria);
             
             tituloEl.textContent = titulo || 'Simulación';
             
             if (!idSubcategoria) {
-                console.log('MODO LEGACY: No hay idSubcategoria, usando rutaArchivo directamente');
-                // Forzar modo legacy
-                niveles = [];
                 cargarSimulacion();
                 return;
             }
 
             await cargarNiveles();
         }
+
 
         async function cargarNiveles() {
             try {
@@ -503,12 +479,12 @@ function actualizarUI() {
             btnAnterior.disabled = nivelActualIndex === 0;
             btnSiguiente.disabled = nivelActualIndex === total - 1;
             
-            // Si es el último nivel, cambiar texto del botón siguiente
+            // Si es el último nivel, cambiar icono del botón siguiente a Check
             if (nivelActualIndex === total - 1) {
-                btnSiguiente.textContent = '✓';
+                btnSiguiente.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
                 btnSiguiente.title = '¡Has completado todos los niveles!';
             } else {
-                btnSiguiente.textContent = '→';
+                btnSiguiente.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>';
                 btnSiguiente.title = 'Siguiente nivel';
             }
         }
@@ -625,6 +601,16 @@ function actualizarUI() {
 
         function cerrarDropdown() {
             dropdown.classList.remove('visible');
+        }
+
+        function confirmarSalida(destino) {
+            if (confirm("¿Deseas salir de la simulación?")) {
+                sessionStorage.removeItem('simulacion_id');
+                sessionStorage.removeItem('simulacion_ruta');
+                sessionStorage.removeItem('simulacion_titulo');
+                sessionStorage.removeItem('simulacion_id_subcategoria');
+                window.api.irA(destino);
+            }
         }
 
         function mostrarToast(mensaje, tipo = '') {

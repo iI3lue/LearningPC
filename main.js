@@ -142,16 +142,24 @@ app.on('browser-window-blur', () => {
 // ── Navegación entre páginas ─────────────────────────────────────────────────
 ipcMain.on('nav:irA', (event, pagina) => {
     const paginas = {
-        login: path.join(__dirname, 'src', 'pages', 'login.html'),
-        registro: path.join(__dirname, 'src', 'pages', 'registro.html'),
-        home: path.join(__dirname, 'src', 'pages', 'home.html'),
-        gestion: path.join(__dirname, 'src', 'pages', 'gestion.html'),
-        formulario: path.join(__dirname, 'src', 'pages', 'formulario.html'),
-        reportes: path.join(__dirname, 'src', 'pages', 'reportes.html'),
-        simulacion: path.join(__dirname, 'src', 'pages', 'simulacion.html'),
-        ajustes: path.join(__dirname, 'src', 'pages', 'ajustes.html'),
+        login: { file: path.join(__dirname, 'src', 'pages', 'login.html') },
+        registro: { file: path.join(__dirname, 'src', 'pages', 'registro.html') },
+        home: { file: path.join(__dirname, 'src', 'pages', 'home.html') },
+        gestion: { file: path.join(__dirname, 'src', 'pages', 'gestion.html') },
+        formulario: { file: path.join(__dirname, 'src', 'pages', 'formulario.html') },
+        reportes: { file: path.join(__dirname, 'src', 'pages', 'home.html'), hash: 'reportes' },
+        simulacion: { file: path.join(__dirname, 'src', 'pages', 'simulacion.html') },
+        ajustes: { file: path.join(__dirname, 'src', 'pages', 'home.html'), hash: 'ajustes' },
     };
-    if (paginas[pagina]) mainWindow.loadFile(paginas[pagina]);
+    
+    const target = paginas[pagina];
+    if (target) {
+        if (target.hash) {
+            mainWindow.loadFile(target.file, { hash: target.hash });
+        } else {
+            mainWindow.loadFile(target.file);
+        }
+    }
 });
 
 // ── Autenticación ────────────────────────────────────────────────────────────

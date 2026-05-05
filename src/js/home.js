@@ -17,7 +17,7 @@
         return el;
     }
     
-    // User info - obtener elementos cuando se usen
+    // User info - Hero section (Dashboard specific)
     const nombreUsuario = getEl('nombre-usuario');
     if (nombreUsuario) nombreUsuario.textContent = usuario.usuario;
     
@@ -27,20 +27,8 @@
     const profileAvatar = getEl('profile-avatar');
     if (profileAvatar) {
         const initial = usuario.usuario.charAt(0).toUpperCase();
-        profileAvatar.innerHTML = `<span style="font-size: 18px; font-weight: 700; color: var(--accent-solid, #0078D4);">${initial}</span>`;
+        profileAvatar.innerHTML = `<span style="font-size: 24px; font-weight: 700;">${initial}</span>`;
     }
-
-    // Navigation
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const page = item.dataset.page;
-            if (page === 'reportes') {
-                window.api.irA('reportes');
-            } else if (page === 'ajustes') {
-                window.api.irA('ajustes');
-            }
-        });
-    });
 
     // Admin link
     const linkAdmin = getEl('link-admin');
@@ -122,14 +110,16 @@
             profileBadge.className = `profile-badge badge-${nivel.clase}`;
         }
 
-        const progresoTexto = getEl('progreso-texto');
-        if (progresoTexto) progresoTexto.textContent = `${progreso}%`;
+        const progresoPorcentaje = getEl('progreso-porcentaje');
+        if (progresoPorcentaje) progresoPorcentaje.textContent = `${progreso}%`;
         
         const progresoMensaje = getEl('progreso-mensaje');
         if (progresoMensaje) progresoMensaje.textContent = getMensajeProgreso(progreso, usuario.usuario);
         
         const nivelesCompletados = getEl('niveles-completados');
         if (nivelesCompletados) nivelesCompletados.textContent = completadosCount;
+        const nivelesCompletados2 = getEl('niveles-completados2');
+        if (nivelesCompletados2) nivelesCompletados2.textContent = completadosCount;
         
         const nivelesTotal = getEl('niveles-total');
         if (nivelesTotal) nivelesTotal.textContent = totalNiveles;
@@ -528,8 +518,9 @@
         }
     }
 
-    // Button handlers
-    const btnCerrarSesion = getEl('btn-cerrar-sesion');
+    // El cierre de sesión ahora se maneja en dashboard-layout.js para el sidebar.
+    // Si existe un botón de logout fuera del sidebar, lo mantenemos aquí.
+    const btnCerrarSesion = getEl('btn-logout-hero'); 
     if (btnCerrarSesion) {
         btnCerrarSesion.addEventListener('click', () => {
             sessionStorage.removeItem('usuario');
