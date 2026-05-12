@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS subcategorias (
     icono             TEXT,
     orden             INTEGER DEFAULT 0,
     activa            INTEGER DEFAULT 1,
-    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE CASCADE
 );
 
 -- Tabla de niveles (Nivel 2 - Lecciones/Temas secuenciales)
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS niveles (
     orden                 INTEGER DEFAULT 0,
     porcentaje_completado REAL    DEFAULT 0.0,
     tiempo_estimado_min   INTEGER,            -- Tiempo estimado en minutos
-    FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria)
+    FOREIGN KEY (id_subcategoria) REFERENCES subcategorias(id_subcategoria) ON DELETE CASCADE
 );
 
 -- Tabla de progreso por usuario y nivel
@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS progreso_usuario (
     fecha_completado  TEXT,
     intentos          INTEGER DEFAULT 0,        -- Cuántas veces lo intentó
     tiempo_usado_seg  INTEGER DEFAULT 0,       -- Tiempo total en segundos
-    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
-    FOREIGN KEY (id_nivel)   REFERENCES niveles(id_nivel)
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_nivel)   REFERENCES niveles(id_nivel) ON DELETE CASCADE
 );
 
 -- =============================================
@@ -108,7 +108,6 @@ INSERT OR IGNORE INTO usuarios (usuario, contraseña, edad, progreso_total) VALU
 INSERT OR IGNORE INTO categorias (id_categoria, nombre, descripcion, icono, orden) VALUES
     (1, 'Office', 'Manejo de herramientas de Microsoft Office', '📎', 1),
     (2, 'Navegación en Internet', 'Uso del navegador y motores de búsqueda', '🌐', 2),
-    (3, 'Navegación en Windows', 'Uso del sistema operativo Windows', '🪟', 3),
     (4, 'Trucos Adicionales', 'Atajos y consejos útiles del computador', '💡', 4);
 
 -- =============================================
@@ -119,12 +118,6 @@ INSERT OR IGNORE INTO subcategorias (id_subcategoria, id_categoria, nombre, desc
     (1, 4, 'Pantallas divididas', 'Aprende a dividir tu pantalla para trabajar con dos ventanas', '🖥️', 1),
     (3, 4, 'Explorador de archivos', 'Navegación y organización de archivos', '📁', 2),
     (4, 4, 'Personalización', 'Personalizar el escritorio y Windows', '🎨', 3),
-    
-    -- Navegación en Windows
-    (5, 3, 'Escritorio', 'Uso del escritorio y manejador de ventanas', '🖥️', 1),
-    (6, 3, 'Menú Inicio', 'Buscar aplicaciones y archivos', '🔍', 2),
-    (7, 3, 'Barra de tareas', 'Anclar aplicaciones y usar la barra', '📌', 3),
-    (8, 3, 'Configuración', 'Ajustes básicos del sistema', '⚙️', 4),
     
     -- Navegación en Internet
     (9, 2, 'Navegador Edge', 'Uso del navegador de Microsoft', '🌐', 1),

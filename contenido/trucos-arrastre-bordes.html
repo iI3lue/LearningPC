@@ -12,33 +12,27 @@
 <body>
     <div class="desktop">
         <!-- Panel de control inicial -->
-        <div class="control-panel" id="panel-control">
-            <h2>Arrastrar ventanas a los bordes</h2>
-            <p>Windows permite dividir la pantalla arrastrando las ventanas.<br>Abre las ventanas y arrastralas hacia los bordes:</p>
-            <div>
-                <button class="btn-abrir" onclick="abrirVentana('navegador')">Abrir Microsoft Edge</button>
-                <button class="btn-abrir" onclick="abrirVentana('biblioteca')">Abrir Biblioteca</button>
-            </div>
-            <div style="margin-top: 16px;">
-                <button class="btn-accion" onclick="restablecer()">🔄 Restablecer</button>
-            </div>
+        <div class="control-panel" id="panel-inicio">
+            <h2>Truco: Snap Layouts (Arrastre)</h2>
+            <p>Windows 11 te permite organizar ventanas arrastrándolas a los bordes de la pantalla.</p>
+            <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
         </div>
-        
+
         <!-- Ventana Navegador (Microsoft Edge) -->
-        <div class="ventana" id="ventana-navegador">
-            <div class="title-bar">
+        <div class="ventana" id="ventana-navegador" style="top: 100px; left: 100px; width: 500px; height: 350px;">
+            <div class="title-bar" onmousedown="iniciarArrastre(event, 'navegador')">
                 <div class="icono">
                     <svg viewBox="0 0 16 16" fill="#0078d4"><circle cx="8" cy="8" r="7"/></svg>
                 </div>
                 <span class="titulo">Microsoft Edge</span>
                 <div class="window-controls">
-                    <div class="window-btn" onclick="minimizarVentana('navegador')">
+                    <div class="window-btn">
                         <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
                     </div>
-                    <div class="window-btn" onclick="maximizarVentana('navegador')">
+                    <div class="window-btn">
                         <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
                     </div>
-                    <div class="window-btn close" onclick="cerrarVentana('navegador')">
+                    <div class="window-btn close">
                         <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
                     </div>
                 </div>
@@ -47,12 +41,6 @@
                 <span class="toolbar-btn">◀</span>
                 <span class="toolbar-btn">▶</span>
                 <span class="toolbar-btn">🔄</span>
-                <div class="toolbar-separator"></div>
-                <span class="toolbar-btn">⭐</span>
-            </div>
-            <div class="address-bar">
-                <span class="icono-bloqueo">🔒</span>
-                <input type="text" value="https://www.bing.com" readonly>
             </div>
             <div class="ventana-content">
                 <div class="nav-inicio">
@@ -60,589 +48,230 @@
                     <input type="text" class="nav-buscar" placeholder="Buscar en la web">
                 </div>
             </div>
-            <div class="status-bar">
-                <span>Listo</span>
-                <span>1 elemento</span>
-            </div>
         </div>
-        
-        <!-- Ventana Biblioteca de Windows -->
-        <div class="ventana" id="ventana-biblioteca">
-            <div class="title-bar">
-                <div class="icono">
-                    <span style="font-size: 14px;">📁</span>
-                </div>
+
+        <!-- Ventana Biblioteca -->
+        <div class="ventana" id="ventana-biblioteca" style="top: 150px; left: 180px; width: 500px; height: 350px;">
+            <div class="title-bar" onmousedown="iniciarArrastre(event, 'biblioteca')">
+                <div class="icono">📁</div>
                 <span class="titulo">Biblioteca</span>
                 <div class="window-controls">
-                    <div class="window-btn" onclick="minimizarVentana('biblioteca')">
+                    <div class="window-btn">
                         <svg viewBox="0 0 10 1"><rect width="10" height="1"/></svg>
                     </div>
-                    <div class="window-btn" onclick="maximizarVentana('biblioteca')">
+                    <div class="window-btn">
                         <svg viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="#fff" stroke-width="1"/></svg>
                     </div>
-                    <div class="window-btn close" onclick="cerrarVentana('biblioteca')">
+                    <div class="window-btn close">
                         <svg viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="#fff" stroke-width="1"/><line x1="10" y1="0" x2="0" y2="10" stroke="#fff" stroke-width="1"/></svg>
                     </div>
                 </div>
             </div>
-            <div class="toolbar">
-                <span class="toolbar-btn">Organizar</span>
-                <span class="toolbar-btn">Incluir en biblioteca</span>
-                <div class="toolbar-separator"></div>
-                <span class="toolbar-btn">Minimizar barra de comandos</span>
-            </div>
             <div class="ventana-content">
-                <!-- Panel lateral -->
-                <div class="panel-lateral">
-                    <div class="panel-seccion">
-                        <div class="panel-seccion-titulo">Acceso rápido</div>
-                        <div class="panel-item">
-                            <span class="icono">⭐</span>
-                            <span class="texto">Acceso rápido</span>
-                        </div>
-                        <div class="panel-item">
-                            <span class="icono">☁️</span>
-                            <span class="texto">OneDrive</span>
-                        </div>
-                    </div>
-                    <div class="panel-seccion">
-                        <div class="panel-seccion-titulo">Este equipo</div>
-                        <div class="panel-item active">
-                            <span class="icono">💻</span>
-                            <span class="texto">Este equipo</span>
-                        </div>
-                    </div>
+                <div class="biblioteca-carpetas">
+                    <div class="carpeta">📁 Documentos</div>
+                    <div class="carpeta">🖼️ Imágenes</div>
                 </div>
-                
-                <!-- Área principal -->
-                <div class="area-principal">
-                    <div class="biblioteca-carpetas">
-                        <div class="carpeta">
-                            <span class="icono">📁</span>
-                            <span class="nombre">Documentos</span>
-                        </div>
-                        <div class="carpeta">
-                            <span class="icono">🎵</span>
-                            <span class="nombre">Música</span>
-                        </div>
-                        <div class="carpeta">
-                            <span class="icono">🖼️</span>
-                            <span class="nombre">Imágenes</span>
-                        </div>
-                        <div class="carpeta">
-                            <span class="icono">🎬</span>
-                            <span class="nombre">Videos</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="status-bar">
-                <span>4 elementos</span>
-                <span>Este equipo</span>
-            </div>
-</div>
-        
-        <!-- Guías de división para arrastre -->
-        <div class="guia-zona guia-izquierda" id="guia-izq"></div>
-        <div class="guia-zona guia-derecha" id="guia-der"></div>
-        
-        <!-- Instrucciones -->
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <h3>Cómo dividir tu pantalla</h3>
-            <p>Mantén presionada <span class="key">Win</span> y presiona una flecha:</p>
-            <div class="keys-combo">
-                <span class="key">Win</span> + <span class="key">←</span>
-                <span>Izquierda</span>
-            </div>
-            <div class="keys-combo">
-                <span class="key">Win</span> + <span class="key">→</span>
-                <span>Derecha</span>
             </div>
         </div>
-        
-        <!-- Mensaje de práctica -->
-        <div class="practica-mensaje" id="practica-mensaje">
-            <h3>Practica en tu PC</h3>
-            <p>Presiona <span class="key">Win</span> + <span class="key">←</span> o <span class="key">Win</span> + <span class="key">→</span><br>en tu computadora</p>
+
+        <!-- Guías de Snap -->
+        <div class="snap-guide izquierda" id="snap-izquierda"></div>
+        <div class="snap-guide derecha" id="snap-derecha"></div>
+
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/4</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Abrí Microsoft Edge desde la barra de tareas.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
         </div>
-        
-        <!-- Selector visual estilo Windows -->
-        <div class="selector-overlay" id="selector-overlay">
-            <div class="selector-header">
-                <span id="selector-mensaje">Elija dónde desea colocar esta ventana</span>
-            </div>
-            
-            <div class="selector-zonas">
-                <!-- Zona Izquierda -->
-                <div class="zona-selector" id="zona-izquierda" onclick="seleccionarZona('izquierda')">
-                    <div class="zona-indicador izquierda">
-                        <span class="flecha-zona">&lt;</span>
-                    </div>
-                    <div class="zona-nombre">Izquierda</div>
-                </div>
-                
-                <!-- Zona Derecha -->
-                <div class="zona-selector" id="zona-derecha" onclick="seleccionarZona('derecha')">
-                    <div class="zona-indicador derecha">
-                        <span class="flecha-zona">&gt;</span>
-                    </div>
-                    <div class="zona-nombre">Derecha</div>
-                </div>
-            </div>
-            
-            <!-- Miniaturas de ventanas arrastrables -->
-            <div class="selector-ventanas">
-                <div class="ventana-mini-selector" id="mini-navegador" draggable="true" ondragstart="iniciarArrastre(event, 'navegador')">
-                    <div class="mini-icono">
-                        <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#0078d4"/></svg>
-                    </div>
-                    <span>Microsoft Edge</span>
-                </div>
-                <div class="ventana-mini-selector" id="mini-biblioteca" draggable="true" ondragstart="iniciarArrastre(event, 'biblioteca')">
-                    <div class="mini-icono">
-                        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M2 2h5l2 2h5v9H2V2z" fill="#FFB900"/></svg>
-                    </div>
-                    <span>Biblioteca</span>
-                </div>
-            </div>
-            
-            <button class="selector-cierre" onclick="cerrarSelector()">Cancelar</button>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Organización Perfecta! 🖥️</h3>
+            <p>Ya sabés cómo usar el arrastre para dividir tu pantalla. ¡Tu productividad acaba de subir de nivel!</p>
         </div>
     </div>
-    
-    <!-- Taskbar Windows 11 -->
+
+    <!-- Taskbar -->
     <div class="taskbar">
-        <div class="start-button">
-            <div class="start-icon"></div>
-        </div>
+        <div class="start-button"><div class="start-icon"></div></div>
         <div class="taskbar-icons">
             <div class="taskbar-icon" id="taskbar-navegador" onclick="abrirVentana('navegador')">🔵</div>
             <div class="taskbar-icon" id="taskbar-biblioteca" onclick="abrirVentana('biblioteca')">📁</div>
         </div>
         <div class="tray">
-            <div class="tray-icons">
-                <div class="tray-icon">🔊</div>
-                <div class="tray-icon">📶</div>
-                <div class="tray-icon">🔋</div>
-            </div>
-            <div class="clock">
-                <div class="clock-hora" id="clock-hora">12:00</div>
-                <div class="clock-fecha" id="clock-fecha">15/3/2026</div>
-            </div>
+            <div class="clock" id="clock">12:00</div>
         </div>
     </div>
-    
-    <!-- JS Compartido: funciones base de Windows 11 -->
+
     <script src="simulacion-core.js"></script>
-    
     <script>
-        // ════════════════════════════════════════════════════════
-        // SIMULACIÓN ESPECÍFICA: Dividir pantalla con Win + Flechas
-        // ════════════════════════════════════════════════════════
-        
-        // Variables locales de esta simulación
+        let currentStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false, 4: false };
         let navegadorAbierto = false;
         let bibliotecaAbierta = false;
-        let selectorActivo = false;
         let ventanaArrastrando = null;
-        let nivelCompletado = false;
-        
+        let offset = { x: 0, y: 0 };
+
+        function iniciarSimulacion() {
+            document.getElementById('panel-inicio').style.display = 'none';
+            updateTourPopup();
+        }
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: Abrir";
+                    content.innerHTML = "Hacé click en el icono azul para abrir <strong>Microsoft Edge</strong>.";
+                    step.textContent = "1/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Más ventanas";
+                    content.innerHTML = "Ahora abrí la <strong>Biblioteca</strong> (icono de carpeta).";
+                    step.textContent = "2/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Dividir Izquierda";
+                    content.innerHTML = "Arrastrá la ventana de <strong>Edge</strong> desde su barra superior hasta tocar el <strong>borde izquierdo</strong> de la pantalla.";
+                    step.textContent = "3/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 4:
+                    title.textContent = "Paso 4: Dividir Derecha";
+                    content.innerHTML = "¡Excelente! Ahora arrastrá la <strong>Biblioteca</strong> hasta el <strong>borde derecho</strong>.";
+                    step.textContent = "4/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 4) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
+
+        function abrirVentana(tipo) {
+            const win = document.getElementById('ventana-' + tipo);
+            const icon = document.getElementById('taskbar-' + tipo);
+            if (!win) return;
+            win.classList.add('visible');
+            icon.classList.add('active');
+            
+            if (tipo === 'navegador') navegadorAbierto = true;
+            if (tipo === 'biblioteca') bibliotecaAbierta = true;
+
+            if (currentStep === 1 && tipo === 'navegador') {
+                pasoCompletado[1] = true;
+                updateTourPopup();
+            } else if (currentStep === 2 && tipo === 'biblioteca' && navegadorAbierto) {
+                pasoCompletado[2] = true;
+                updateTourPopup();
+            }
+        }
+
+        function iniciarArrastre(e, id) {
+            ventanaArrastrando = document.getElementById('ventana-' + id);
+            const rect = ventanaArrastrando.getBoundingClientRect();
+            offset.x = e.clientX - rect.left;
+            offset.y = e.clientY - rect.top;
+            
+            ventanaArrastrando.style.zIndex = "100";
+            document.addEventListener('mousemove', moverVentana);
+            document.addEventListener('mouseup', detenerArrastre);
+        }
+
+        function moverVentana(e) {
+            if (!ventanaArrastrando) return;
+            
+            let x = e.clientX - offset.x;
+            let y = e.clientY - offset.y;
+            
+            ventanaArrastrando.style.left = x + 'px';
+            ventanaArrastrando.style.top = y + 'px';
+            ventanaArrastrando.style.transform = 'none';
+
+            // Mostrar guías de snap
+            if (e.clientX < 20) {
+                document.getElementById('snap-izquierda').classList.add('active');
+            } else if (e.clientX > window.innerWidth - 20) {
+                document.getElementById('snap-derecha').classList.add('active');
+            } else {
+                document.querySelectorAll('.snap-guide').forEach(g => g.classList.remove('active'));
+            }
+        }
+
+        function detenerArrastre(e) {
+            if (!ventanaArrastrando) return;
+
+            if (e.clientX < 50) {
+                // Snap Izquierda
+                ventanaArrastrando.style.left = "0";
+                ventanaArrastrando.style.top = "0";
+                ventanaArrastrando.style.width = "50%";
+                ventanaArrastrando.style.height = "calc(100vh - 48px)";
+                
+                if (currentStep === 3 && ventanaArrastrando.id === 'ventana-navegador') {
+                    pasoCompletado[3] = true;
+                    updateTourPopup();
+                }
+            } else if (e.clientX > window.innerWidth - 50) {
+                // Snap Derecha
+                ventanaArrastrando.style.left = "50%";
+                ventanaArrastrando.style.top = "0";
+                ventanaArrastrando.style.width = "50%";
+                ventanaArrastrando.style.height = "calc(100vh - 48px)";
+                
+                if (currentStep === 4 && ventanaArrastrando.id === 'ventana-biblioteca') {
+                    pasoCompletado[4] = true;
+                    updateTourPopup();
+                }
+            }
+
+            document.querySelectorAll('.snap-guide').forEach(g => g.classList.remove('active'));
+            document.removeEventListener('mousemove', moverVentana);
+            document.removeEventListener('mouseup', detenerArrastre);
+            ventanaArrastrando = null;
+        }
+
         function completarNivel() {
-            if (nivelCompletado) return;
-            nivelCompletado = true;
             if (window.parent && window.parent.completarNivelYAvanzar) {
                 window.parent.completarNivelYAvanzar();
             }
         }
-        
-        // Callbacks para el core
-        function onVentanaAbierta(tipo) {
-            if (tipo === 'navegador') {
-                navegadorAbierto = true;
-            } else if (tipo === 'biblioteca') {
-                bibliotecaAbierta = true;
-            }
-            actualizarPanel();
-        }
-        
-        function onVentanaCerrada(tipo) {
-            if (tipo === 'navegador') {
-                navegadorAbierto = false;
-            } else if (tipo === 'biblioteca') {
-                bibliotecaAbierta = false;
-            }
-            actualizarPanel();
-        }
-        
-        function actualizarPanel() {
-            const panel = document.getElementById('panel-control');
-            const instrucciones = document.getElementById('instrucciones');
-            
-            if (navegadorAbierto || bibliotecaAbierta) {
-                panel.style.display = 'none';
-                instrucciones.style.display = 'block';
-            } else {
-                panel.style.display = 'block';
-                instrucciones.style.display = 'none';
-            }
-        }
-        
-        function dividirIzquierda() {
-            if (!navegadorAbierto || !bibliotecaAbierta) {
-                mostrarToast('Abre dos ventanas para dividir');
-                return;
-            }
-            mostrarSelectorVentanas('izquierda');
-        }
-        
-        function dividirDerecha() {
-            if (!navegadorAbierto || !bibliotecaAbierta) {
-                mostrarToast('Abre dos ventanas para dividir');
-                return;
-            }
-            mostrarSelectorVentanas('derecha');
-        }
-        
-        function seleccionarZona(zonaElegida) {
-            if (!ventanaArrastrando) {
-                if (zonaElegida === 'izquierda') {
-                    ejecutarDividir('biblioteca', 'izquierda');
-                } else {
-                    ejecutarDividir('navegador', 'izquierda');
-                }
-            } else {
-                ejecutarDividir(ventanaArrastrando, zonaElegida);
-            }
-        }
-        
-        function ejecutarDividir(ventanaSeleccionada, zonaElegida) {
-            const nav = document.getElementById('ventana-navegador');
-            const bib = document.getElementById('ventana-biblioteca');
-            
-            // Remover estilos previos
-            nav.classList.remove('maximizada', 'izquierda', 'derecha');
-            bib.classList.remove('maximizada', 'izquierda', 'derecha');
-            
-            // Resetear estilos inline
-            nav.style.position = '';
-            nav.style.top = '';
-            nav.style.left = '';
-            nav.style.width = '';
-            nav.style.height = '';
-            bib.style.position = '';
-            bib.style.top = '';
-            bib.style.left = '';
-            bib.style.width = '';
-            bib.style.height = '';
-            
-            if (zonaElegida === 'izquierda') {
-                if (ventanaSeleccionada === 'navegador') {
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '0';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                    
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '50%';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                } else {
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '0';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                    
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '50%';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                }
-            } else {
-                if (ventanaSeleccionada === 'navegador') {
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '50%';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                    
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '0';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                } else {
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '50%';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                    
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '0';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                }
-            }
-            
-            cerrarSelector();
-            mostrarMensajePractica();
-        }
-        
-        function restablecer() {
-            const nav = document.getElementById('ventana-navegador');
-            const bib = document.getElementById('ventana-biblioteca');
-            
-            nav.classList.remove('maximizada', 'izquierda', 'derecha');
-            bib.classList.remove('maximizada', 'izquierda', 'derecha');
-            
-            nav.style.position = 'absolute';
-            nav.style.top = '60px';
-            nav.style.left = '80px';
-            nav.style.width = '500px';
-            nav.style.height = '350px';
-            
-            bib.style.position = 'absolute';
-            bib.style.top = '100px';
-            bib.style.left = '160px';
-            bib.style.width = '500px';
-            bib.style.height = '350px';
-        }
-        
-        function mostrarMensajePractica() {
-            const msg = document.getElementById('practica-mensaje');
-            msg.classList.add('visible');
-            setTimeout(() => {
-                msg.classList.remove('visible');
-            }, 2000);
-        }
-        
-        // Control de teclado específico
-        function manejarTeclaPersonalizada(e) {
-            const tieneWin = e.key === 'Meta' || 
-                             e.getModifierState('Meta') || 
-                             e.code === 'MetaLeft' || 
-                             e.code === 'MetaRight';
-            const tieneAlt = e.altKey;
-            
-            if (!tieneWin && !tieneAlt) return;
-            if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-            
-            if (selectorActivo) {
-                if (e.key === 'Escape') {
-                    cerrarSelector();
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                return;
-            }
-            
-            if (!navegadorAbierto || !bibliotecaAbierta) return;
-            
-            if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                e.stopPropagation();
-                dividirIzquierda();
-            }
-            
-            if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                e.stopPropagation();
-                dividirDerecha();
-            }
-        }
-        
-        // ═══════════════════════════════════════════════════════════
-        // FUNCIONALIDAD DE ARRASTRE PARA ESTA SIMULACIÓN
-        // ═══════════════════════════════════════════════════════════
-        
-        // Variables para arrastre
-        let arrastrando = false;
-        let ventanaSiendoArrastrada = null;
-        let offsetArrastreX = 0;
-        let offsetArrastreY = 0;
-        
-        const guiaIzq = document.getElementById('guia-izq');
-        const guiaDer = document.getElementById('guia-der');
-        
-        // Agregar event listeners a las title-bars
-        function agregarArrastreVentana(ventanaId) {
-            const ventana = document.getElementById('ventana-' + ventanaId);
-            const titleBar = ventana.querySelector('.title-bar');
-            
-            titleBar.addEventListener('mousedown', function(e) {
-                // No iniciar si clickeó en botón de ventana
-                if (e.target.closest('.window-btn')) return;
-                
-                iniciarArrastre(e, ventana, ventanaId);
-            });
-        }
-        
-        // Iniciar arrastre
-        function iniciarArrastre(e, ventana, tipo) {
-            e.preventDefault();
-            arrastrando = true;
-            ventanaSiendoArrastrada = { elemento: ventana, tipo: tipo };
-            
-            const rect = ventana.getBoundingClientRect();
-            offsetArrastreX = e.clientX - rect.left;
-            offsetArrastreY = e.clientY - rect.top;
-            
-            ventana.classList.add('activa');
-            
-            document.addEventListener('mousemove', moverArrastre);
-            document.addEventListener('mouseup', terminarArrastre);
-        }
-        
-        // Mover ventana mientras arrastra
-        function moverArrastre(e) {
-            if (!arrastrando || !ventanaSiendoArrastrada) return;
-            
-            const ventana = ventanaSiendoArrastrada.elemento;
-            const nuevoX = e.clientX - offsetArrastreX;
-            const nuevoY = e.clientY - offsetArrastreY;
-            
-            ventana.style.left = nuevoX + 'px';
-            ventana.style.top = nuevoY + 'px';
-            
-            // Mostrar guías cerca de bordes
-            const anchoPantalla = window.innerWidth;
-            
-            if (nuevoX < 80) {
-                guiaIzq.classList.add('visible');
-                guiaDer.classList.remove('visible');
-            } else if (nuevoX > anchoPantalla - 580) {
-                guiaDer.classList.add('visible');
-                guiaIzq.classList.remove('visible');
-            } else {
-                guiaIzq.classList.remove('visible');
-                guiaDer.classList.remove('visible');
-            }
-        }
-        
-        // Terminar arrastre
-        function terminarArrastre() {
-            if (!arrastrando || !ventanaSiendoArrastrada) return;
-            
-            arrastrando = false;
-            const ventana = ventanaSiendoArrastrada.elemento;
-            const tipo = ventanaSiendoArrastrada.tipo;
-            
-            document.removeEventListener('mousemove', moverArrastre);
-            document.removeEventListener('mouseup', terminarArrastre);
-            
-            // Limpiar guías
-            guiaIzq.classList.remove('visible');
-            guiaDer.classList.remove('visible');
-            
-            // Verificar posición
-            const rect = ventana.getBoundingClientRect();
-            const anchoPantalla = window.innerWidth;
-            
-            if (rect.left < 40) {
-                // Dividir izquierda
-                ejecutarDividirConArrastre(tipo, 'izquierda');
-            } else if (rect.right > anchoPantalla - 40) {
-                // Dividir derecha
-                ejecutarDividirConArrastre(tipo, 'derecha');
-            }
-            
-            ventanaSiendoArrastrada = null;
-        }
-        
-        // Ejecutar división al soltar
-        function ejecutarDividirConArrastre(ventanaElegida, zona) {
-            const nav = document.getElementById('ventana-navegador');
-            const bib = document.getElementById('ventana-biblioteca');
-            
-            // Remover clases previas
-            nav.classList.remove('izquierda', 'derecha');
-            bib.classList.remove('izquierda', 'derecha');
-            nav.style.position = '';
-            nav.style.left = '';
-            nav.style.top = '';
-            nav.style.width = '';
-            nav.style.height = '';
-            bib.style.position = '';
-            bib.style.left = '';
-            bib.style.top = '';
-            bib.style.width = '';
-            bib.style.height = '';
-            
-            if (zona === 'izquierda') {
-                if (ventanaElegida === 'navegador') {
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '0';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                    
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '50%';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                } else {
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '0';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                    
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '50%';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                }
-            } else {
-                // Derecha
-                if (ventanaElegida === 'navegador') {
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '50%';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                    
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '0';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                } else {
-                    bib.style.position = 'fixed';
-                    bib.style.top = '0';
-                    bib.style.left = '50%';
-                    bib.style.width = '50%';
-                    bib.style.height = 'calc(100vh - 48px)';
-                    
-                    nav.style.position = 'fixed';
-                    nav.style.top = '0';
-                    nav.style.left = '0';
-                    nav.style.width = '50%';
-                    nav.style.height = 'calc(100vh - 48px)';
-                }
-            }
-            
-            mostrarToast('¡Pantalla dividida!');
-            
-            // Mostrar mensaje de práctica
-            const msg = document.getElementById('practica-mensaje');
-            if (msg) {
-                msg.classList.add('visible');
-                setTimeout(() => msg.classList.remove('visible'), 2500);
-            }
-            
-            completarNivel();
-        }
-        
-        // Agregar arrastre a ambas ventanas al cargar
-        agregarArrastreVentana('navegador');
-        agregarArrastreVentana('biblioteca');
+
+        // Reloj
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        }, 1000);
     </script>
 </body>
 </html>

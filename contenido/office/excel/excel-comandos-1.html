@@ -100,7 +100,6 @@
                 </div>
                 <div class="spreadsheet">
                     <div class="col-headers">
-                        <div class="col-header" style="width: 40px;"></div>
                         <div class="col-header">A</div>
                         <div class="col-header">B</div>
                         <div class="col-header">C</div>
@@ -171,8 +170,25 @@
             </div>
         </div>
 
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <p id="instruccion-texto">Selecciona una celda y usa <span class="key combo">Ctrl+B</span>, <span class="key combo">Ctrl+I</span> o <span class="key combo">Ctrl+U</span></p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Selecciona la celda <strong>A1</strong> y aplica <strong>Negrita</strong> (Ctrl+B).
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Dominio de Excel! 📊</h3>
+            <p>Has aprendido a aplicar formatos básicos a las celdas para organizar mejor tus datos.</p>
         </div>
 
         <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
@@ -198,11 +214,59 @@
         </div>
     </div>
 
+    <script src="../../simulacion-core.js"></script>
     <script>
         let excelVisible = false;
         let nivelCompletado = false;
-        let selectedCell = null;
-        let formatosAplicados = { negrita: false, cursiva: false, subrayado: false };
+        let selectedCellRef = null;
+        let tourStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(tourStep) {
+                case 1:
+                    title.textContent = "Paso 1: Negrita";
+                    content.innerHTML = "Selecciona la celda <strong>A1</strong> (Dato 1) y presiona <span class='key'>Ctrl+B</span> para resaltarla.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Cursiva";
+                    content.innerHTML = "Ahora selecciona <strong>B2</strong> (el número 100) y aplica <span class='key'>Ctrl+I</span>.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Subrayado";
+                    content.innerHTML = "Finalmente, ve a la celda <strong>C1</strong> (Total) y aplica <span class='key'>Ctrl+U</span>.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[tourStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[tourStep]) {
+                tourStep++;
+                if (tourStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
 
         function completarNivel() {
             if (nivelCompletado) return;
@@ -215,10 +279,10 @@
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('ventana').classList.add('visible');
-            document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('taskbar-excel').classList.add('active');
             excelVisible = true;
             selectCell('A1');
+            updateTourPopup();
         }
 
         function focusExcel() {
@@ -228,75 +292,82 @@
         }
 
         function selectCell(cellRef) {
-            if (selectedCell) {
-                document.querySelector('[data-cell="' + selectedCell + '"]').classList.remove('selected');
+            if (selectedCellRef) {
+                const prev = document.querySelector('[data-cell="' + selectedCellRef + '"]');
+                if (prev) prev.classList.remove('selected');
             }
-            selectedCell = cellRef;
+            selectedCellRef = cellRef;
             const cell = document.querySelector('[data-cell="' + cellRef + '"]');
-            cell.classList.add('selected');
-            document.getElementById('cell-reference').textContent = cellRef;
-            document.getElementById('formula-input').textContent = cell.textContent;
-            cell.focus();
+            if (cell) {
+                cell.classList.add('selected');
+                document.getElementById('cell-reference').textContent = cellRef;
+                document.getElementById('formula-input').textContent = cell.textContent;
+                actualizarEstadoBotones();
+                
+                // Info para el status bar
+                document.getElementById('selection-info').textContent = cellRef + ': ' + cell.textContent;
+            }
         }
 
         function aplicarNegrita() {
-            if (!selectedCell) return;
-            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            if (!selectedCellRef) return;
+            const cell = document.querySelector('[data-cell="' + selectedCellRef + '"]');
             cell.classList.toggle('bold');
             cell.style.fontWeight = cell.classList.contains('bold') ? 'bold' : '';
-            formatosAplicados.negrita = true;
+            
+            if (tourStep === 1 && selectedCellRef === 'A1' && cell.classList.contains('bold')) {
+                pasoCompletado[1] = true;
+                updateTourPopup();
+            }
+            
             actualizarEstadoBotones();
-            verificarCompletado();
             mostrarToast('Negrita');
         }
 
         function aplicarCursiva() {
-            if (!selectedCell) return;
-            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            if (!selectedCellRef) return;
+            const cell = document.querySelector('[data-cell="' + selectedCellRef + '"]');
             cell.classList.toggle('italic');
             cell.style.fontStyle = cell.classList.contains('italic') ? 'italic' : '';
-            formatosAplicados.cursiva = true;
+            
+            if (tourStep === 2 && selectedCellRef === 'B2' && cell.classList.contains('italic')) {
+                pasoCompletado[2] = true;
+                updateTourPopup();
+            }
+            
             actualizarEstadoBotones();
-            verificarCompletado();
             mostrarToast('Cursiva');
         }
 
         function aplicarSubrayado() {
-            if (!selectedCell) return;
-            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            if (!selectedCellRef) return;
+            const cell = document.querySelector('[data-cell="' + selectedCellRef + '"]');
             cell.classList.toggle('underline');
             cell.style.textDecoration = cell.classList.contains('underline') ? 'underline' : '';
-            formatosAplicados.subrayado = true;
+            
+            if (tourStep === 3 && selectedCellRef === 'C1' && cell.classList.contains('underline')) {
+                pasoCompletado[3] = true;
+                updateTourPopup();
+            }
+            
             actualizarEstadoBotones();
-            verificarCompletado();
             mostrarToast('Subrayado');
         }
 
         function actualizarEstadoBotones() {
-            if (!selectedCell) return;
-            const cell = document.querySelector('[data-cell="' + selectedCell + '"]');
+            if (!selectedCellRef) return;
+            const cell = document.querySelector('[data-cell="' + selectedCellRef + '"]');
             document.getElementById('btn-negrita').classList.toggle('active', cell.classList.contains('bold'));
             document.getElementById('btn-cursiva').classList.toggle('active', cell.classList.contains('italic'));
             document.getElementById('btn-subrayado').classList.toggle('active', cell.classList.contains('underline'));
         }
 
-        function verificarCompletado() {
-            if (nivelCompletado) return;
-            const formatosCount = [formatosAplicados.negrita, formatosAplicados.cursiva, formatosAplicados.subrayado].filter(Boolean).length;
-            if (formatosCount >= 2) {
-                nivelCompletado = true;
-                mostrarToast('🎉 ¡Felicidades! Aplicaste ' + formatosCount + ' formatos', 'exito');
-                document.getElementById('btn-reiniciar').classList.add('visible');
-                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
-                completarNivel();
-            }
-        }
-
         document.addEventListener('keydown', function(e) {
             if (!excelVisible) return;
-            if (e.ctrlKey && e.key === 'b') { e.preventDefault(); aplicarNegrita(); }
-            if (e.ctrlKey && e.key === 'i') { e.preventDefault(); aplicarCursiva(); }
-            if (e.ctrlKey && e.key === 'u') { e.preventDefault(); aplicarSubrayado(); }
+            const key = e.key.toLowerCase();
+            if (e.ctrlKey && key === 'b') { e.preventDefault(); aplicarNegrita(); }
+            if (e.ctrlKey && key === 'i') { e.preventDefault(); aplicarCursiva(); }
+            if (e.ctrlKey && key === 'u') { e.preventDefault(); aplicarSubrayado(); }
         });
 
         function cerrarExcel() {
@@ -343,13 +414,6 @@
             }
         }
 
-        function actualizarEstadoBotones() {
-            if (!celdaActual) return;
-            const cell = celdaActual;
-            document.getElementById('btn-negrita').classList.toggle('active', cell.classList.contains('bold'));
-            document.getElementById('btn-cursiva').classList.toggle('active', cell.classList.contains('italic'));
-            document.getElementById('btn-subrayado').classList.toggle('active', cell.classList.contains('underline'));
-        }
 
         // Zoom functionality
         let zoomActual = 100;

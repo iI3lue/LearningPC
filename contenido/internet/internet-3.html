@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 3: Seguridad en Línea - LearningPC</title>
+    <link rel="stylesheet" href="../simulacion-core.css">
+    <style>
+        /* Estilos del navegador */
+        .browser-window {
+            width: 1000px;
+            height: 700px;
+            background: #fdfdfd;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+        }
+
+        .browser-tabs { height: 40px; background: #dee1e6; display: flex; align-items: flex-end; padding: 0 10px; gap: 5px; }
+        .tab { height: 32px; width: 200px; background: #fff; border-radius: 8px 8px 0 0; display: flex; align-items: center; padding: 0 12px; font-size: 12px; }
+
+        .browser-toolbar { height: 44px; background: #fff; display: flex; align-items: center; padding: 0 10px; gap: 10px; border-bottom: 1px solid #dee1e6; }
+        .address-bar { flex: 1; height: 30px; background: #f1f3f4; border-radius: 15px; display: flex; align-items: center; padding: 0 15px; font-size: 13px; gap: 8px; }
+
+        .lock-icon { cursor: pointer; font-size: 14px; transition: transform 0.2s; }
+        .lock-icon:hover { transform: scale(1.2); }
+        .lock-icon.highlight { color: #10B981; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .browser-content { flex: 1; background: #fff; padding: 40px; }
+
+        /* Fake Bank Page */
+        .fake-bank-card {
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .bank-btn {
+            background: #d32f2f;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            margin-top: 20px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+        }
+
+        .bank-btn.danger-zone { border: 2px solid transparent; transition: all 0.2s; }
+        .bank-btn.danger-zone:hover { border-color: #000; box-shadow: 0 0 15px rgba(211,47,47,0.5); }
+
+        /* Guide */
+        .guide-overlay {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f1f1f;
+            color: #fff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 450px;
+            border-left: 5px solid #EAB308;
+        }
+
+        .step-item { display: flex; align-items: center; gap: 12px; opacity: 0.5; }
+        .step-item.active { opacity: 1; }
+        .step-item.completed { opacity: 0.7; color: #10B981; }
+        .step-number { width: 24px; height: 24px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        .step-item.active .step-number { background: #EAB308; }
+        .step-item.completed .step-number { background: #10B981; }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <div class="browser-window">
+            <div class="browser-tabs"><div class="tab">Mi Banco Online</div></div>
+            <div class="browser-toolbar">
+                <div class="address-bar">
+                    <span class="lock-icon" id="lock-icon" onclick="checkStep(1)">🔒</span>
+                    <span id="url-text">https://mibanco-seguro.com/login</span>
+                </div>
+            </div>
+            <div class="browser-content">
+                <div class="fake-bank-card" id="bank-card">
+                    <h2 style="color: #d32f2f; margin-top: 0;">Mi Banco</h2>
+                    <p style="font-size: 14px; color: #666;">Ingresá tus datos para acceder a tu cuenta.</p>
+                    <input type="text" placeholder="Usuario" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;" readonly>
+                    <input type="password" placeholder="Contraseña" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" readonly>
+                    <button class="bank-btn" onclick="checkStep(2)">Iniciar Sesión</button>
+                    
+                    <div id="phishing-alert" style="display: none; margin-top: 20px; padding: 15px; background: #fff4e5; border: 1px solid #ffa117; border-radius: 4px; text-align: left;">
+                        <strong style="color: #663c00;">⚠️ ¡Cuidado!</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; color: #663c00;">Recibiste un correo diciendo: "Tu cuenta ha sido bloqueada. Haz clic aquí para reactivarla: <u>http://mibanco-premios.net/fix</u>"</p>
+                        <button class="bank-btn danger-zone" style="background: #ffa117; color: #663c00; margin-top: 10px;" onclick="checkStep(3)">Ignorar y denunciar correo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Hacé clic en el <strong>Candado</strong> para verificar si la conexión es segura.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Escudo Digital Activo! 🛡️</h3>
+            <p>Ya sabés protegerte: verificás el candado y no caés en trampas de Phishing. ¡Muy bien!</p>
+        </div>
+    </div>
+
+    <div id="toast-feedback" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(10px); opacity: 0; background: #fff; color: #333; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 2000; transition: all 0.3s;"></div>
+
+    <script src="../simulacion-core.js"></script>
+    <script>
+        let currentStep = 1;
+        let nivelCompletado = false;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: Seguridad HTTPS";
+                    content.innerHTML = "Hacé clic en el <strong>Candado</strong> junto a la URL. El candado indica que tus datos están cifrados.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Acceso Seguro";
+                    content.innerHTML = "¡Correcto! Ahora intentá <strong>Iniciar Sesión</strong>. Asegurate siempre de que la URL sea oficial.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Phishing";
+                    content.innerHTML = "¡Cuidado! Te llegó un correo sospechoso. Hacé clic en el botón naranja para <strong>Ignorar y denunciar</strong>.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    finalizarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
+
+        function checkStep(step) {
+            if (step !== currentStep || pasoCompletado[step]) return;
+
+            if (step === 1) {
+                mostrarFeedback('¡Bien! El candado indica que la conexión está cifrada (HTTPS).', 'exito');
+                document.getElementById('lock-icon').classList.add('highlight');
+                pasoCompletado[1] = true;
+                updateTourPopup();
+            } else if (step === 2) {
+                mostrarFeedback('Perfecto. Siempre revisá que la URL empiece con https:// y el nombre sea correcto.', 'exito');
+                document.getElementById('phishing-alert').style.display = 'block';
+                pasoCompletado[2] = true;
+                updateTourPopup();
+            } else if (step === 3) {
+                mostrarFeedback('¡Excelente! Nunca hagas clic en enlaces sospechosos que pidan tus datos.', 'exito');
+                pasoCompletado[3] = true;
+                updateTourPopup();
+            }
+        }
+
+        function finalizarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            setTimeout(() => {
+                if (window.parent && window.parent.completarNivelYAvanzar) {
+                    window.parent.completarNivelYAvanzar();
+                }
+            }, 2000);
+        }
+
+        function mostrarFeedback(mensaje, tipo = 'info') {
+            const toast = document.getElementById('toast-feedback');
+            toast.textContent = mensaje;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            toast.style.borderLeft = tipo === 'exito' ? '5px solid #10B981' : (tipo === 'error' ? '5px solid #EF4444' : '5px solid #EAB308');
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(10px)';
+            }, 4000);
+        }
+
+        // Inicialización
+        window.addEventListener('load', () => {
+            if (typeof initClock === 'function') initClock();
+            updateTourPopup();
+        });
+    </script>
+</body>
+</html>

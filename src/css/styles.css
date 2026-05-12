@@ -20,17 +20,24 @@
     --input-bg: #FFFFFF;
     
     /* ── Color Secundario ── */
-    --secondary-1: #107C10; /* Verde Microsoft */
-    --secondary-1-light: #DFF6DD;
-    --secondary-1-dark: #054B05;
-    --secondary-2: #8B5CF6; 
-    --secondary-2-light: #EDE9FE;
-    --secondary-2-dark: #4C1D95;
+    --secondary-1: #10B981; 
+    --secondary-1-light: #D1FAE5;
+    --secondary-1-dark: #065F46;
+    
+    /* MEJORA-06: .badge-avanzado usa estas variables que faltaban */
+    --secondary-2: #F59E0B;
+    --secondary-2-light: #FEF3C7;
+    --secondary-2-dark: #92400E;
     
     /* Timing Functions */
     --ease-fluent: cubic-bezier(0.1, 0.9, 0.2, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Duration tokens (MEJORA-01: faltaban — sin esto todas las transiciones son 0s) */
+    --duration-fast:   100ms;
+    --duration-medium: 200ms;
+    --duration-normal: 300ms;
 
     /* Elevations (Fluent depth) */
     --elevation-0: none;
@@ -3003,5 +3010,149 @@ button:active {
     margin: 0;
     font-size: 0.85rem;
     color: var(--text-secondary);
+}
+
+/* ── Ajustes View ────────────────────────────── */
+.ajustes-contenido {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ajustes-seccion {
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 24px;
+    box-shadow: var(--elevation-1);
+}
+
+.ajustes-seccion h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ajuste-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--hover-bg);
+    gap: 20px;
+}
+
+.ajuste-item:last-child {
+    border-bottom: none;
+}
+
+.ajuste-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.ajuste-info p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.color-opciones {
+    display: flex;
+    gap: 12px;
+}
+
+.color-opcion {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all var(--duration-fast) var(--ease-fluent);
+}
+
+.color-opcion:hover {
+    transform: scale(1.1);
+}
+
+.color-opcion.seleccionado {
+    border-color: var(--text-color);
+    box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--accent-solid);
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+    width: 44px;
+    height: 22px;
+    background: var(--text-secondary);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s;
+}
+
+.toggle-switch.active {
+    background: var(--accent-solid);
+}
+
+.toggle-switch.active::after {
+    transform: translateX(22px);
+}
+
+/* ── Toast Notification ────────────────────────────── */
+.toast-notification {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card-bg);
+    color: var(--text-color);
+    padding: 12px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--elevation-4);
+    border: 1px solid var(--border-color);
+    z-index: 10000;
+    transition: transform 0.4s var(--ease-spring), opacity 0.4s var(--ease-fluent);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.toast-notification.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--accent-solid);
+}
+
+.toast-message {
+    font-size: 14px;
+    font-weight: 600;
 }
 

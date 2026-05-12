@@ -552,6 +552,11 @@
                 <p><span class="key">Win+E</span> = Abrir Explorador</p>
                 <p><span class="key">Win+L</span> = Bloquear PC</p>
             </div>
+            <div class="hint-box" style="border-color: #ffb900; margin-top: 10px;">
+                <h4 style="color: #ffb900;">⚠️ Atención con tu PC Real</h4>
+                <p>Como estás usando un entorno real, tu computadora podría interceptar estos atajos (ej. bloqueando tu PC real con Win+L).</p>
+                <p>Si eso pasa, simplemente <strong>haz clic en los botones</strong> de abajo para simular la acción en el curso.</p>
+            </div>
         </div>
         
         <!-- Grid de atajos -->
@@ -647,16 +652,31 @@
             <div class="hint">Presiona cualquier tecla o haz clic para continuar</div>
         </div>
         
-        <!-- Instrucciones -->
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <h3>Paso a paso</h3>
-            <p id="instruccion-texto">Presiona los atajos de teclado para practicar</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Presiona <span class="key combo">Win + D</span> para mostrar el escritorio.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
         </div>
-        
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Pro de Windows! 🪟</h3>
+            <p>Ya conocés los atajos fundamentales para navegar como un experto. ¡Ahorrarás mucho tiempo!</p>
+        </div>
+
         <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
         
         <div class="toast" id="toast">
-            <span class="toast-mensaje" id="toast-mensaje">✓ ¡Copiado!</span>
+            <span class="toast-mensaje" id="toast-mensaje">✓ ¡Hecho!</span>
         </div>
     </div>
     
@@ -702,32 +722,80 @@
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('atajos-grid').style.display = 'grid';
-            document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('start-button').classList.add('active');
-            actualizarInstrucciones();
+            updateTourPopup();
         }
         
+        let currentStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: Escritorio";
+                    content.innerHTML = "Presiona <span class='key combo'>Win + D</span> para esconder todo y ver el escritorio rápidamente.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Archivos";
+                    content.innerHTML = "Presiona <span class='key combo'>Win + E</span> para abrir el Explorador de Archivos.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Seguridad";
+                    content.innerHTML = "Presiona <span class='key combo'>Win + L</span> para bloquear tu PC cuando te alejes.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
+
         // Capturar atajos de teclado
         document.addEventListener('keydown', function(e) {
             // Win + D = Mostrar escritorio
-            if (e.key === 'd' && e.winKey) {
+            if (e.key === 'd' && (e.metaKey || e.winKey)) {
                 e.preventDefault();
-                completarAtajo('win-d');
                 mostrarEscritorio();
+                checkStep('win-d');
             }
             
             // Win + E = Abrir Explorador
-            if (e.key === 'e' && e.winKey) {
+            if (e.key === 'e' && (e.metaKey || e.winKey)) {
                 e.preventDefault();
-                completarAtajo('win-e');
                 abrirExplorador();
+                checkStep('win-e');
             }
             
             // Win + L = Bloquear PC
-            if (e.key === 'l' && e.winKey) {
+            if (e.key === 'l' && (e.metaKey || e.winKey)) {
                 e.preventDefault();
-                completarAtajo('win-l');
                 bloquearPC();
+                checkStep('win-l');
             }
             
             // Escape = Cerrar menús
@@ -736,6 +804,25 @@
                 desbloquearPC();
             }
         });
+
+        function checkStep(atajo) {
+            if (currentStep === 1 && atajo === 'win-d') {
+                pasoCompletado[1] = true;
+                document.getElementById('atajo-win-d').classList.add('completado');
+                mostrarToast('✓ ¡Escritorio mostrado!');
+                updateTourPopup();
+            } else if (currentStep === 2 && atajo === 'win-e') {
+                pasoCompletado[2] = true;
+                document.getElementById('atajo-win-e').classList.add('completado');
+                mostrarToast('✓ ¡Explorador abierto!');
+                updateTourPopup();
+            } else if (currentStep === 3 && atajo === 'win-l') {
+                pasoCompletado[3] = true;
+                document.getElementById('atajo-win-l').classList.add('completado');
+                mostrarToast('✓ ¡PC Bloqueada!');
+                updateTourPopup();
+            }
+        }
         
         // Simular Win key
         let winKeyPresionada = false;
@@ -772,16 +859,19 @@
         }
         
         function probarAtajo(atajo) {
-            // Guía visual
+            // Ejecuta la acción simulada Y valida el paso
             switch(atajo) {
                 case 'win-d':
-                    mostrarToast('Presiona Win + D en tu teclado');
+                    mostrarEscritorio();
+                    checkStep('win-d');
                     break;
                 case 'win-e':
-                    mostrarToast('Presiona Win + E en tu teclado');
+                    abrirExplorador();
+                    checkStep('win-e');
                     break;
                 case 'win-l':
-                    mostrarToast('Presiona Win + L en tu teclado');
+                    bloquearPC();
+                    checkStep('win-l');
                     break;
             }
         }
@@ -846,18 +936,6 @@
             const todos = Object.values(atajosCompletados).every(v => v === true);
             if (todos) {
                 document.getElementById('btn-reiniciar').classList.add('visible');
-                actualizarInstrucciones();
-                completarNivel();
-            }
-        }
-        
-        function actualizarInstrucciones() {
-            const instr = document.getElementById('instruccion-texto');
-            const todos = Object.values(atajosCompletados).every(v => v === true);
-            if (todos) {
-                instr.textContent = '🎉 ¡Felicidades! Has practicado los 3 atajos';
-            } else {
-                instr.innerHTML = 'Presiona <span class="key combo">Win+D</span>, <span class="key combo">Win+E</span>, o <span class="key combo">Win+L</span>';
             }
         }
         

@@ -6,8 +6,9 @@ const bcrypt = require('bcryptjs');
 
 // Rutas de archivos
 const DB_PATH = path.join(__dirname, 'learning_pc.db');
-
 const { initDatabase, getDatabase } = require('./db/database');
+
+
 
 let mainWindow;
 
@@ -126,8 +127,11 @@ ipcMain.on('window:openDevTools', () => {
 });
 
 // Atajo F11 para pantalla completa
+const { globalShortcut } = require('electron');
+
 app.on('browser-window-focus', () => {
-    const { globalShortcut } = require('electron');
+    // Desregistrar primero para evitar registros duplicados (BUG-11)
+    globalShortcut.unregister('F11');
     globalShortcut.register('F11', () => {
         const isFullScreen = mainWindow.isFullScreen();
         mainWindow.setFullScreen(!isFullScreen);
@@ -135,7 +139,6 @@ app.on('browser-window-focus', () => {
 });
 
 app.on('browser-window-blur', () => {
-    const { globalShortcut } = require('electron');
     globalShortcut.unregister('F11');
 });
 
@@ -176,18 +179,12 @@ ipcMain.handle('auth:login', (event, { usuario, contraseña }) => {
             return { ok: false, mensaje: 'El usuario no existe.', codigo: 'usuario_no_existe' };
         }
         
-        // Comparar contraseña (soporta texto plano para admin inicial o hash para nuevos)
+        // Comparar contraseña con bcrypt (todas las contraseñas ya fueron migradas a hash)
         let passwordMatch = false;
-        if (user.contraseña === contraseña) {
-            // Caso legacy/admin inicial: texto plano
-            passwordMatch = true;
-        } else {
-            // Caso normal: hash con bcrypt
-            try {
-                passwordMatch = bcrypt.compareSync(contraseña, user.contraseña);
-            } catch (e) {
-                passwordMatch = false;
-            }
+        try {
+            passwordMatch = bcrypt.compareSync(contraseña, user.contraseña);
+        } catch (e) {
+            passwordMatch = false;
         }
         
         if (passwordMatch) {
@@ -403,6 +400,8 @@ ipcMain.handle('admin:guardarNivel', (event, datos) => {
 ipcMain.handle('admin:eliminarNivel', (event, idNivel) => {
     const db = getDatabase();
     try {
+        // MEJORA-03: Borrar el progreso huérfano asociado al nivel antes de eliminarlo
+        db.prepare('DELETE FROM progreso_usuario WHERE id_nivel = ?').run(idNivel);
         db.prepare('DELETE FROM niveles WHERE id_nivel = ?').run(idNivel);
         return { ok: true };
     } catch (err) {
@@ -415,6 +414,18 @@ ipcMain.handle('admin:actualizarRutaNivel', (event, { idNivel, rutaArchivo }) =>
     const db = getDatabase();
     try {
         db.prepare('UPDATE niveles SET ruta_archivo = ? WHERE id_nivel = ?').run(rutaArchivo, idNivel);
+        return { ok: true };
+    } catch (err) {
+        return { ok: false, mensaje: err.message };
+    }
+});
+
+// Resetear progreso de un usuario (BUG-07)
+ipcMain.handle('admin:resetProgreso', (event, idUsuario) => {
+    const db = getDatabase();
+    try {
+        db.prepare('DELETE FROM progreso_usuario WHERE id_usuario = ?').run(idUsuario);
+        db.prepare('UPDATE usuarios SET progreso_total = 0 WHERE id_usuario = ?').run(idUsuario);
         return { ok: true };
     } catch (err) {
         return { ok: false, mensaje: err.message };

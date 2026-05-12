@@ -65,8 +65,9 @@ function cargarColorSecundario() {
     if (c) {
         document.documentElement.style.setProperty('--accent-solid', c.solid);
         document.documentElement.style.setProperty('--accent-pastel', c.light);
-        document.documentElement.style.setProperty('--secondary-1-solid', c.solid);
+        document.documentElement.style.setProperty('--secondary-1', c.solid);
         document.documentElement.style.setProperty('--secondary-1-light', c.light);
+        document.documentElement.style.setProperty('--secondary-1-dark', c.dark);
         
         document.querySelectorAll('.toggle-switch.active').forEach(el => {
             el.style.background = c.solid;

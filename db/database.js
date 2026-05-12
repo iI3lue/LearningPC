@@ -3,11 +3,12 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-// La BD se guarda junto a la app (en producción usar volumen persistente)
-// En Render: usar /data (RENDER_PERSISTENT_DISK_DIR) si está disponible
+// La BD se guarda junto a la app
+// BUG-08: process.cwd() puede ser System32 en producción Electron.
+// __dirname acá es la carpeta 'db', por lo que hay que subir un nivel para la raíz del proyecto.
 const RENDER_DATA_DIR = process.env.RENDER_PERSISTENT_DISK_DIR || 
                        process.env.DATA_DIR || 
-                       process.cwd();
+                       path.join(__dirname, '..');
 const DB_PATH = path.join(RENDER_DATA_DIR, 'learning_pc.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 

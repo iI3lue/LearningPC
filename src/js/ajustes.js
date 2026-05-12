@@ -72,9 +72,16 @@ function cambiarColorSecundario(color) {
 
     const c = colores[color];
     if (c) {
+        document.documentElement.style.setProperty('--accent-solid', c.solid);
+        document.documentElement.style.setProperty('--accent-pastel', c.light);
         document.documentElement.style.setProperty('--secondary-1', c.solid);
         document.documentElement.style.setProperty('--secondary-1-light', c.light);
         document.documentElement.style.setProperty('--secondary-1-dark', c.dark);
+
+        // Actualizar toggles activos inmediatamente
+        document.querySelectorAll('.toggle-switch.active').forEach(el => {
+            el.style.background = c.solid;
+        });
     }
 
     document.querySelectorAll('.color-opcion').forEach(el => {
@@ -86,6 +93,10 @@ function toggleEfectos() {
     const toggle = document.getElementById('toggle-efectos');
     if (!toggle) return;
     toggle.classList.toggle('active');
+    const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+    const colores = { emerald: '#10B981', violeta: '#8B5CF6', amber: '#F59E0B', rojo: '#EF4444', rosa: '#EC4899', cyan: '#06B6D4' };
+    const solidColor = colores[colorSec] || '#10B981';
+    toggle.style.background = toggle.classList.contains('active') ? solidColor : 'var(--text-secondary)';
     localStorage.setItem('efectos', toggle.classList.contains('active'));
 }
 
@@ -93,15 +104,40 @@ function toggleSonido() {
     const toggle = document.getElementById('toggle-sonido');
     if (!toggle) return;
     toggle.classList.toggle('active');
+    const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+    const colores = { emerald: '#10B981', violeta: '#8B5CF6', amber: '#F59E0B', rojo: '#EF4444', rosa: '#EC4899', cyan: '#06B6D4' };
+    const solidColor = colores[colorSec] || '#10B981';
+    toggle.style.background = toggle.classList.contains('active') ? solidColor : 'var(--text-secondary)';
     localStorage.setItem('sonido', toggle.classList.contains('active'));
 }
 
 function reiniciarProgreso() {
-    if (confirm('¿Estás seguro de que quieres reiniciar todo el progreso? Esta acción no se puede deshacer.')) {
-        localStorage.removeItem('progreso_global');
-        localStorage.removeItem('player_stats');
-        localStorage.removeItem('navegacion_actual');
-        alert('Progreso reiniciado. Recargá la aplicación para comenzar desde cero.');
+    if (confirm('¿Estás seguro de que querés reiniciar todo el progreso? Esta acción no se puede deshacer.')) {
+        // BUG-07: el progreso real está en SQLite. Limpiar localStorage no es suficiente.
+        // Intentar llamar al IPC si está disponible
+        const usuario = JSON.parse(sessionStorage.getItem('usuario') || 'null');
+        if (usuario && window.api && window.api.resetProgreso) {
+            window.api.resetProgreso(usuario.id_usuario)
+                .then(() => {
+                    localStorage.removeItem('progreso_global');
+                    localStorage.removeItem('player_stats');
+                    localStorage.removeItem('navegacion_actual');
+                    if (window.showToast) window.showToast('Progreso reiniciado correctamente.', 'success');
+                })
+                .catch(() => {
+                    if (window.showToast) window.showToast('Error al reiniciar el progreso en la base de datos.', 'error');
+                });
+        } else {
+            // Fallback: solo localStorage (progreso de BD persiste hasta que admin lo limpie)
+            localStorage.removeItem('progreso_global');
+            localStorage.removeItem('player_stats');
+            localStorage.removeItem('navegacion_actual');
+            if (window.showToast) {
+                window.showToast('Progreso local reiniciado. El progreso en BD requiere al administrador.', 'info');
+            } else {
+                alert('Progreso local reiniciado. Recargá la aplicación.');
+            }
+        }
     }
 }
 
@@ -109,6 +145,11 @@ function toggleAutoSubcat() {
     const el = document.getElementById('toggle-auto-subcat');
     if (!el) return;
     el.classList.toggle('active');
+    const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+    const colores = { emerald: '#10B981', violeta: '#8B5CF6', amber: '#F59E0B', rojo: '#EF4444', rosa: '#EC4899', cyan: '#06B6D4' };
+    const solidColor = colores[colorSec] || '#10B981';
+    el.style.background = el.classList.contains('active') ? solidColor : 'var(--text-secondary)';
+    
     if (window.LearningPCSettings) {
         window.LearningPCSettings.setAutoContinue(el.classList.contains('active'));
     }
@@ -118,21 +159,17 @@ function toggleShowPrompt() {
     const el = document.getElementById('toggle-show-prompt');
     if (!el) return;
     el.classList.toggle('active');
+    const colorSec = localStorage.getItem('secondaryColor') || 'emerald';
+    const colores = { emerald: '#10B981', violeta: '#8B5CF6', amber: '#F59E0B', rojo: '#EF4444', rosa: '#EC4899', cyan: '#06B6D4' };
+    const solidColor = colores[colorSec] || '#10B981';
+    el.style.background = el.classList.contains('active') ? solidColor : 'var(--text-secondary)';
+
     if (window.LearningPCSettings) {
         window.LearningPCSettings.setShowPrompt(el.classList.contains('active'));
     }
 }
 
 function aplicarCambios() {
-    const toggleTemaEl = document.getElementById('toggle-tema');
-    const toggleEfectosEl = document.getElementById('toggle-efectos');
-    const toggleSonidoEl = document.getElementById('toggle-sonido');
-
-    if (toggleTemaEl) localStorage.setItem('theme', toggleTemaEl.classList.contains('active') ? 'dark' : 'light');
-    if (toggleEfectosEl) localStorage.setItem('efectos', toggleEfectosEl.classList.contains('active'));
-    if (toggleSonidoEl) localStorage.setItem('sonido', toggleSonidoEl.classList.contains('active'));
-
-    // Notificar sin reload (estamos en SPA)
     const toast = window.showToast || ((msg) => alert(msg));
     toast('Cambios aplicados correctamente');
 }

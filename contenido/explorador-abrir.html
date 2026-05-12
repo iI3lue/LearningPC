@@ -390,30 +390,6 @@
             word-break: break-word;
         }
         
-        .instrucciones-panel {
-            position: fixed;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1f1f1f;
-            border: 1px solid #3d3d3d;
-            border-radius: 8px;
-            padding: 16px 24px;
-            text-align: center;
-            z-index: 100;
-        }
-        
-        .instrucciones-panel h3 {
-            color: #ffffff;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        
-        .instrucciones-panel p {
-            color: #9e9e9e;
-            font-size: 12px;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
@@ -561,19 +537,25 @@
             </div>
         </div>
         
-        <!-- Popup informativo -->
-        <div class="info-popup" id="info-popup">
-            <div class="info-icon">💡</div>
-            <div class="info-content">
-                <h4 id="info-titulo">¡Bien!</h4>
-                <p id="info-mensaje">Mensaje...</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Hacé clic en el ícono de carpeta en la <strong>Barra de Tareas</strong> (abajo al centro).
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
             </div>
         </div>
-        
-        <!-- Instrucciones cuando está abierto -->
-        <div class="instrucciones-panel" id="instrucciones" style="display: none;">
-            <h3>Explorador de archivos abierto</h3>
-            <p>Puedes ver tus carpetas y archivos. ¡Practica los otros métodos!</p>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Dueño de tus Archivos! 📂</h3>
+            <p>Ya sabés las 3 formas de abrir el Explorador. ¡Usá la que te sea más cómoda!</p>
         </div>
     </div>
     
@@ -602,11 +584,12 @@
     <script>
         let exploradorAbierto = false;
         let startMenuAbierto = false;
-        let infoTimeout = null;
+        let nivelCompletado = false;
+        let currentStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
         
         const startMenu = document.getElementById('start-menu');
-        const infoPopup = document.getElementById('info-popup');
-        
+
         function toggleStartMenu() {
             startMenuAbierto = !startMenuAbierto;
             if (startMenuAbierto) {
@@ -615,100 +598,95 @@
                 startMenu.classList.remove('visible');
             }
         }
-        
-        // Bandera para prevenir duplicación
-        let nivelCompletado = false;
 
-        function marcarCompletadoNivel() {
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: Barra de Tareas";
+                    content.innerHTML = "Hacé clic en el ícono de <strong>Carpeta</strong> en la Barra de Tareas. Es la forma más rápida.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Menú Inicio";
+                    content.innerHTML = "Hacé clic en el botón <strong>Inicio</strong> (el logo azul) y buscá el Explorador ahí.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Escritorio";
+                    content.innerHTML = "Finalmente, hacé doble clic en <strong>Este equipo</strong> en el escritorio.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    cerrarVentana('explorador');
+                    updateTourPopup();
+                }
+            }
+        }
+        
+
+        function completarNivel() {
             if (nivelCompletado) return;
             nivelCompletado = true;
-            // Notificar al frame padre que el nivel se ha completado
             if (window.parent && window.parent.completarNivelYAvanzar) {
                 window.parent.completarNivelYAvanzar();
             }
         }
 
         function abrirExplorador(origen) {
-            // Cerrar menú inicio si está abierto
             if (startMenuAbierto) {
                 startMenuAbierto = false;
                 startMenu.classList.remove('visible');
             }
             
-            // Abrir ventana del explorador
             const ventana = document.getElementById('ventana-explorador');
             ventana.classList.add('visible');
-            
-            // Posicionar ventana
             ventana.style.left = '100px';
             ventana.style.top = '60px';
-            
-            // Traer al frente
             bringToFront(ventana);
             
-            // Actualizar taskbar
-            const taskbarIcon = document.getElementById('taskbar-explorador');
-            taskbarIcon.classList.add('active');
-            
+            document.getElementById('taskbar-explorador').classList.add('active');
             exploradorAbierto = true;
-            
-            // Ocultar panel de control
             document.getElementById('panel-control').style.display = 'none';
             
-            // Mostrar popup informativo según origen
-            let mensaje = '';
-            switch(origen) {
-                case 'taskbar':
-                    mensaje = '¡Bien! Has abierto el Explorador desde la barra de tareas. Es la forma más rápida de acceder a tus archivos. El icono se encuentra siempre visible en la barra inferior.';
-                    break;
-                case 'inicio':
-                    mensaje = '¡Desde el menú Inicio también puedes acceder al Explorador! Observa cómo se abre la ventana. Busca el icono de carpeta en la lista de aplicaciones.';
-                    break;
-                case 'este-equipo':
-                    mensaje = '¡Este equipo muestra todos los discos y dispositivos de almacenamiento conectados a tu computadora! Puedes acceder rápidamente a tus archivos desde el escritorio.';
-                    break;
-                default:
-                    mensaje = '¡Has abierto el Explorador de archivos! Desde aquí puedes gestionar todas tus carpetas y archivos.';
-            }
-            
-            mostrarInfo(mensaje);
-            actualizarPanel();
-            
-            // Marcar el nivel como completado cuando se abre exitosamente
-            setTimeout(marcarCompletadoNivel, 500);
+            checkStep(origen);
         }
-        
-        function mostrarInfo(mensajeOtipo) {
-            const titulo = document.getElementById('info-titulo');
-            const texto = document.getElementById('info-mensaje');
-            
-            // Determinar contenido
-            if (typeof mensajeOtipo === 'string') {
-                // Es un mensaje directo
-                titulo.textContent = '¡Bien!';
-                texto.textContent = mensajeOtipo;
-            } else {
-                // Es un evento - mostrar mensaje genérico
-                titulo.textContent = '¡Próximamente!';
-                texto.textContent = 'Esta función te llevará a más contenido. ¡Sigue practicando los métodos para abrir el Explorador!';
-            }
-            
-            // Mostrar popup
-            infoPopup.classList.add('visible');
-            
-            // Ocultar después de 4 segundos
-            if (infoTimeout) clearTimeout(infoTimeout);
-            infoTimeout = setTimeout(() => {
-                infoPopup.classList.remove('visible');
-            }, 4000);
-        }
-        
-        function actualizarPanel() {
-            const instrucciones = document.getElementById('instrucciones');
-            if (exploradorAbierto) {
-                instrucciones.style.display = 'block';
-            } else {
-                instrucciones.style.display = 'none';
+
+        function checkStep(origen) {
+            if (currentStep === 1 && origen === 'taskbar') {
+                pasoCompletado[1] = true;
+                mostrarToast('✓ ¡Abierto desde Barra de Tareas!', 'exito');
+                updateTourPopup();
+            } else if (currentStep === 2 && origen === 'inicio') {
+                pasoCompletado[2] = true;
+                mostrarToast('✓ ¡Abierto desde Menú Inicio!', 'exito');
+                updateTourPopup();
+            } else if (currentStep === 3 && origen === 'este-equipo') {
+                pasoCompletado[3] = true;
+                mostrarToast('✓ ¡Abierto desde Escritorio!', 'exito');
+                updateTourPopup();
             }
         }
         
@@ -716,17 +694,26 @@
             if (tipo === 'explorador') {
                 exploradorAbierto = false;
                 document.getElementById('taskbar-explorador').classList.remove('active');
-                document.getElementById('panel-control').style.display = 'block';
-                actualizarPanel();
+                if (currentStep > 3) {
+                     document.getElementById('panel-control').style.display = 'block';
+                }
             }
         }
+
+        function mostrarInfo(msg) {
+             mostrarToast(msg);
+        }
         
-        // Cerrar menú inicio al hacer click en desktop
         document.querySelector('.desktop').addEventListener('click', function(e) {
             if (startMenuAbierto && !e.target.closest('.start-button') && !e.target.closest('.start-menu')) {
                 startMenuAbierto = false;
                 startMenu.classList.remove('visible');
             }
+        });
+
+        window.addEventListener('load', () => {
+            if (typeof initClock === 'function') initClock();
+            updateTourPopup();
         });
     </script>
 </body>

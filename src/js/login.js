@@ -27,7 +27,10 @@ console.log('[LOGIN] window.api disponible:', typeof window.api);
 
 if (!window.api || !window.api.login) {
     console.error('[LOGIN] window.api.login NO disponible');
-    showToast('Error: API no disponible. Recarga la página.', 'error');
+    // BUG-05: showToast puede no estar definida aún en scope de módulo
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof showToast === 'function') showToast('Error: API no disponible. Recargá la página.', 'error');
+    });
 }
 
 // Enviar formulario de login

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="simulacion-core.css">
     <link rel="stylesheet" href="simulacion-office.css">
 </head>
-<body>
+<body class="app-word">
     <div class="desktop">
         <!-- Panel de control inicial -->
         <div class="control-panel" id="panel-inicio">
@@ -286,10 +286,25 @@
             <span class="info">Portapapeles: <strong id="contenido-portapapeles">vacío</strong></span>
         </div>
 
-        <!-- Instrucciones -->
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <h3>Paso a paso</h3>
-            <p id="instruccion-texto">Selecciona un texto del documento con el mouse</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Seleccioná un texto del documento con el mouse (click y arrastrar).
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Dominio del Teclado! ⌨️</h3>
+            <p>Ya sabés copiar y pegar como un experto. Estos atajos te ahorrarán horas de trabajo.</p>
         </div>
 
         <!-- Botón reiniciar -->
@@ -337,6 +352,7 @@
         </div>
     </div>
 
+    <script src="simulacion-core.js"></script>
     <script>
         let portapapeles = '';
         let estado = 'inicio';
@@ -374,12 +390,11 @@
                 document.getElementById('contenido-portapapeles').textContent = 
                     texto.length > 20 ? texto.substring(0, 20) + '...' : texto;
                 
-                // Si es la primera vez que selecciona algo, pasar al siguiente paso
-                if (estado === 'esperando-seleccion' && primeraVez) {
-                    estado = 'esperando-copiar';
-                    mostrarToast('✓ ¡Texto seleccionado! Presiona Ctrl+C para copiar', 'exito');
-                    actualizarInstrucciones();
-                    primeraVez = false;
+                // Validar paso 1
+                if (currentStep === 1 && !pasoCompletado[1]) {
+                    pasoCompletado[1] = true;
+                    mostrarToast('✓ ¡Texto seleccionado! Ahora vamos a copiarlo.', 'exito');
+                    updateTourPopup();
                 }
             } else {
                 textoSeleccionadoActual = '';
@@ -406,9 +421,12 @@
                 portapapeles = texto;
                 document.getElementById('contenido-portapapeles').textContent = 
                     portapapeles.length > 20 ? portapapeles.substring(0, 20) + '...' : portapapeles;
-                estado = 'esperando-pegar';
-                mostrarToast('✓ ¡Copiado al portapapeles!', 'exito');
-                actualizarInstrucciones();
+                
+                if (currentStep === 2 && !pasoCompletado[2]) {
+                    pasoCompletado[2] = true;
+                    mostrarToast('✓ ¡Copiado al portapapeles!', 'exito');
+                    updateTourPopup();
+                }
             } else {
                 mostrarToast('Seleccioná texto primero con el mouse');
             }
@@ -420,28 +438,23 @@
                 
                 if (selection.rangeCount > 0) {
                     const range = selection.getRangeAt(0);
-                    
-                    // Eliminar selección actual si existe
                     range.deleteContents();
                     
-                    // Insertar texto en la posición del cursor
                     const textNode = document.createTextNode(portapapeles + ' ');
                     range.insertNode(textNode);
                     
-                    // Mover el cursor después del texto插入ado
                     range.setStartAfter(textNode);
                     range.setEndAfter(textNode);
                     selection.removeAllRanges();
                     selection.addRange(range);
                     
-                    // Actualizar portapapeles visual
                     document.getElementById('contenido-portapapeles').textContent = portapapeles;
                     
-                    estado = 'completado';
-                    document.getElementById('btn-reiniciar').classList.add('visible');
-                    mostrarToast('🎉 ¡Perfecto! Has pegado el texto', 'exito');
-                    actualizarInstrucciones();
-                    completarNivel();
+                    if (currentStep === 3 && !pasoCompletado[3]) {
+                        pasoCompletado[3] = true;
+                        mostrarToast('🎉 ¡Perfecto! Has pegado el texto', 'exito');
+                        updateTourPopup();
+                    }
                 }
             } else {
                 mostrarToast('No hay nada en el portapapeles');
@@ -452,18 +465,62 @@
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('ventana').classList.add('visible');
-            document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('taskbar-word').classList.add('active');
             wordVisible = true;
-
-            estado = 'esperando-seleccion';
-            actualizarInstrucciones();
-
-            // Enfocar el documento
+            updateTourPopup();
             document.getElementById('documento').focus();
         }
 
         // ========== ATAJOS DE TECLADO ==========
+        let currentStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: Seleccionar";
+                    content.innerHTML = "Seleccioná un texto del documento con el mouse <span class='key'>(click y arrastrar)</span>.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Copiar";
+                    content.innerHTML = "¡Muy bien! Ahora presiona <span class='key combo'>Ctrl + C</span> o el botón <strong>Copiar</strong> en la cinta.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Pegar";
+                    content.innerHTML = "Finalmente, hacé click en otra parte del documento y presiona <span class='key combo'>Ctrl + V</span> o <strong>Pegar</strong>.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
+
         document.addEventListener('keydown', function(e) {
             if (!wordVisible) return;
 
@@ -477,62 +534,39 @@
                     portapapeles = texto;
                     document.getElementById('contenido-portapapeles').textContent = 
                         portapapeles.length > 20 ? portapapeles.substring(0, 20) + '...' : portapapeles;
-                    estado = 'esperando-pegar';
-                    mostrarToast('✓ ¡Copiado al portapapeles!', 'exito');
-                    actualizarInstrucciones();
+                    
+                    if (currentStep === 2 && !pasoCompletado[2]) {
+                        pasoCompletado[2] = true;
+                        mostrarToast('✓ ¡Copiado al portapapeles!', 'exito');
+                        updateTourPopup();
+                    }
                 } else {
                     e.preventDefault();
                     mostrarToast('Seleccioná texto primero con el mouse');
                 }
             }
 
-            // Ctrl+V = Pegar en posición exacta
+            // Ctrl+V = Pegar
             if (e.ctrlKey && e.key === 'v') {
                 e.preventDefault();
-                
                 if (portapapeles) {
                     const selection = window.getSelection();
-                    
                     if (selection.rangeCount > 0) {
                         const range = selection.getRangeAt(0);
-                        
-                        // Eliminar cualquier texto seleccionado actualmente
                         range.deleteContents();
-                        
-                        // Insertar texto en la posición del cursor
                         const textNode = document.createTextNode(portapapeles + ' ');
                         range.insertNode(textNode);
-                        
-                        // Mover el cursor después del texto插入ado
                         range.setStartAfter(textNode);
                         range.setEndAfter(textNode);
                         selection.removeAllRanges();
                         selection.addRange(range);
                         
-                        // Actualizar UI
                         document.getElementById('contenido-portapapeles').textContent = portapapeles;
-                        mostrarToast('✓ Pegado en la posición del cursor', 'exito');
                         
-                        // Verificar si completó
-                        if (estado === 'esperando-pegar') {
-                            estado = 'completado';
-                            document.getElementById('btn-reiniciar').classList.add('visible');
-                            actualizarInstrucciones();
-                            completarNivel();
-                        }
-                    } else {
-                        // Si no hay cursor visible, pegar al final
-                        const doc = document.getElementById('documento');
-                        const nuevoP = document.createElement('p');
-                        nuevoP.textContent = portapapeles;
-                        doc.appendChild(nuevoP);
-                        mostrarToast('✓ Pegado al final del documento', 'exito');
-                        
-                        if (estado === 'esperando-pegar') {
-                            estado = 'completado';
-                            document.getElementById('btn-reiniciar').classList.add('visible');
-                            actualizarInstrucciones();
-                            completarNivel();
+                        if (currentStep === 3 && !pasoCompletado[3]) {
+                            pasoCompletado[3] = true;
+                            mostrarToast('✓ ¡Pegado con éxito!', 'exito');
+                            updateTourPopup();
                         }
                     }
                 } else {
@@ -543,14 +577,8 @@
             // Ctrl+Z = Deshacer
             if (e.ctrlKey && e.key === 'z') {
                 e.preventDefault();
-                // En contenteditable, el navegador maneja deshacer naturalmente
-                // Pero podemos mostrar un mensaje
-                if (estado === 'completado') {
-                    document.execCommand('undo');
-                    estado = 'esperando-pegar';
-                    mostrarToast('↩️ Deshacer');
-                    actualizarInstrucciones();
-                }
+                document.execCommand('undo');
+                mostrarToast('↩️ Deshacer');
             }
         });
 
@@ -563,25 +591,6 @@
             setTimeout(() => {
                 toast.classList.remove('visible');
             }, 3000);
-        }
-
-        // ========== ACTUALIZAR INSTRUCCIONES ==========
-        function actualizarInstrucciones() {
-            const instr = document.getElementById('instruccion-texto');
-            switch(estado) {
-                case 'esperando-seleccion':
-                    instr.innerHTML = 'Selecciona un texto del documento con el mouse <span class="key">(click y arrastrar)</span>';
-                    break;
-                case 'esperando-copiar':
-                    instr.innerHTML = 'Presiona <span class="key combo">Ctrl+C</span> para copiar el texto seleccionado';
-                    break;
-                case 'esperando-pegar':
-                    instr.innerHTML = 'Presiona <span class="key combo">Ctrl+V</span> para pegar donde está el cursor';
-                    break;
-                case 'completado':
-                    instr.textContent = '🎉 ¡Felicidades! Has completado la práctica';
-                    break;
-            }
         }
 
         // ========== CONTROLES DE VENTANA ==========
@@ -680,7 +689,7 @@
             }
         }
 
-        // Show ruler by default in Ver tab
+        // Show ruler only in Ver tab
         function cambiarPestana(pestana) {
             document.querySelectorAll('.ribbon-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.ribbon-content').forEach(c => c.classList.remove('active'));
@@ -690,7 +699,6 @@
             document.querySelector(`.ribbon-tab:nth-child(${indice})`).classList.add('active');
             document.getElementById('ribbon-' + pestana).classList.add('active');
             
-            // Show ruler only in Ver tab
             if (pestana === 'ver') {
                 if (!rulerVisible) toggleRuler();
             } else {
@@ -711,6 +719,5 @@
                 now.getMinutes().toString().padStart(2, '0');
         }, 1000);
     </script>
-    <script src="simulacion-core.js"></script>
 </body>
 </html>

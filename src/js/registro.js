@@ -60,7 +60,10 @@ formRegistro.addEventListener('submit', async (e) => {
 });
 
 // Ir a login
-linkLogin.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.api.irA('login');
-});
+// BUG-04: verificar que el elemento existe antes de asignar listener
+if (linkLogin) {
+    linkLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.api.irA('login');
+    });
+}

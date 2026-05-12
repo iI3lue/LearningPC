@@ -6,26 +6,75 @@
     <title>Insertar elementos - PowerPoint Comandos</title>
     <link rel="stylesheet" href="../../simulacion-core.css">
     <link rel="stylesheet" href="../../simulacion-office.css">
+    <style>
+        /* Modals */
+        .ppt-modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 50; display: none; align-items: center; justify-content: center; }
+        .ppt-modal { background: #2d2d2d; border: 1px solid #444; border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); width: 400px; display: flex; flex-direction: column; }
+        .ppt-modal-header { padding: 12px 16px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
+        .ppt-modal-header h3 { margin: 0; color: #fff; font-size: 14px; font-weight: normal; }
+        .ppt-modal-close { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; }
+        .ppt-modal-close:hover { color: #fff; }
+        .ppt-modal-body { padding: 16px; }
+        
+        /* Grid Imágenes */
+        .img-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .img-item { background: #1a1a1a; border: 2px solid transparent; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; transition: all 0.2s; border-radius: 4px; }
+        .img-item:hover { border-color: #c43e1c; background: #333; }
+        
+        /* Formas */
+        .shape-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+        .shape-item { background: #1a1a1a; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; border: 2px solid transparent; border-radius: 4px; color: #fff; }
+        .shape-item:hover { border-color: #c43e1c; }
+        .shape-item.selected { border-color: #c43e1c; background: rgba(196, 62, 28, 0.2); }
+        .color-picker { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+        .color-item { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .color-item.selected { border-color: #fff; transform: scale(1.1); }
+        
+        /* Tabla Picker */
+        .table-picker { display: flex; flex-direction: column; align-items: center; }
+        .table-grid { display: grid; grid-template-columns: repeat(8, 20px); grid-template-rows: repeat(8, 20px); gap: 2px; margin-bottom: 12px; }
+        .table-cell-picker { border: 1px solid #555; background: #1a1a1a; cursor: pointer; }
+        .table-cell-picker.hovered { background: rgba(196, 62, 28, 0.5); border-color: #c43e1c; }
+        .table-size-label { color: #ccc; font-size: 13px; margin-bottom: 12px; }
+
+        /* Slide Canvas */
+        .app-powerpoint .slide { background: linear-gradient(135deg, #1f4037, #99f2c8); justify-content: flex-start; padding: 40px; position: relative; overflow: hidden; align-items: center; }
+        .slide-title-area { width: 100%; text-align: center; margin-bottom: 30px; }
+        .slide-title-area h1 { margin: 0; font-size: 40px; font-weight: bold; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+        .slide-subtitle { color: #1f4037; font-size: 20px; margin-top: 10px; font-weight: 600; text-shadow: 1px 1px 2px rgba(255,255,255,0.5); }
+        .slide-elements-area { display: flex; justify-content: space-around; align-items: center; width: 100%; flex: 1; flex-wrap: wrap; gap: 20px; }
+        
+        .inserted-img { font-size: 90px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .inserted-shape { font-size: 100px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .inserted-table { border-collapse: collapse; background: rgba(255,255,255,0.8); border-radius: 4px; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.3); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #333; }
+        .inserted-table th { background: #c43e1c; color: white; padding: 6px 12px; font-size: 12px; text-align: left; border: 1px solid rgba(0,0,0,0.1); }
+        .inserted-table td { padding: 6px 12px; font-size: 11px; border: 1px solid rgba(0,0,0,0.1); }
+        
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .btn-insert-modal { background: #c43e1c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: 600; }
+        .btn-insert-modal:hover { background: #a33317; }
+        .btn-insert-modal:disabled { background: #555; color: #888; cursor: not-allowed; }
+    </style>
 </head>
 <body class="app-powerpoint">
     <div class="desktop">
         <div class="control-panel" id="panel-inicio">
             <h2>Insertar elementos</h2>
-            <p>Aprende a insertar imágenes, formas y tablas en tus presentaciones</p>
+            <p>Aprende a enriquecer tus presentaciones insertando imágenes, formas y tablas con diseño visual.</p>
             <button class="btn-iniciar" onclick="iniciarSimulacion()">Comenzar práctica</button>
             <div class="hint-box">
                 <h4>📽️ ¿Qué vas a practicar?</h4>
-                <p>Insertar una imagen</p>
-                <p>Insertar una forma</p>
-                <p>Insertar una tabla</p>
-                <p>Inserta al menos 2 elementos diferentes</p>
+                <p>1. Insertar una imagen desde la galería</p>
+                <p>2. Elegir e insertar una forma con color</p>
+                <p>3. Dibujar e insertar una tabla de datos</p>
             </div>
         </div>
 
         <div class="ventana" id="ventana">
             <div class="title-bar">
                 <div class="app-icon"><span>P</span></div>
-                <span class="doc-name">Presentación1 - PowerPoint</span>
+                <span class="doc-name">Diseño Visual - PowerPoint</span>
                 <div class="window-controls">
                     <div class="window-btn" onclick="minimizarPpt()">
                         <svg viewBox="0 0 10 1"><rect width="10" height="1" fill="#fff"/></svg>
@@ -46,13 +95,13 @@
                 <div class="ribbon-content active">
                     <div class="ribbon-group">
                         <div class="ribbon-group-items">
-                            <div class="ribbon-btn" id="btn-imagen" title="Imagen" onclick="insertarImagen()">
+                            <div class="ribbon-btn" id="btn-imagen" title="Imagen" onclick="abrirModal('modal-imagen')">
                                 <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                             </div>
-                            <div class="ribbon-btn" id="btn-forma" title="Forma" onclick="insertarForma()">
+                            <div class="ribbon-btn" id="btn-forma" title="Forma" onclick="abrirModal('modal-forma')">
                                 <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                             </div>
-                            <div class="ribbon-btn" id="btn-tabla" title="Tabla" onclick="insertarTabla()">
+                            <div class="ribbon-btn" id="btn-tabla" title="Tabla" onclick="abrirModal('modal-tabla')">
                                 <svg viewBox="0 0 24 24"><path d="M20 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h15v14z"/></svg>
                             </div>
                         </div>
@@ -67,9 +116,12 @@
                 </div>
                 <div class="slide-canvas">
                     <div class="slide" id="slide">
-                        <div class="slide-content" id="slide-content">
-                            <h1>Mi presentación</h1>
-                            <p>Usa los botones de arriba para insertar elementos aquí.</p>
+                        <div class="slide-title-area">
+                            <h1>Nuestra Compañía</h1>
+                            <div class="slide-subtitle">Reporte de crecimiento anual</div>
+                        </div>
+                        <div class="slide-elements-area" id="slide-elements-area">
+                            <!-- Los elementos insertados aparecerán aquí -->
                         </div>
                     </div>
                 </div>
@@ -79,10 +131,95 @@
                 <span>Diapositiva 1 de 1</span>
                 <span>Listo</span>
             </div>
+
+            <!-- Modals Overlay -->
+            <div class="ppt-modal-overlay" id="modal-imagen">
+                <div class="ppt-modal">
+                    <div class="ppt-modal-header">
+                        <h3>Insertar Imágenes en línea</h3>
+                        <button class="ppt-modal-close" onclick="cerrarModal('modal-imagen')">✕</button>
+                    </div>
+                    <div class="ppt-modal-body">
+                        <div class="img-grid">
+                            <div class="img-item" onclick="insertarImagen('🏔️')">🏔️</div>
+                            <div class="img-item" onclick="insertarImagen('🏙️')">🏙️</div>
+                            <div class="img-item" onclick="insertarImagen('📈')">📈</div>
+                            <div class="img-item" onclick="insertarImagen('💻')">💻</div>
+                            <div class="img-item" onclick="insertarImagen('👥')">👥</div>
+                            <div class="img-item" onclick="insertarImagen('🚀')">🚀</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ppt-modal-overlay" id="modal-forma">
+                <div class="ppt-modal">
+                    <div class="ppt-modal-header">
+                        <h3>Insertar Forma</h3>
+                        <button class="ppt-modal-close" onclick="cerrarModal('modal-forma')">✕</button>
+                    </div>
+                    <div class="ppt-modal-body">
+                        <div class="color-picker" id="shape-colors">
+                            <div class="color-item selected" style="background:#0078d4" onclick="seleccionarColorForma(this, '#0078d4')"></div>
+                            <div class="color-item" style="background:#107c41" onclick="seleccionarColorForma(this, '#107c41')"></div>
+                            <div class="color-item" style="background:#c43e1c" onclick="seleccionarColorForma(this, '#c43e1c')"></div>
+                            <div class="color-item" style="background:#ffb900" onclick="seleccionarColorForma(this, '#ffb900')"></div>
+                            <div class="color-item" style="background:#881798" onclick="seleccionarColorForma(this, '#881798')"></div>
+                        </div>
+                        <div class="shape-grid" id="shape-grid">
+                            <div class="shape-item selected" onclick="seleccionarForma(this, '⬛')">⬛</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '⏺️')">⏺️</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '🔺')">🔺</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '⭐')">⭐</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '➡️')">➡️</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '☁️')">☁️</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '❤️')">❤️</div>
+                            <div class="shape-item" onclick="seleccionarForma(this, '💠')">💠</div>
+                        </div>
+                        <button class="btn-insert-modal" onclick="confirmarForma()">Insertar Forma</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ppt-modal-overlay" id="modal-tabla">
+                <div class="ppt-modal" style="width: 250px;">
+                    <div class="ppt-modal-header">
+                        <h3>Insertar Tabla</h3>
+                        <button class="ppt-modal-close" onclick="cerrarModal('modal-tabla')">✕</button>
+                    </div>
+                    <div class="ppt-modal-body">
+                        <div class="table-picker">
+                            <div class="table-size-label" id="table-size-label">Tabla 1x1</div>
+                            <div class="table-grid" id="table-picker-grid">
+                                <!-- Generado por JS -->
+                            </div>
+                            <button class="btn-insert-modal" id="btn-confirm-table" onclick="confirmarTabla()">Insertar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <p id="instruccion-texto">Usa los botones de Insertar: Imagen, Forma o Tabla</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Comencemos por agregar contexto visual. Haz clic en <strong>Imagen</strong> y selecciona una gráfica de la biblioteca.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Diseño Completo! 📽️</h3>
+            <p>Has aprendido a enriquecer tus diapositivas insertando elementos visuales correctamente.</p>
         </div>
 
         <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
@@ -108,10 +245,108 @@
         </div>
     </div>
 
+    <script src="../../simulacion-core.js"></script>
     <script>
         let pptVisible = false;
         let nivelCompletado = false;
-        let elementosInsertados = new Set();
+        let tourStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        // Variables de estado para formas y tablas
+        let formaSeleccionada = '⬛';
+        let colorForma = '#0078d4';
+        let tablaCols = 1;
+        let tablaRows = 1;
+
+        // Inicializar grid de tabla
+        function initTablePicker() {
+            const grid = document.getElementById('table-picker-grid');
+            grid.innerHTML = '';
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'table-cell-picker';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    cell.addEventListener('mouseover', () => hoverTable(r, c));
+                    grid.appendChild(cell);
+                }
+            }
+            hoverTable(0, 0); // Default 1x1
+        }
+
+        function hoverTable(row, col) {
+            tablaRows = row + 1;
+            tablaCols = col + 1;
+            document.getElementById('table-size-label').textContent = `Tabla ${tablaCols}x${tablaRows}`;
+            
+            const cells = document.querySelectorAll('.table-cell-picker');
+            cells.forEach(cell => {
+                const r = parseInt(cell.dataset.r);
+                const c = parseInt(cell.dataset.c);
+                if (r <= row && c <= col) {
+                    cell.classList.add('hovered');
+                } else {
+                    cell.classList.remove('hovered');
+                }
+            });
+        }
+
+        initTablePicker();
+
+        // Control del Tour
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(tourStep) {
+                case 1:
+                    title.textContent = "Paso 1: Insertar Imagen";
+                    content.innerHTML = "Comencemos por agregar contexto visual. Haz clic en <strong>Imagen</strong> en la cinta y selecciona una gráfica de la biblioteca.";
+                    step.textContent = "1/3";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Insertar Forma";
+                    content.innerHTML = "Ahora, haz clic en <strong>Forma</strong>, selecciona un estilo y un color de relleno para destacar información.";
+                    step.textContent = "2/3";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Insertar Tabla";
+                    content.innerHTML = "Finalmente, haz clic en <strong>Tabla</strong>, selecciona la cantidad de celdas en la cuadrícula y haz clic en Insertar.";
+                    step.textContent = "3/3";
+                    break;
+            }
+            
+            popup.className = "tour-popup visible toolbar-pos";
+            nextBtn.style.display = pasoCompletado[tourStep] ? 'block' : 'none';
+            
+            // Habilitar o deshabilitar botones de la ribbon
+            document.getElementById('btn-imagen').style.opacity = (tourStep === 1 || pasoCompletado[1]) ? '1' : '0.5';
+            document.getElementById('btn-forma').style.opacity = (tourStep === 2 || pasoCompletado[2]) ? '1' : '0.5';
+            document.getElementById('btn-tabla').style.opacity = (tourStep === 3 || pasoCompletado[3]) ? '1' : '0.5';
+            
+            document.getElementById('btn-imagen').style.pointerEvents = (tourStep === 1 || pasoCompletado[1]) ? 'auto' : 'none';
+            document.getElementById('btn-forma').style.pointerEvents = (tourStep === 2 || pasoCompletado[2]) ? 'auto' : 'none';
+            document.getElementById('btn-tabla').style.pointerEvents = (tourStep === 3 || pasoCompletado[3]) ? 'auto' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[tourStep]) {
+                tourStep++;
+                if (tourStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
 
         function completarNivel() {
             if (nivelCompletado) return;
@@ -121,12 +356,13 @@
             }
         }
 
+        // Simulación General
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('ventana').classList.add('visible');
-            document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('taskbar-ppt').classList.add('active');
             pptVisible = true;
+            updateTourPopup();
         }
 
         function focusPpt() {
@@ -135,58 +371,97 @@
             document.getElementById('taskbar-ppt').classList.add('active');
         }
 
-        function insertarImagen() {
-            const content = document.getElementById('slide-content');
-            const imagen = document.createElement('div');
-            imagen.className = 'inserted-image';
-            imagen.innerHTML = '📷 Imagen insertada';
-            content.appendChild(imagen);
-            elementosInsertados.add('imagen');
-            document.getElementById('btn-imagen').classList.add('active');
+        // Modales
+        function abrirModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function cerrarModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // Acciones de Inserción
+        function insertarImagen(emoji) {
+            if (tourStep !== 1) return;
+            
+            const area = document.getElementById('slide-elements-area');
+            const el = document.createElement('div');
+            el.className = 'inserted-img';
+            el.textContent = emoji;
+            area.appendChild(el);
+            
+            cerrarModal('modal-imagen');
             mostrarToast('Imagen insertada');
-            verificarCompletado();
+            
+            pasoCompletado[1] = true;
+            updateTourPopup();
         }
 
-        function insertarForma() {
-            const content = document.getElementById('slide-content');
-            const forma = document.createElement('div');
-            forma.className = 'inserted-shape';
-            content.appendChild(forma);
-            elementosInsertados.add('forma');
-            document.getElementById('btn-forma').classList.add('active');
+        // Formas
+        function seleccionarColorForma(elem, color) {
+            document.querySelectorAll('#shape-colors .color-item').forEach(el => el.classList.remove('selected'));
+            elem.classList.add('selected');
+            colorForma = color;
+        }
+
+        function seleccionarForma(elem, forma) {
+            document.querySelectorAll('#shape-grid .shape-item').forEach(el => el.classList.remove('selected'));
+            elem.classList.add('selected');
+            formaSeleccionada = forma;
+        }
+
+        function confirmarForma() {
+            if (tourStep !== 2) return;
+            
+            const area = document.getElementById('slide-elements-area');
+            const el = document.createElement('div');
+            el.className = 'inserted-shape';
+            el.style.color = colorForma;
+            el.textContent = formaSeleccionada;
+            area.appendChild(el);
+            
+            cerrarModal('modal-forma');
             mostrarToast('Forma insertada');
-            verificarCompletado();
+            
+            pasoCompletado[2] = true;
+            updateTourPopup();
         }
 
-        function insertarTabla() {
-            const content = document.getElementById('slide-content');
-            const tabla = document.createElement('div');
+        // Tablas
+        function confirmarTabla() {
+            if (tourStep !== 3) return;
+            
+            const area = document.getElementById('slide-elements-area');
+            const tabla = document.createElement('table');
             tabla.className = 'inserted-table';
-            tabla.innerHTML = `
-                <table>
-                    <tr><th>Nombre</th><th>Edad</th></tr>
-                    <tr><td>Ana</td><td>25</td></tr>
-                    <tr><td>Juan</td><td>30</td></tr>
-                </table>
-            `;
-            content.appendChild(tabla);
-            elementosInsertados.add('tabla');
-            document.getElementById('btn-tabla').classList.add('active');
-            mostrarToast('Tabla insertada');
-            verificarCompletado();
-        }
-
-        function verificarCompletado() {
-            if (nivelCompletado) return;
-            if (elementosInsertados.size >= 2) {
-                nivelCompletado = true;
-                mostrarToast('🎉 ¡Felicidades! Insertaste ' + elementosInsertados.size + ' elementos', 'exito');
-                document.getElementById('btn-reiniciar').classList.add('visible');
-                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
-                completarNivel();
+            
+            // Limitamos a 4x4 visualmente para que quepa bien en el layout si el usuario eligió muy grande
+            const rCount = Math.min(tablaRows, 4);
+            const cCount = Math.min(tablaCols, 4);
+            
+            let html = '';
+            for (let r = 0; r < rCount; r++) {
+                html += '<tr>';
+                for (let c = 0; c < cCount; c++) {
+                    if (r === 0) {
+                        html += `<th>Dato ${c+1}</th>`;
+                    } else {
+                        html += `<td>${Math.floor(Math.random() * 100)}</td>`;
+                    }
+                }
+                html += '</tr>';
             }
+            tabla.innerHTML = html;
+            area.appendChild(tabla);
+            
+            cerrarModal('modal-tabla');
+            mostrarToast(`Tabla ${tablaCols}x${tablaRows} insertada`);
+            
+            pasoCompletado[3] = true;
+            updateTourPopup();
         }
 
+        // Ventanas
         function cerrarPpt() {
             document.getElementById('ventana').classList.remove('visible');
             pptVisible = false;

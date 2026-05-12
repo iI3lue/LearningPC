@@ -102,7 +102,6 @@
                 </div>
                 <div class="spreadsheet">
                     <div class="col-headers">
-                        <div class="col-header" style="width: 40px;"></div>
                         <div class="col-header">A</div>
                         <div class="col-header">B</div>
                         <div class="col-header">C</div>
@@ -142,8 +141,25 @@
             </div>
         </div>
 
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <p id="instruccion-texto">Selecciona celdas del encabezado y usa los botones de bordes y centrar</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Selecciona el encabezado y aplica <strong>Bordes</strong>.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Excelente trabajo! 📐</h3>
+            <p>Has aprendido a usar bordes y alineación para que tus tablas de Excel se vean profesionales.</p>
         </div>
 
         <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
@@ -169,11 +185,59 @@
         </div>
     </div>
 
+    <script src="../../simulacion-core.js"></script>
     <script>
         let excelVisible = false;
         let nivelCompletado = false;
-        let selectedCells = [];
-        let tareasCompletadas = { bordes: false, centrar: false };
+        let selectedCellsRefs = [];
+        let tourStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(tourStep) {
+                case 1:
+                    title.textContent = "Paso 1: Bordes";
+                    content.innerHTML = "Selecciona el rango <strong>A1:C1</strong> y haz clic en el botón de <strong>Bordes</strong> para definirlos.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Centrar";
+                    content.innerHTML = "Ahora presiona el botón de <strong>Centrar</strong> para que los títulos queden alineados.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Alineación";
+                    content.innerHTML = "Finalmente, selecciona la celda <strong>A2</strong> (María) y alinéala a la <strong>Izquierda</strong>.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[tourStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[tourStep]) {
+                tourStep++;
+                if (tourStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
 
         function completarNivel() {
             if (nivelCompletado) return;
@@ -186,10 +250,10 @@
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('ventana').classList.add('visible');
-            document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('taskbar-excel').classList.add('active');
             excelVisible = true;
-            selectAllHeaderCells();
+            selectRange(['A1', 'B1', 'C1']);
+            updateTourPopup();
         }
 
         function focusExcel() {
@@ -198,76 +262,144 @@
             document.getElementById('taskbar-excel').classList.add('active');
         }
 
-        function selectAllHeaderCells() {
-            selectedCells = ['A1', 'B1', 'C1'];
+        let isDragging = false;
+        let startCell = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.cell').forEach(cell => {
+                // Prevenir el comportamiento por defecto de drag para evitar conflicto con selección de texto nativa
+                cell.addEventListener('dragstart', (e) => e.preventDefault());
+                
+                cell.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    startCell = this.dataset.cell;
+                    selectRange([startCell]);
+                });
+                
+                cell.addEventListener('mouseover', function(e) {
+                    if (isDragging && startCell) {
+                        const currentCell = this.dataset.cell;
+                        selectRange(getRange(startCell, currentCell));
+                    }
+                });
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        });
+
+        function getRange(start, end) {
+            const cols = ['A', 'B', 'C'];
+            const startCol = cols.indexOf(start[0]);
+            const startRow = parseInt(start[1]);
+            const endCol = cols.indexOf(end[0]);
+            const endRow = parseInt(end[1]);
+            
+            const minCol = Math.min(startCol, endCol);
+            const maxCol = Math.max(startCol, endCol);
+            const minRow = Math.min(startRow, endRow);
+            const maxRow = Math.max(startRow, endRow);
+            
+            let range = [];
+            for (let r = minRow; r <= maxRow; r++) {
+                for (let c = minCol; c <= maxCol; c++) {
+                    range.push(cols[c] + r);
+                }
+            }
+            return range;
+        }
+
+        function selectCell(cellRef) {
+            selectRange([cellRef]);
+        }
+
+        function selectRange(refs) {
             document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
-            selectedCells.forEach(ref => {
+            selectedCellsRefs = refs;
+            selectedCellsRefs.forEach(ref => {
                 const cell = document.querySelector('[data-cell="' + ref + '"]');
                 if (cell) cell.classList.add('selected');
             });
-            document.getElementById('cell-reference').textContent = 'A1:C1';
-            document.getElementById('instruccion-texto').innerHTML = 'Usa los botones de <b>Bordes</b> y <b>Centrar</b> en el encabezado';
+            document.getElementById('cell-reference').textContent = refs.length > 1 ? refs[0] + ':' + refs[refs.length-1] : refs[0];
+            actualizarEstadoBotones();
         }
 
         function toggleBorde() {
-            selectedCells.forEach(ref => {
+            let hasBorder = false;
+            selectedCellsRefs.forEach(ref => {
                 const cell = document.querySelector('[data-cell="' + ref + '"]');
                 if (cell) {
                     cell.classList.toggle('border-all');
+                    if (cell.classList.contains('border-all')) hasBorder = true;
                 }
             });
-            tareasCompletadas.bordes = true;
-            verificarCompletado();
+            
+            if (tourStep === 1 && selectedCellsRefs.includes('A1') && hasBorder) {
+                pasoCompletado[1] = true;
+                updateTourPopup();
+            }
+            
             mostrarToast('Bordes aplicados');
         }
 
         function centrarCelda() {
-            selectedCells.forEach(ref => {
+            selectedCellsRefs.forEach(ref => {
                 const cell = document.querySelector('[data-cell="' + ref + '"]');
                 if (cell) {
                     cell.classList.remove('left', 'right');
                     cell.classList.add('center');
                 }
             });
-            document.getElementById('btn-centrar').classList.add('active');
-            tareasCompletadas.centrar = true;
-            verificarCompletado();
+            
+            if (tourStep === 2 && selectedCellsRefs.includes('A1')) {
+                pasoCompletado[2] = true;
+                updateTourPopup();
+            }
+            
+            actualizarEstadoBotones();
             mostrarToast('Centrado');
         }
 
         function izquierdaCelda() {
-            selectedCells.forEach(ref => {
+            selectedCellsRefs.forEach(ref => {
                 const cell = document.querySelector('[data-cell="' + ref + '"]');
                 if (cell) {
                     cell.classList.remove('center', 'right');
                     cell.classList.add('left');
                 }
             });
-            verificarCompletado();
+            
+            if (tourStep === 3 && selectedCellsRefs.includes('A2')) {
+                pasoCompletado[3] = true;
+                updateTourPopup();
+            }
+            
+            actualizarEstadoBotones();
             mostrarToast('Alineado a la izquierda');
         }
 
         function derechaCelda() {
-            selectedCells.forEach(ref => {
+            selectedCellsRefs.forEach(ref => {
                 const cell = document.querySelector('[data-cell="' + ref + '"]');
                 if (cell) {
                     cell.classList.remove('center', 'left');
                     cell.classList.add('right');
                 }
             });
-            verificarCompletado();
+            actualizarEstadoBotones();
             mostrarToast('Alineado a la derecha');
         }
 
-        function verificarCompletado() {
-            if (nivelCompletado) return;
-            if (tareasCompletadas.bordes && tareasCompletadas.centrar) {
-                nivelCompletado = true;
-                mostrarToast('🎉 ¡Felicidades! Aplicaste bordes y centraiste', 'exito');
-                document.getElementById('btn-reiniciar').classList.add('visible');
-                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
-                completarNivel();
-            }
+        function actualizarEstadoBotones() {
+            if (selectedCellsRefs.length === 0) return;
+            const ref = selectedCellsRefs[0];
+            const cell = document.querySelector('[data-cell="' + ref + '"]');
+            if (!cell) return;
+            
+            document.getElementById('btn-centrar').classList.toggle('active', cell.classList.contains('center'));
+            document.getElementById('btn-izquierda').classList.toggle('active', cell.classList.contains('left'));
+            document.getElementById('btn-derecha').classList.toggle('active', cell.classList.contains('right'));
         }
 
         function cerrarExcel() {

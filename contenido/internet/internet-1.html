@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nivel 1: Conceptos de Navegación - LearningPC</title>
+    <link rel="stylesheet" href="../simulacion-core.css">
+    <style>
+        /* Estilos específicos para el navegador simulado */
+        .browser-window {
+            width: 1000px;
+            height: 700px;
+            background: #fdfdfd;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+        }
+
+        .browser-window.visible {
+            display: flex;
+        }
+
+        .browser-tabs {
+            height: 40px;
+            background: #dee1e6;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 10px;
+            gap: 5px;
+        }
+
+        .tab {
+            height: 32px;
+            width: 200px;
+            background: #dee1e6;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 12px;
+            color: #5f6368;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: #fff;
+            color: #202124;
+        }
+
+        .browser-toolbar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 10px;
+            border-bottom: 1px solid #dee1e6;
+        }
+
+        .nav-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #5f6368;
+        }
+
+        .nav-btn:hover { background: #f1f3f4; }
+
+        .address-bar {
+            flex: 1;
+            height: 28px;
+            background: #f1f3f4;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 13px;
+            color: #202124;
+            border: 1px solid transparent;
+        }
+
+        .address-bar.highlight {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+        }
+
+        .browser-content {
+            flex: 1;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Página de Buscador Simulada */
+        .search-engine-page {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px;
+        }
+
+        .search-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .search-box-container {
+            width: 500px;
+            height: 44px;
+            border: 1px solid #dfe1e5;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
+        }
+
+        .search-box-container.highlight {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+
+        /* Desktop Icons */
+        .desktop-icon {
+            position: absolute;
+            left: 30px;
+            top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .icon-img {
+            width: 48px;
+            height: 48px;
+            background: #0078d4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Icono de Microsoft Edge -->
+        <div class="desktop-icon" onclick="checkStep(1)">
+            <div class="icon-img">🌐</div>
+            <span style="color: #fff; font-size: 12px; text-shadow: 0 1px 2px #000;">Microsoft Edge</span>
+        </div>
+
+        <!-- Ventana del Navegador -->
+        <div class="browser-window" id="ventana-navegador">
+            <div class="browser-tabs">
+                <div class="tab active">Nueva pestaña</div>
+            </div>
+            <div class="browser-toolbar">
+                <div class="nav-btn">←</div>
+                <div class="nav-btn">→</div>
+                <div class="nav-btn">↻</div>
+                <div class="address-bar" id="address-bar" onclick="checkStep(2)">
+                    https://www.google.com
+                </div>
+            </div>
+            <div class="browser-content">
+                <div class="search-engine-page">
+                    <div class="search-logo">
+                        <span style="color: #4285F4">G</span>
+                        <span style="color: #EA4335">o</span>
+                        <span style="color: #FBBC05">o</span>
+                        <span style="color: #4285F4">g</span>
+                        <span style="color: #34A853">l</span>
+                        <span style="color: #EA4335">e</span>
+                    </div>
+                    <div class="search-box-container" id="search-box" onclick="checkStep(3)">
+                        <span style="margin-right: 10px; opacity: 0.5;">🔍</span>
+                        <input type="text" class="search-input" placeholder="Buscar en Google o escribir una URL" readonly>
+                    </div>
+                    <p style="margin-top: 30px; font-size: 13px; color: #5f6368;">
+                        Google ofrecido en: <span style="color: #1a0dab; cursor: pointer;">Español (Latinoamérica)</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/3</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Abrí el <strong>Navegador</strong> (Microsoft Edge) desde el escritorio.
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Explorador de la Red! 🌐</h3>
+            <p>Ya sabés la diferencia crítica: el <strong>Navegador</strong> es el programa y el <strong>Buscador</strong> es el sitio web.</p>
+        </div>
+    </div>
+
+
+    <script src="../simulacion-core.js"></script>
+    <script>
+        let currentStep = 1;
+        let nivelCompletado = false;
+        let pasoCompletado = { 1: false, 2: false, 3: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: El Navegador";
+                    content.innerHTML = "Hacé doble clic en el ícono de <strong>Microsoft Edge</strong> para abrir el navegador.";
+                    step.textContent = "1/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Barra de Direcciones";
+                    content.innerHTML = "Hacé clic en la <strong>Barra de Direcciones</strong> (arriba). Es donde escribís el link directo.";
+                    step.textContent = "2/3";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: El Buscador";
+                    content.innerHTML = "Ahora hacé clic en el cuadro de búsqueda de <strong>Google</strong>. Recordá: Google es una página, no el programa.";
+                    step.textContent = "3/3";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 3) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    finalizarNivel();
+                } else {
+                    updateTourPopup();
+                    if (currentStep === 2) {
+                        document.getElementById('address-bar').classList.add('highlight');
+                    } else {
+                        document.getElementById('address-bar').classList.remove('highlight');
+                    }
+                    if (currentStep === 3) {
+                        document.getElementById('search-box').classList.add('highlight');
+                    }
+                }
+            }
+        }
+
+        function checkStep(stepClicked) {
+            if (stepClicked !== currentStep) return;
+
+            if (currentStep === 1) {
+                abrirNavegador();
+            } else if (currentStep === 2) {
+                pasoCompletado[2] = true;
+                updateTourPopup();
+                mostrarFeedback('¡Correcto! Aquí escribís URLs como youtube.com', 'exito');
+            } else if (currentStep === 3) {
+                pasoCompletado[3] = true;
+                updateTourPopup();
+                mostrarFeedback('¡Bien! El buscador te ayuda a encontrar cosas que no sabés el link.', 'exito');
+            }
+        }
+
+        function abrirNavegador() {
+            document.getElementById('ventana-navegador').classList.add('visible');
+            pasoCompletado[1] = true;
+            updateTourPopup();
+            mostrarFeedback('¡Navegador abierto!', 'exito');
+        }
+
+        function finalizarNivel() {
+            if (nivelCompletado) return;
+            nivelCompletado = true;
+            setTimeout(() => {
+                if (window.parent && window.parent.completarNivelYAvanzar) {
+                    window.parent.completarNivelYAvanzar();
+                }
+            }, 2000);
+        }
+
+        function mostrarFeedback(mensaje, tipo = 'info') {
+            if (typeof window.mostrarFeedback === 'function') {
+                window.mostrarFeedback(mensaje, tipo);
+            }
+        }
+
+        // Inicialización
+        window.addEventListener('load', () => {
+            if (typeof initClock === 'function') initClock();
+            updateTourPopup();
+        });
+    </script>
+</body>
+</html>

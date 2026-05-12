@@ -456,38 +456,6 @@
         }
         
         /* Instrucciones */
-        .instrucciones-panel {
-            position: fixed;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 12px 20px;
-            text-align: center;
-            z-index: 100;
-        }
-        
-        .instrucciones-panel h3 {
-            color: #fff;
-            font-size: 13px;
-            margin-bottom: 4px;
-        }
-        
-        .instrucciones-panel p {
-            color: #9e9e9e;
-            font-size: 11px;
-            margin: 0;
-        }
-        
-        .instrucciones-panel .key {
-            background: #333;
-            padding: 1px 4px;
-            border-radius: 2px;
-            color: #60cdff;
-            font-size: 10px;
-        }
     </style>
 </head>
 <body>
@@ -585,19 +553,25 @@
             </div>
         </div>
         
-        <!-- Popup informativo -->
-        <div class="info-popup" id="info-popup">
-            <div class="info-icon">💡</div>
-            <div class="info-content">
-                <h4 id="info-titulo">¡Bien!</h4>
-                <p id="info-mensaje">Mensaje...</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/4</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Hacé clic en <strong>Documentos</strong> en el panel lateral (Acceso rápido).
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
             </div>
         </div>
-        
-        <!-- Instrucciones -->
-        <div class="instrucciones-panel" id="instrucciones" style="display: none;">
-            <h3>Usa los botones de navegación</h3>
-            <p><span class="key">◀</span> Atrás | <span class="key">▶</span> Adelante | <span class="key">⬆️</span> Subir | <span class="key">🔄</span> Recargar | <span class="key">+</span> Nueva pestaña</p>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Navegación Dominada! 🧭</h3>
+            <p>Ya sabés cómo moverte entre tus carpetas como un profesional.</p>
         </div>
     </div>
     
@@ -794,285 +768,187 @@
         
         const infoPopup = document.getElementById('info-popup');
         
+        let simulacionIniciada = false;
+        let currentStep = 1;
+        let pasoCompletado = { 1: false, 2: false, 3: false, 4: false };
+        let rutaActual = 'Este equipo';
+        let historialAtras = [];
+        let historialAdelante = [];
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(currentStep) {
+                case 1:
+                    title.textContent = "Paso 1: Panel Lateral";
+                    content.innerHTML = "Hacé clic en <strong>Descargas</strong> en el panel lateral. Es la forma más rápida de saltar a carpetas principales.";
+                    step.textContent = "1/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Explorar Contenido";
+                    content.innerHTML = "Volvé a <strong>Este equipo</strong> y entrá a <strong>Disco local (C:)</strong> haciendo doble clic.";
+                    step.textContent = "2/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 3:
+                    title.textContent = "Paso 3: Botón Atrás";
+                    content.innerHTML = "Usá el botón <strong>◀ Atrás</strong> en la barra de herramientas para volver a la carpeta anterior.";
+                    step.textContent = "3/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+                case 4:
+                    title.textContent = "Paso 4: Subir Nivel";
+                    content.innerHTML = "Navegá hasta una subcarpeta (ej. Windows) y usá el botón <strong>⬆️ Subir</strong> para ir a la carpeta contenedora.";
+                    step.textContent = "4/4";
+                    popup.className = "tour-popup visible theory-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[currentStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[currentStep]) {
+                currentStep++;
+                if (currentStep > 4) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
+
         function iniciarSimulacion() {
             simulacionIniciada = true;
             document.getElementById('panel-control').style.display = 'none';
-            const ventana = document.getElementById('ventana-explorador');
-            ventana.style.display = 'flex';
-            ventana.style.left = '80px';
-            ventana.style.top = '40px';
-            bringToFront(ventana);
-            document.getElementById('instrucciones').style.display = 'block';
+            document.getElementById('ventana-explorador').style.display = 'flex';
             document.getElementById('taskbar-explorador').classList.add('active');
-            actualizarContenido();
-            actualizarBotones();
-            actualizarBreadcrumbs();
-            actualizarEstado();
-            actualizarPestañas();
+            renderizarContenido();
+            updateTourPopup();
         }
-        
-        function navegarA(ruta) {
-            if (!estructura[ruta]) return;
-            if (ruta !== rutaActual) {
+
+        function navegarA(nuevaRuta, esRetroceso = false) {
+            if (rutaActual === nuevaRuta) return;
+            
+            if (!esRetroceso) {
                 historialAtras.push(rutaActual);
                 historialAdelante = [];
             }
-            rutaActual = ruta;
-            pestañas[pestañaActiva].ruta = ruta;
-            pestañas[pestañaActiva].titulo = ruta;
-            actualizarContenido();
-            actualizarBotones();
-            actualizarBreadcrumbs();
-            actualizarEstado();
-            actualizarPestañas();
-            actualizarPanelLateral();
-        }
-        
-        function actualizarContenido() {
-            const area = document.getElementById('area-principal');
-            const datos = estructura[rutaActual];
-            if (!datos) {
-                area.innerHTML = '<p style="color:#666;padding:20px;">Carpeta vacía</p>';
-                return;
-            }
             
-            let html = '';
+            rutaActual = nuevaRuta;
+            renderizarContenido();
             
-            // Carpetas
-            if (datos.carpetas && datos.carpetas.length > 0) {
-                datos.carpetas.forEach(c => {
-                    html += `<div class="carpeta" onclick="navegarA('${c.nombre}')">
-                        <span class="icono">${c.icon}</span>
-                        <span class="nombre">${c.nombre}</span>
-                    </div>`;
-                });
-            }
-            
-            // Archivos
-            if (datos.archivos && datos.archivos.length > 0) {
-                datos.archivos.forEach(a => {
-                    html += `<div class="archivo" onclick="mostrarInfoArchivo('${a.nombre}')">
-                        <span class="icono">${a.icon}</span>
-                        <span class="nombre">${a.nombre}</span>
-                    </div>`;
-                });
-            }
-            
-            if (!html) {
-                html = '<p style="color:#666;padding:20px;">Carpeta vacía</p>';
-            }
-            
-            area.innerHTML = html;
-        }
-        
-        function actualizarBotones() {
-            const btnAtras = document.getElementById('btn-atras');
-            const btnAdelante = document.getElementById('btn-adelante');
-            if (btnAtras) btnAtras.disabled = historialAtras.length === 0;
-            if (btnAdelante) btnAdelante.disabled = historialAdelante.length === 0;
-        }
-        
-        function actualizarBreadcrumbs() {
-            const container = document.getElementById('breadcrumbs');
-            const path = obtenerRuta();
-            let html = '';
-            path.forEach((parte, i) => {
-                if (i > 0) html += '<span class="breadcrumb sep">></span>';
-                const esActual = i === path.length - 1;
-                html += `<span class="breadcrumb ${esActual ? 'current' : ''}" onclick="navegarA('${parte}')">${parte}</span>`;
-            });
-            container.innerHTML = html;
-        }
-        
-        function obtenerRuta() {
-            const path = [rutaActual];
-            let actual = rutaActual;
-            while (rutasPadre[actual]) {
-                actual = rutasPadre[actual];
-                path.unshift(actual);
-            }
-            return path;
-        }
-        
-        function actualizarEstado() {
-            const datos = estructura[rutaActual];
-            let count = 0;
-            if (datos) {
-                count = (datos.carpetas?.length || 0) + (datos.archivos?.length || 0);
-            }
-            document.getElementById('status-elementos').textContent = count + ' elementos';
-            document.getElementById('status-ruta').textContent = obtenerRuta().join(' > ');
-        }
-        
-        function actualizarPanelLateral() {
-            document.querySelectorAll('.panel-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            const panelDiscos = document.getElementById('panel-discos');
-            if (rutaActual === 'Este equipo') {
-                panelDiscos.classList.add('active');
+            // Validar pasos
+            if (currentStep === 1 && nuevaRuta === 'Descargas') {
+                marcarPaso(1);
+            } else if (currentStep === 2 && nuevaRuta === 'Disco local (C:)') {
+                marcarPaso(2);
             }
         }
-        
-        // Navegación
+
+        function marcarPaso(n) {
+            if (!pasoCompletado[n]) {
+                pasoCompletado[n] = true;
+                mostrarToast(`✓ Paso ${n} completado`, 'exito');
+                updateTourPopup();
+            }
+        }
+
         function navegarAtras() {
             if (historialAtras.length > 0) {
+                const anterior = historialAtras.pop();
                 historialAdelante.push(rutaActual);
-                rutaActual = historialAtras.pop();
-                pestañas[pestañaActiva].ruta = rutaActual;
-                pestañas[pestañaActiva].titulo = rutaActual;
-                actualizarContenido();
-                actualizarBotones();
-                actualizarBreadcrumbs();
-                actualizarEstado();
-                actualizarPestañas();
-                mostrarInfo('¡Has vuelto!', 'Navegaste hacia atrás en tu historial.');
+                navegarA(anterior, true);
+                if (currentStep === 3) marcarPaso(3);
             }
         }
-        
+
         function navegarAdelante() {
             if (historialAdelante.length > 0) {
+                const siguiente = historialAdelante.pop();
                 historialAtras.push(rutaActual);
-                rutaActual = historialAdelante.pop();
-                pestañas[pestañaActiva].ruta = rutaActual;
-                pestañas[pestañaActiva].titulo = rutaActual;
-                actualizarContenido();
-                actualizarBotones();
-                actualizarBreadcrumbs();
-                actualizarEstado();
-                actualizarPestañas();
-                mostrarInfo('¡Adelante!', 'Navegaste hacia adelante en tu historial.');
+                navegarA(siguiente, true);
             }
         }
-        
-        function recargarContenido() {
-            actualizarContenido();
-            mostrarInfo('¡Actualizado!', 'El contenido de la carpeta se ha recargado.');
-        }
-        
+
         function subirNivel() {
             const padre = rutasPadre[rutaActual];
             if (padre) {
-                historialAtras.push(rutaActual);
-                historialAdelante = [];
-                rutaActual = padre;
-                pestañas[pestañaActiva].ruta = rutaActual;
-                pestañas[pestañaActiva].titulo = rutaActual;
-                actualizarContenido();
-                actualizarBotones();
-                actualizarBreadcrumbs();
-                actualizarEstado();
-                actualizarPestañas();
-                mostrarInfo('¡Subiste de nivel!', 'Ahora estás en la carpeta padre.');
-                // Marcar completación después de demostrar navegación
-                setTimeout(marcarCompletadoNivel, 500);
+                navegarA(padre);
+                if (currentStep === 4) marcarPaso(4);
             }
         }
-        
-        // Sistema de pestañas
-        function nuevaPestana() {
-            pestañas.push({ ruta: 'Este equipo', titulo: 'Este equipo' });
-            pestañaActiva = pestañas.length - 1;
-            rutaActual = 'Este equipo';
-            actualizarContenido();
-            actualizarBotones();
-            actualizarBreadcrumbs();
-            actualizarEstado();
-            actualizarPestañas();
-            mostrarInfo('¡Nueva pestaña!', 'Has creado una nueva pestaña. Cada pestaña puede mostrar una ubicación diferente.');
-        }
-        
-        function cambiarPestana(index) {
-            if (index >= 0 && index < pestañas.length) {
-                pestañaActiva = index;
-                rutaActual = pestañas[index].ruta;
-                actualizarContenido();
-                actualizarBotones();
-                actualizarBreadcrumbs();
-                actualizarEstado();
-                actualizarPestañas();
-            }
-        }
-        
-        function cerrarPestana(event, index) {
-            event.stopPropagation();
-            if (pestañas.length === 1) {
-                cerrarVentana('explorador');
-                return;
-            }
-            pestañas.splice(index, 1);
-            if (pestañaActiva >= pestañas.length) {
-                pestañaActiva = pestañas.length - 1;
-            }
-            rutaActual = pestañas[pestañaActiva].ruta;
-            actualizarContenido();
-            actualizarBotones();
-            actualizarBreadcrumbs();
-            actualizarEstado();
-            actualizarPestañas();
-        }
-        
-        function actualizarPestañas() {
-            const container = document.getElementById('explorador-tabs');
-            const btnNueva = container.querySelector('.nueva-pestana-btn');
+
+        function renderizarContenido() {
+            const container = document.getElementById('area-principal');
+            const breadcrumbs = document.getElementById('breadcrumbs');
+            const statusElementos = document.getElementById('status-elementos');
+            const data = estructura[rutaActual] || { carpetas: [], archivos: [] };
             
-            // Limpiar tabs existentes
-            Array.from(container.children).forEach(child => {
-                if (!child.classList.contains('nueva-pestana-btn')) {
-                    child.remove();
-                }
+            container.innerHTML = '';
+            
+            // Render carpetas
+            data.carpetas.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'carpeta';
+                div.onclick = () => navegarA(c.nombre);
+                div.innerHTML = `<span class="icono">${c.icon}</span><span class="nombre">${c.nombre}</span>`;
+                container.appendChild(div);
             });
             
-            // Crear tabs
-            pestañas.forEach((tab, i) => {
-                const datos = estructura[tab.ruta] || { icon: '📁' };
-                const tabEl = document.createElement('div');
-                tabEl.className = 'explorador-tab' + (i === pestañaActiva ? ' active' : '');
-                tabEl.onclick = () => cambiarPestana(i);
-                tabEl.innerHTML = `
-                    <span class="icono">${datos.icon}</span>
-                    <span class="titulo">${tab.titulo}</span>
-                    <span class="cerrar" onclick="cerrarPestana(event, ${i})">×</span>
-                `;
-                container.insertBefore(tabEl, btnNueva);
+            // Render archivos
+            data.archivos.forEach(a => {
+                const div = document.createElement('div');
+                div.className = 'archivo';
+                div.innerHTML = `<span class="icono">${a.icon}</span><span class="nombre">${a.nombre}</span>`;
+                container.appendChild(div);
+            });
+            
+            breadcrumbs.innerHTML = `<span class="breadcrumb current">${rutaActual}</span>`;
+            statusElementos.textContent = `${data.carpetas.length + data.archivos.length} elementos`;
+            
+            document.getElementById('btn-atras').disabled = historialAtras.length === 0;
+            document.getElementById('btn-adelante').disabled = historialAdelante.length === 0;
+
+            // Actualizar panel lateral active
+            document.querySelectorAll('.panel-item').forEach(item => {
+                const texto = item.querySelector('.texto').textContent;
+                if (texto === rutaActual) item.classList.add('active');
+                else item.classList.remove('active');
             });
         }
-        
-        // Popups informativos
-        function mostrarInfo(titulo, mensaje) {
-            document.getElementById('info-titulo').textContent = titulo;
-            document.getElementById('info-mensaje').textContent = mensaje;
-            infoPopup.classList.add('visible');
-            if (infoTimeout) clearTimeout(infoTimeout);
-            infoTimeout = setTimeout(() => {
-                infoPopup.classList.remove('visible');
-            }, 4000);
+
+        function completarNivel() {
+            if (window.parent && window.parent.completarNivelYAvanzar) {
+                window.parent.completarNivelYAvanzar();
+            }
         }
-        
+
         function mostrarInfoBarraDireccion() {
-            mostrarInfo('Barra de dirección', 'Aquí ves la ruta de la carpeta actual. Haz clic en cualquier nombre para ir directamente a esa carpeta.');
+            mostrarToast("La barra de dirección te muestra dónde estás parado exactamente.");
         }
-        
-        function mostrarInfoArchivo(nombre) {
-            mostrarInfo('Archivo: ' + nombre, 'Has seleccionado un archivo. En Windows real, puedes hacer click derecho para ver más opciones.');
+
+        function recargarContenido() {
+            mostrarToast("✓ Carpeta actualizada");
+            renderizarContenido();
         }
-        
-        // Callback para cerrar ventana
-        function onVentanaCerrada(tipo) {
-            if (tipo === 'explorador') {
-                simulacionIniciada = false;
-                document.getElementById('ventana-explorador').style.display = 'none';
-                document.getElementById('panel-control').style.display = 'block';
-                document.getElementById('instrucciones').style.display = 'none';
-                document.getElementById('taskbar-explorador').classList.remove('active');
-                // Resetear estado
-                historialAtras = [];
-                historialAdelante = [];
-                rutaActual = 'Este equipo';
-                pestañas = [{ ruta: 'Este equipo', titulo: 'Este equipo' }];
-                pestañaActiva = 0;
-            }
+
+        function nuevaPestana() {
+            mostrarToast("Las pestañas te permiten tener varias carpetas abiertas en la misma ventana.");
         }
+
+        window.addEventListener('load', () => {
+            if (typeof initClock === 'function') initClock();
+        });
     </script>
 </body>
 </html>

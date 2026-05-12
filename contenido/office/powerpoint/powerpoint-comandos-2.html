@@ -6,6 +6,16 @@
     <title>Diseño de diapositiva - PowerPoint Comandos</title>
     <link rel="stylesheet" href="../../simulacion-core.css">
     <link rel="stylesheet" href="../../simulacion-office.css">
+    <style>
+        .slide.design-1 { background: #2d2d2d; color: #fff; }
+        .slide.design-2 { background: #1e3a5f; color: #fff; border: 10px solid #2a4b7c; }
+        .slide.design-2 h1 { color: #60cdff; }
+        .slide.design-3 { background: #d24726; color: #fff; border-left: 40px solid #a33317; text-align: left; align-items: flex-start; }
+        .slide.design-3 h1 { border-bottom: 2px solid #fff; width: 100%; }
+        
+        .design-thumb { width: 40px; height: 24px; border: 1px solid #555; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; border-radius: 2px; }
+        .ribbon-btn.active .design-thumb { border-color: #c43e1c; border-width: 2px; }
+    </style>
 </head>
 <body class="app-powerpoint">
     <div class="desktop">
@@ -80,8 +90,25 @@
             </div>
         </div>
 
-        <div class="instrucciones" id="instrucciones" style="display: none;">
-            <p id="instruccion-texto">Prueba los 3 diseños haciendo clic en los botones de Diseño</p>
+        <!-- Tour Popup -->
+        <div id="tour-popup" class="tour-popup">
+            <div class="tour-header">
+                <span class="tour-icon">💡</span>
+                <span class="tour-title" id="tour-title">Paso 1</span>
+                <span class="tour-step" id="tour-step">1/2</span>
+            </div>
+            <div class="tour-content" id="tour-content">
+                Cambia el estilo de la diapositiva seleccionando el <strong>Diseño 2</strong> (Azul).
+            </div>
+            <div class="tour-actions">
+                <button class="tour-btn next" id="tour-next" onclick="nextTourStep()" style="display:none;">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        <div id="success-msg" class="success-msg">
+            <h3>¡Presentación con Estilo! 📽️</h3>
+            <p>Has aprendido a personalizar el aspecto visual de tus diapositivas de forma rápida.</p>
         </div>
 
         <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciarSimulacion()">🔄 Reiniciar</button>
@@ -107,10 +134,52 @@
         </div>
     </div>
 
+    <script src="../../simulacion-core.js"></script>
     <script>
         let pptVisible = false;
         let nivelCompletado = false;
-        let disenosUsados = new Set();
+        let tourStep = 1;
+        let pasoCompletado = { 1: false, 2: false };
+
+        function updateTourPopup() {
+            const title = document.getElementById('tour-title');
+            const content = document.getElementById('tour-content');
+            const step = document.getElementById('tour-step');
+            const popup = document.getElementById('tour-popup');
+            const nextBtn = document.getElementById('tour-next');
+
+            popup.classList.add('visible');
+
+            switch(tourStep) {
+                case 1:
+                    title.textContent = "Paso 1: Diseño Azul";
+                    content.innerHTML = "Cambia el estilo de la diapositiva seleccionando el <strong>Diseño 2</strong> (Azul).";
+                    step.textContent = "1/2";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+                case 2:
+                    title.textContent = "Paso 2: Diseño Rojo";
+                    content.innerHTML = "Ahora prueba el <strong>Diseño 3</strong> (Naranja/Rojo) para ver un estilo más vibrante.";
+                    step.textContent = "2/2";
+                    popup.className = "tour-popup visible toolbar-pos";
+                    break;
+            }
+            
+            nextBtn.style.display = pasoCompletado[tourStep] ? 'block' : 'none';
+        }
+
+        function nextTourStep() {
+            if (pasoCompletado[tourStep]) {
+                tourStep++;
+                if (tourStep > 2) {
+                    document.getElementById('tour-popup').classList.remove('visible');
+                    document.getElementById('success-msg').classList.add('visible');
+                    completarNivel();
+                } else {
+                    updateTourPopup();
+                }
+            }
+        }
 
         function completarNivel() {
             if (nivelCompletado) return;
@@ -123,10 +192,10 @@
         function iniciarSimulacion() {
             document.getElementById('panel-inicio').style.display = 'none';
             document.getElementById('ventana').classList.add('visible');
-            document.getElementById('instrucciones').style.display = 'block';
             document.getElementById('taskbar-ppt').classList.add('active');
             pptVisible = true;
             document.getElementById('design-1').classList.add('active');
+            updateTourPopup();
         }
 
         function focusPpt() {
@@ -142,16 +211,15 @@
             document.querySelectorAll('.ribbon-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('design-' + numero).classList.add('active');
 
-            disenosUsados.add(numero);
-            mostrarToast('Diseño ' + numero + ' aplicado');
-
-            if (disenosUsados.size >= 2) {
-                nivelCompletado = true;
-                mostrarToast('🎉 ¡Felicidades! Probaste ' + disenosUsados.size + ' diseños', 'exito');
-                document.getElementById('btn-reiniciar').classList.add('visible');
-                document.getElementById('instruccion-texto').innerHTML = '🎉 ¡Completado!';
-                completarNivel();
+            if (tourStep === 1 && numero === 2) {
+                pasoCompletado[1] = true;
+                updateTourPopup();
+            } else if (tourStep === 2 && numero === 3) {
+                pasoCompletado[2] = true;
+                updateTourPopup();
             }
+            
+            mostrarToast('Diseño ' + numero + ' aplicado');
         }
 
         function cerrarPpt() {

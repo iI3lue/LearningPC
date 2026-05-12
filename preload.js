@@ -58,4 +58,6 @@ contextBridge.exposeInMainWorld('api', {
     eliminarNivel: (idNivel) => ipcRenderer.invoke('admin:eliminarNivel', idNivel),
     actualizarRutaNivel: (idNivel, ruta) => ipcRenderer.invoke('admin:actualizarRutaNivel', { idNivel, rutaArchivo: ruta }),
     getReporteGeneral: () => ipcRenderer.invoke('admin:getReporteGeneral'),
+    // BUG-07: reset de progreso en BD (no solo localStorage)
+    resetProgreso: (idUsuario) => ipcRenderer.invoke('admin:resetProgreso', idUsuario),
 });

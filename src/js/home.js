@@ -203,7 +203,7 @@
             if (cat.subcategorias) {
                 const subcategoriasConNiveles = cat.subcategorias.filter(sub => 
                     sub.niveles && sub.niveles.length > 0
-                ).slice(0, 3);
+                );
                 
                 subcategoriasHtml = subcategoriasConNiveles.map(sub => {
                     const subCompletados = sub.niveles ? sub.niveles.filter(n => 
@@ -514,7 +514,10 @@
 
             renderCategorias(categoriasConDatos, progresoData, stats);
         } catch (error) {
-            // Error loading dashboard
+            // BUG-10: no silenciar errores del dashboard
+            console.error('[HOME] Error cargando dashboard:', error);
+            const grid = getEl('categorias-grid');
+            if (grid) grid.innerHTML = '<p style="color: var(--accent-solid); padding: 20px;">Error al cargar el panel. Recargá la aplicación.</p>';
         }
     }
 
@@ -534,6 +537,14 @@
         btnFullscreen.addEventListener('click', () => {
             window.api.toggleFullScreen();
         });
+    }
+
+    // BUG-06: NO redefinir window.showToast aquí — viene de toast.js con firma (mensaje, tipo)
+    // Si no existe (p.ej. toast.js no cargó), crear un fallback mínimo
+    if (!window.showToast) {
+        window.showToast = function(mensaje) {
+            console.warn('[HOME] showToast fallback:', mensaje);
+        };
     }
 
     // Init

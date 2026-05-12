@@ -95,8 +95,17 @@ function initProgreso(containerId = 'progreso-container') {
 function cargarProgreso() {
     try {
         const saved = localStorage.getItem('progreso_global');
-        if (saved) progresoGlobal = JSON.parse(saved);
-    } catch(e) {}
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // BUG-03: Set no se serializa en JSON. Usamos Array internamente.
+            progresoGlobal = {
+                ...parsed,
+                completados: Array.isArray(parsed.completados)
+                    ? parsed.completados
+                    : []
+            };
+        }
+    } catch(e) { console.error('[NAV] Error cargando progreso:', e); }
 }
 
 function guardarProgreso() {
@@ -105,11 +114,12 @@ function guardarProgreso() {
 
 function marcarNivelCompletado(categoria, subcategoria, nivelIndex) {
     const key = `${categoria}_${subcategoria}_${nivelIndex}`;
-    if (!progresoGlobal.completados) progresoGlobal.completados = new Set();
-    if (!progresoGlobal.completados.has && progresoGlobal.completados.push) {
+    // BUG-03: usar Array (serializable por JSON) en lugar de Set
+    if (!Array.isArray(progresoGlobal.completados)) {
+        progresoGlobal.completados = [];
+    }
+    if (!progresoGlobal.completados.includes(key)) {
         progresoGlobal.completados.push(key);
-    } else if (!progresoGlobal.completados.has(key)) {
-        progresoGlobal.completados.add(key);
         guardarProgreso();
         renderProgreso();
         verificarLogros();
@@ -120,8 +130,10 @@ function renderProgreso() {
     const container = document.getElementById('progreso-container');
     if (!container) return;
     
-    const total = progresoGlobal.total || 27; // Total de niveles
-    const completados = progresoGlobal.completados?.size || 0;
+    const total = progresoGlobal.total || 27;
+    const completados = Array.isArray(progresoGlobal.completados)
+        ? progresoGlobal.completados.length
+        : 0;
     const porcentaje = total > 0 ? Math.round((completados / total) * 100) : 0;
     
     container.innerHTML = `
@@ -222,7 +234,10 @@ function renderMapaLecciones() {
                         <div class="mapa-niveles">
                             ${Array.from({length: subcat.niveles}, (_, i) => {
                                 const nivelKey = `${cat.nombre}_${subcat.nombre}_${i}`;
-                                const completado = progresoGlobal.completados?.has?.(nivelKey) || progresoGlobal.completados?.includes?.(nivelKey);
+                                const completados = Array.isArray(progresoGlobal.completados)
+                                    ? progresoGlobal.completados
+                                    : [];
+                                const completado = completados.includes(nivelKey);
                                 return `<span class="mapa-nivel ${completado ? 'completado' : ''}">${i + 1}</span>`;
                             }).join('')}
                         </div>
