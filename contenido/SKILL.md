@@ -11,7 +11,7 @@ metadata:
 
 ## Purpose
 
-Generas simulaciones interactivas de Windows 11 para los tutorials de LearningPC. Cada simulación reproduce una parte de la interfaz de Windows 11 con fondo negro y barra de tareas, permitiendo al usuario practicar sin riesgos.
+Generas simulaciones interactivas de Windows 11 para los tutorials de PrimerClic. Cada simulación reproduce una parte de la interfaz de Windows 11 con fondo negro y barra de tareas, permitiendo al usuario practicar sin riesgos.
 
 ## When to Run
 
@@ -21,7 +21,7 @@ Generas simulaciones interactivas de Windows 11 para los tutorials de LearningPC
 
 ## Project Context
 
-El proyecto LearningPC está en: `C:\Workspaces\UCC\Desarrollo Sostenible\LearningPC`
+El proyecto PrimerClic está en: `C:\Workspaces\UCC\Desarrollo Sostenible\PrimerClic`
 
 - Las simulaciones se guardan en: `contenido/`
 - Es una app Electron que enseña Windows
@@ -247,7 +247,7 @@ Según el tipo de tutorial, agrega:
 
 1. Nombre del archivo: `{categoria}-{titulo-slug}.html`
    - Ejemplo: `trucos-dividir-pantalla.html`, `navegacion-explorador.html`
-2. Guarda en: `C:\Workspaces\UCC\Desarrollo Sostenible\LearningPC\contenido\`
+2. Guarda en: `C:\Workspaces\UCC\Desarrollo Sostenible\PrimerClic\contenido\`
 3. Usa minúsculas y guiones para el slug
 
 ### Step 5: Return Summary

@@ -5,7 +5,7 @@ const fs = require('fs');
 const bcrypt = require('bcryptjs');
 
 // Rutas de archivos
-const DB_PATH = path.join(__dirname, 'learning_pc.db');
+const DB_PATH = path.join(__dirname, 'primer_clic.db');
 const { initDatabase, getDatabase } = require('./db/database');
 
 
@@ -20,6 +20,8 @@ function createWindow() {
         resizable: true,
         minWidth: 800,
         minHeight: 600,
+        frame: false,
+        icon: path.join(__dirname, 'src', 'assets', 'images', 'logo.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
@@ -119,6 +121,19 @@ ipcMain.handle('app:getPath', () => __dirname);
 ipcMain.on('window:toggleFullScreen', () => {
     const isFullScreen = mainWindow.isFullScreen();
     mainWindow.setFullScreen(!isFullScreen);
+});
+ipcMain.on('window:minimize', () => {
+    mainWindow.minimize();
+});
+ipcMain.on('window:maximize', () => {
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+    } else {
+        mainWindow.maximize();
+    }
+});
+ipcMain.on('window:close', () => {
+    app.quit();
 });
 
 // DevTools shortcut (Ctrl+Shift+I)

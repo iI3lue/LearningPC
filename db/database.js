@@ -9,7 +9,7 @@ const fs = require('fs');
 const RENDER_DATA_DIR = process.env.RENDER_PERSISTENT_DISK_DIR || 
                        process.env.DATA_DIR || 
                        path.join(__dirname, '..');
-const DB_PATH = path.join(RENDER_DATA_DIR, 'learning_pc.db');
+const DB_PATH = path.join(RENDER_DATA_DIR, 'primer_clic.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
 let db;

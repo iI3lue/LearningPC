@@ -7,157 +7,297 @@
 <link rel="stylesheet" href="../simulacion-core.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',sans-serif;background:#1c1c1c;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
-.win-settings{display:flex;height:calc(100vh - 48px);background:#1c1c1c;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',sans-serif;}
+
+/* ── ESCRITORIO ─────────────────────────────────── */
+#desktop{
+  position:fixed;inset:0 0 48px 0;
+  background:#1a3a5c;
+  transition:background 0.6s ease;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.desktop-icons{
+  position:absolute;top:16px;left:16px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.desktop-icon{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px;border-radius:6px;cursor:pointer;
+  color:#fff;font-size:11px;text-align:center;width:72px;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);
+  transition:background .15s;user-select:none;
+}
+.desktop-icon:hover{background:rgba(255,255,255,.15);}
+.desktop-icon .ico{font-size:28px;}
+
+/* ── HINT OVERLAY ───────────────────────────────── */
+#minimize-hint{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.7);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.2);border-radius:12px;
+  padding:24px 32px;text-align:center;color:#fff;
+  display:none;pointer-events:none;
+}
+#minimize-hint p{font-size:15px;line-height:1.5;}
+#minimize-hint strong{color:#60cdff;}
+
+/* ── VENTANA DE CONFIGURACIÓN ───────────────────── */
+.win-window{
+  position:absolute;
+  background:#1c1c1c;border-radius:10px;
+  box-shadow:0 16px 60px rgba(0,0,0,.8);
+  overflow:hidden;display:flex;flex-direction:column;
+  min-width:700px;width:780px;height:500px;
+  top:40px;left:50%;transform:translateX(-50%);
+  border:1px solid #444;
+  transition:opacity .25s,transform .25s;
+  resize:none;
+}
+.win-window.minimized{
+  opacity:0;pointer-events:none;transform:translateX(-50%) scale(.92);
+}
+
+/* Barra de título */
+.win-titlebar{
+  height:36px;background:#2d2d2d;
+  display:flex;align-items:center;padding:0 12px;gap:8px;
+  flex-shrink:0;cursor:move;user-select:none;
+  border-bottom:1px solid #3a3a3a;
+}
+.win-titlebar-icon{font-size:14px;}
+.win-titlebar-title{font-size:13px;color:#ccc;flex:1;}
+.win-controls{display:flex;gap:2px;margin-left:auto;}
+.win-ctrl{
+  width:28px;height:22px;border:none;background:transparent;
+  color:#ccc;font-size:12px;cursor:pointer;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+.win-ctrl:hover{background:rgba(255,255,255,.1);}
+.win-ctrl.close:hover{background:#c42b1c;color:#fff;}
+
+/* Contenido de la ventana */
+.win-body{display:flex;flex:1;overflow:hidden;}
 
 /* Sidebar */
-.sidebar{width:260px;background:#202020;padding:16px 0;display:flex;flex-direction:column;gap:2px;border-right:1px solid #333;flex-shrink:0;}
-.sidebar-header{padding:12px 20px 16px;font-size:20px;font-weight:600;color:#fff;}
-.sidebar-item{padding:10px 20px;border-radius:6px;margin:0 8px;cursor:pointer;color:#ccc;font-size:13px;display:flex;align-items:center;gap:12px;transition:background .15s;}
+.sidebar{width:240px;background:#202020;padding:12px 0;flex-shrink:0;border-right:1px solid #333;overflow-y:auto;}
+.sidebar-header{padding:10px 18px 14px;font-size:18px;font-weight:600;color:#fff;}
+.sidebar-item{
+  padding:9px 18px;border-radius:6px;margin:0 6px;
+  cursor:pointer;color:#ccc;font-size:13px;
+  display:flex;align-items:center;gap:10px;transition:background .15s;
+}
 .sidebar-item:hover{background:#2d2d2d;color:#fff;}
 .sidebar-item.active{background:#0078d4;color:#fff;}
-.sidebar-item .icon{font-size:16px;width:20px;text-align:center;}
+.sidebar-item .icon{font-size:15px;width:18px;text-align:center;}
 
 /* Main panel */
-.main{flex:1;padding:32px 40px;overflow-y:auto;background:#1c1c1c;}
-.page-title{font-size:28px;font-weight:600;margin-bottom:8px;}
-.breadcrumb{color:#888;font-size:13px;margin-bottom:28px;}
+.main{flex:1;padding:24px 32px;overflow-y:auto;background:#1c1c1c;}
+.page-title{font-size:24px;font-weight:600;margin-bottom:6px;}
+.breadcrumb{color:#888;font-size:12px;margin-bottom:20px;}
 .breadcrumb span{color:#0078d4;}
 
 /* Cards */
-.card{background:#2d2d2d;border-radius:8px;padding:20px;margin-bottom:12px;}
-.card-title{font-size:14px;font-weight:600;margin-bottom:16px;color:#fff;}
+.card{background:#2d2d2d;border-radius:8px;padding:18px;margin-bottom:10px;}
+.card-title{font-size:13px;font-weight:600;margin-bottom:14px;}
 
 /* Monitor Preview */
-.monitor-wrap{display:flex;justify-content:center;margin-bottom:24px;}
-.monitor{width:220px;height:140px;border:3px solid #555;border-radius:6px;background:#000;overflow:hidden;position:relative;box-shadow:0 4px 16px rgba(0,0,0,0.5);}
-.monitor-screen{width:100%;height:100%;transition:background 0.4s;}
-.monitor-taskbar{position:absolute;bottom:0;left:0;right:0;height:16px;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;}
-.monitor-taskbar-dot{width:12px;height:12px;background:rgba(255,255,255,0.15);border-radius:2px;}
-.monitor-base{width:40px;height:12px;background:#444;margin:0 auto;border-radius:0 0 4px 4px;}
+.monitor-wrap{display:flex;justify-content:center;margin-bottom:20px;}
+.monitor{width:180px;height:112px;border:3px solid #555;border-radius:5px;overflow:hidden;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+.monitor-screen{width:100%;height:100%;transition:background 0.5s;}
+.monitor-taskbar{position:absolute;bottom:0;left:0;right:0;height:14px;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;}
+.monitor-taskbar-dot{width:10px;height:10px;background:rgba(255,255,255,.15);border-radius:2px;}
+.monitor-base{width:36px;height:10px;background:#444;margin:0 auto;border-radius:0 0 4px 4px;}
 
 /* Dropdown */
-.dropdown-label{font-size:13px;color:#ccc;margin-bottom:8px;}
-.win-dropdown{background:#3d3d3d;border:1px solid #555;color:#fff;padding:10px 14px;border-radius:6px;width:100%;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;position:relative;}
+.dropdown-label{font-size:12px;color:#ccc;margin-bottom:6px;}
+.win-dropdown{
+  background:#3d3d3d;border:1px solid #555;color:#fff;
+  padding:9px 12px;border-radius:6px;width:100%;font-size:13px;
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+}
 .win-dropdown:hover{background:#484848;}
-.win-dropdown.active-step{border:2px solid #0078d4;box-shadow:0 0 0 2px rgba(0,120,212,0.3);}
+.win-dropdown.active-step{border:2px solid #0078d4;box-shadow:0 0 0 2px rgba(0,120,212,.3);}
 .dropdown-menu{background:#3d3d3d;border:1px solid #555;border-radius:6px;overflow:hidden;margin-top:4px;display:none;}
 .dropdown-menu.open{display:block;}
-.dropdown-opt{padding:10px 14px;cursor:pointer;font-size:13px;transition:background .1s;}
+.dropdown-opt{padding:9px 12px;cursor:pointer;font-size:13px;transition:background .1s;}
 .dropdown-opt:hover{background:#0078d4;}
 .dropdown-opt.selected{color:#0078d4;font-weight:600;}
 
 /* Gallery */
-.gallery-label{font-size:13px;color:#ccc;margin:16px 0 10px;}
-.gallery{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
-.gallery-img{aspect-ratio:16/9;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .2s;overflow:hidden;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.gallery-label{font-size:12px;color:#ccc;margin:14px 0 8px;}
+.gallery{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+.gallery-img{
+  aspect-ratio:16/9;border-radius:5px;cursor:pointer;
+  border:2px solid transparent;transition:all .2s;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px;
+}
 .gallery-img:hover{border-color:#888;transform:scale(1.05);}
-.gallery-img.selected{border-color:#0078d4;box-shadow:0 0 0 2px rgba(0,120,212,0.4);}
+.gallery-img.selected{border-color:#0078d4;box-shadow:0 0 0 2px rgba(0,120,212,.4);}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,120,212,.5);}50%{box-shadow:0 0 0 6px rgba(0,120,212,0);}}
 .gallery-img.active-step{animation:pulse 1.5s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,120,212,0.5);}50%{box-shadow:0 0 0 6px rgba(0,120,212,0);}}
 
-/* Shuffle row */
-.shuffle-row{display:flex;align-items:center;gap:12px;margin-top:16px;}
-.win-btn{background:#3d3d3d;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;transition:background .15s;}
+/* Botones */
+.shuffle-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.win-btn{background:#3d3d3d;color:#fff;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;transition:background .15s;}
 .win-btn:hover{background:#484848;}
 .win-btn.primary{background:#0078d4;}
 .win-btn.primary:hover{background:#006cbf;}
-.win-btn.disabled{opacity:0.4;cursor:not-allowed;}
+.win-btn:disabled{opacity:.4;cursor:not-allowed;}
+.confirm-area{margin-top:12px;display:none;}
+.confirm-area.visible{display:flex;gap:10px;align-items:center;}
+.confirm-msg{color:#60cdff;font-size:12px;}
 
-/* Taskbar (simulación) */
-.win-taskbar{height:48px;background:#1c1c1c;border-top:1px solid #333;display:flex;align-items:center;padding:0 16px;justify-content:space-between;}
-.taskbar-center{display:flex;gap:6px;align-items:center;}
-.taskbar-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;color:#ccc;font-size:16px;}
-.taskbar-right{color:#888;font-size:12px;display:flex;gap:12px;align-items:center;}
+/* ── BARRA DE TAREAS ────────────────────────────── */
+#taskbar{
+  position:fixed;bottom:0;left:0;right:0;height:48px;
+  background:rgba(28,28,28,.85);backdrop-filter:blur(16px);
+  border-top:1px solid #333;
+  display:flex;align-items:center;padding:0 12px;justify-content:space-between;
+  z-index:1000;
+}
+.taskbar-center{display:flex;gap:4px;align-items:center;}
+.taskbar-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:6px;cursor:pointer;
+  color:#ccc;font-size:13px;transition:background .15s;
+  position:relative;border:none;background:transparent;
+}
+.taskbar-btn:hover{background:rgba(255,255,255,.08);}
+.taskbar-btn .tb-ico{font-size:18px;}
+.taskbar-btn .tb-label{font-size:11px;}
+.taskbar-btn.active::after{
+  content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+  width:16px;height:3px;border-radius:2px;background:#0078d4;
+}
+.taskbar-right{display:flex;align-items:center;gap:12px;}
 .clock-display{text-align:right;}
 .clock-time{font-size:13px;color:#ccc;}
 .clock-date{font-size:11px;color:#888;}
 
-/* Confirmación */
-.confirm-area{margin-top:16px;display:none;}
-.confirm-area.visible{display:flex;gap:12px;align-items:center;}
-.confirm-msg{color:#60cdff;font-size:13px;}
+/* Indicador "restaurar" en taskbar */
+.restore-indicator{
+  position:absolute;top:-4px;right:2px;
+  width:8px;height:8px;border-radius:50%;
+  background:#0078d4;display:none;
+}
+.taskbar-btn.minimized-app .restore-indicator{display:block;}
+
+/* ── PANTALLA DE BLOQUEO (no usada en nivel 1) ── */
 </style>
 </head>
 <body>
 
-<div class="win-settings">
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-header">Configuración</div>
-    <div class="sidebar-item"><span class="icon">🏠</span> Inicio</div>
-    <div class="sidebar-item active"><span class="icon">🎨</span> Personalización</div>
-    <div class="sidebar-item"><span class="icon">📱</span> Aplicaciones</div>
-    <div class="sidebar-item"><span class="icon">🔒</span> Cuentas</div>
-    <div class="sidebar-item"><span class="icon">🕐</span> Hora e idioma</div>
-    <div class="sidebar-item"><span class="icon">⚙️</span> Sistema</div>
+<!-- ESCRITORIO -->
+<div id="desktop">
+  <div class="desktop-icons">
+    <div class="desktop-icon"><span class="ico">📁</span>Mis archivos</div>
+    <div class="desktop-icon"><span class="ico">🗑️</span>Papelera</div>
+    <div class="desktop-icon"><span class="ico">🌐</span>Navegador</div>
   </div>
+  <div id="minimize-hint">
+    <p>¡Excelente! 🎉<br>Tu nuevo fondo de pantalla está aplicado.<br>
+    Haz clic en <strong>⚙️ Configuración</strong> de la barra de tareas para continuar.</p>
+  </div>
+</div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="page-title">Personalización</div>
-    <div class="breadcrumb">Configuración &rsaquo; <span>Personalización</span> &rsaquo; Fondo</div>
-
-    <!-- Preview Monitor -->
-    <div class="monitor-wrap">
-      <div>
-        <div class="monitor">
-          <div class="monitor-screen" id="monitor-screen" style="background:#1c1c1c;"></div>
-          <div class="monitor-taskbar"><div class="monitor-taskbar-dot"></div></div>
-        </div>
-        <div class="monitor-base"></div>
-      </div>
+<!-- VENTANA DE CONFIGURACIÓN -->
+<div class="win-window" id="window-settings">
+  <!-- Titlebar -->
+  <div class="win-titlebar title-bar" id="titlebar-settings">
+    <span class="win-titlebar-icon">⚙️</span>
+    <span class="win-titlebar-title">Configuración</span>
+    <div class="win-controls">
+      <button class="win-ctrl" onclick="minimizeSettings()" title="Minimizar">&#xE921;</button>
+      <button class="win-ctrl">&#xE922;</button>
+      <button class="win-ctrl close">&#xE8BB;</button>
+    </div>
+  </div>
+  <!-- Body -->
+  <div class="win-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-header">Configuración</div>
+      <div class="sidebar-item"><span class="icon">🏠</span> Inicio</div>
+      <div class="sidebar-item active"><span class="icon">🎨</span> Personalización</div>
+      <div class="sidebar-item"><span class="icon">📱</span> Aplicaciones</div>
+      <div class="sidebar-item"><span class="icon">🔒</span> Cuentas</div>
+      <div class="sidebar-item"><span class="icon">⚙️</span> Sistema</div>
     </div>
 
-    <!-- Card: Tipo de Fondo -->
-    <div class="card">
-      <div class="card-title">Fondo de pantalla</div>
-      <div class="dropdown-label">Personalizar el fondo</div>
-      <div class="win-dropdown active-step" id="tipo-dropdown" onclick="toggleDropdown()">
-        <span id="tipo-label">Imagen</span>
-        <span>⌄</span>
-      </div>
-      <div class="dropdown-menu" id="dropdown-menu">
-        <div class="dropdown-opt selected" onclick="seleccionarTipo('Imagen')">Imagen</div>
-        <div class="dropdown-opt" onclick="seleccionarTipo('Presentación')">Presentación de diapositivas</div>
-        <div class="dropdown-opt" onclick="seleccionarTipo('Color sólido')">Color sólido</div>
-        <div class="dropdown-opt" onclick="seleccionarTipo('Spotlight')">Presentación de Windows</div>
+    <!-- MAIN -->
+    <div class="main">
+      <div class="page-title">Personalización</div>
+      <div class="breadcrumb">Configuración &rsaquo; <span>Personalización</span> &rsaquo; Fondo</div>
+
+      <!-- Monitor Preview -->
+      <div class="monitor-wrap">
+        <div>
+          <div class="monitor">
+            <div class="monitor-screen" id="monitor-screen" style="background:#1a3a5c;"></div>
+            <div class="monitor-taskbar"><div class="monitor-taskbar-dot"></div></div>
+          </div>
+          <div class="monitor-base"></div>
+        </div>
       </div>
 
-      <div class="gallery-label" id="gallery-label" style="display:none;">Fotos recientes</div>
-      <div class="gallery" id="gallery" style="display:none;">
-        <div class="gallery-img active-step" onclick="elegirFoto(this,'linear-gradient(135deg,#1f4037,#99f2c8)')" style="background:linear-gradient(135deg,#1f4037,#99f2c8);">🌿</div>
-        <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#1a1a2e,#e94560)')" style="background:linear-gradient(135deg,#1a1a2e,#e94560);">🌃</div>
-        <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#0f2027,#2c5364)')" style="background:linear-gradient(135deg,#0f2027,#2c5364);">🌊</div>
-        <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#f7971e,#ffd200)')" style="background:linear-gradient(135deg,#f7971e,#ffd200);">🌅</div>
-        <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#4776e6,#8e54e9)')" style="background:linear-gradient(135deg,#4776e6,#8e54e9);">🔮</div>
-        <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#11998e,#38ef7d)')" style="background:linear-gradient(135deg,#11998e,#38ef7d);">🍃</div>
-      </div>
+      <!-- Card: Tipo de Fondo -->
+      <div class="card">
+        <div class="card-title">Fondo de pantalla</div>
+        <div class="dropdown-label">Personalizar el fondo</div>
+        <div class="win-dropdown active-step" id="tipo-dropdown" onclick="toggleDropdown()">
+          <span id="tipo-label">Imagen</span>
+          <span>⌄</span>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <div class="dropdown-opt selected" onclick="seleccionarTipo('Imagen')">Imagen</div>
+          <div class="dropdown-opt" onclick="seleccionarTipo('Presentación')">Presentación de diapositivas</div>
+          <div class="dropdown-opt" onclick="seleccionarTipo('Color sólido')">Color sólido</div>
+          <div class="dropdown-opt" onclick="seleccionarTipo('Spotlight')">Presentación de Windows</div>
+        </div>
 
-      <div class="shuffle-row" id="shuffle-row" style="display:none;">
-        <button class="win-btn" onclick="">Elegir foto</button>
-        <div class="confirm-area" id="confirm-area">
-          <button class="win-btn primary" id="btn-confirm" onclick="confirmarSeleccion()">✓ Confirmar selección</button>
-          <span class="confirm-msg">¡Fondo listo! Haz clic para aplicar.</span>
+        <div class="gallery-label" id="gallery-label" style="display:none;">Fotos recientes</div>
+        <div class="gallery" id="gallery" style="display:none;">
+          <div class="gallery-img active-step" onclick="elegirFoto(this,'linear-gradient(135deg,#1f4037,#99f2c8)')" style="background:linear-gradient(135deg,#1f4037,#99f2c8);">🌿</div>
+          <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#1a1a2e,#e94560)')" style="background:linear-gradient(135deg,#1a1a2e,#e94560);">🌃</div>
+          <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#0f2027,#2c5364)')" style="background:linear-gradient(135deg,#0f2027,#2c5364);">🌊</div>
+          <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#f7971e,#ffd200)')" style="background:linear-gradient(135deg,#f7971e,#ffd200);">🌅</div>
+          <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#4776e6,#8e54e9)')" style="background:linear-gradient(135deg,#4776e6,#8e54e9);">🔮</div>
+          <div class="gallery-img" onclick="elegirFoto(this,'linear-gradient(135deg,#11998e,#38ef7d)')" style="background:linear-gradient(135deg,#11998e,#38ef7d);">🍃</div>
+        </div>
+
+        <div class="shuffle-row" id="shuffle-row" style="display:none;">
+          <div class="confirm-area" id="confirm-area">
+            <button class="win-btn primary" id="btn-confirm" onclick="confirmarSeleccion()">✓ Aplicar fondo</button>
+            <span class="confirm-msg" id="confirm-msg-text" style="display:none;">¡Fondo listo! Haz clic para aplicar.</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Taskbar -->
-<div class="win-taskbar">
+<!-- BARRA DE TAREAS -->
+<div id="taskbar">
   <div></div>
   <div class="taskbar-center">
-    <div class="taskbar-icon">🪟</div>
-    <div class="taskbar-icon">🔍</div>
-    <div class="taskbar-icon">📁</div>
-    <div class="taskbar-icon">⚙️</div>
+    <button class="taskbar-btn" title="Inicio">
+      <span class="tb-ico">🪟</span>
+    </button>
+    <button class="taskbar-btn" title="Buscar">
+      <span class="tb-ico">🔍</span>
+    </button>
+    <button class="taskbar-btn active" id="tb-settings" onclick="toggleSettings()" title="Configuración">
+      <span class="tb-ico">⚙️</span>
+      <span class="tb-label">Configuración</span>
+      <span class="restore-indicator" id="restore-dot"></span>
+    </button>
   </div>
   <div class="taskbar-right">
     <div class="clock-display">
-      <div class="clock-time" id="clock-time">--:--</div>
-      <div class="clock-date" id="clock-date">--/--/----</div>
+      <div class="clock-time" id="clock-hora">--:--</div>
+      <div class="clock-date" id="clock-fecha">--/--/----</div>
     </div>
   </div>
 </div>
@@ -167,7 +307,7 @@ body{font-family:'Segoe UI',sans-serif;background:#1c1c1c;color:#fff;height:100v
   <div class="tour-header">
     <span class="tour-icon">💡</span>
     <span class="tour-title" id="tour-title">Paso 1</span>
-    <span class="tour-step" id="tour-step">1/3</span>
+    <span class="tour-step" id="tour-step">1/4</span>
   </div>
   <div class="tour-content" id="tour-content"></div>
   <div class="tour-actions">
@@ -185,24 +325,29 @@ body{font-family:'Segoe UI',sans-serif;background:#1c1c1c;color:#fff;height:100v
 <script src="../simulacion-core.js"></script>
 <script>
   let step = 0;
-  let fotoSeleccionada = null;
-  let tipoElegido = false;
+  let fondoElegido = null;
+  let settingsMinimized = false;
 
   const pasos = [
     {
       title: 'Paso 1: Tipo de fondo',
       content: 'El menú muestra el tipo de fondo actual. Haz clic en <strong>el menú desplegable</strong> y selecciona <strong>"Imagen"</strong> para continuar.',
-      step: '1/3'
+      step: '1/4'
     },
     {
       title: 'Paso 2: Elegir foto',
-      content: '¡Bien! Ahora elige una foto de la <strong>galería de fondos</strong>. Haz clic en cualquiera para aplicarla como fondo.',
-      step: '2/3'
+      content: '¡Bien! Ahora elige una foto de la <strong>galería de fondos</strong>. Haz clic en cualquiera para aplicarla.',
+      step: '2/4'
     },
     {
       title: 'Paso 3: Aplicar',
-      content: '¡Perfecto! Puedes ver la previsualización en el monitor. Ahora haz clic en <strong>"Confirmar selección"</strong> para guardar el fondo.',
-      step: '3/3'
+      content: 'Seleccionaste un fondo. Haz clic en <strong>"✓ Aplicar fondo"</strong> para que se establezca en el escritorio.',
+      step: '3/4'
+    },
+    {
+      title: 'Paso 4: ¡Mirá tu escritorio!',
+      content: 'Tu fondo ya está aplicado. Haz clic en <strong>el botón [ – ] de la ventana</strong> (arriba a la derecha) o en <strong>⚙️ Configuración</strong> de la barra de tareas para <strong>minimizar y ver tu escritorio</strong>.',
+      step: '4/4'
     }
   ];
 
@@ -221,20 +366,21 @@ body{font-family:'Segoe UI',sans-serif;background:#1c1c1c;color:#fff;height:100v
     if (step < pasos.length) {
       mostrarPaso(step);
     } else {
-      document.getElementById('tour-popup').style.display = 'none';
-      const sm = document.getElementById('success-msg');
-      sm.style.display = 'block';
-      sm.classList.add('visible');
-      if (window.parent && window.parent.completarNivelYAvanzar) window.parent.completarNivelYAvanzar();
+      terminar();
     }
   }
 
+  function terminar() {
+    document.getElementById('tour-popup').style.display = 'none';
+    const sm = document.getElementById('success-msg');
+    sm.style.display = 'block';
+    sm.classList.add('visible');
+    if (window.parent && window.parent.completarNivelYAvanzar) window.parent.completarNivelYAvanzar();
+  }
+
+  /* ── DROPDOWN ─────────────────────────────────── */
   function toggleDropdown() {
-    const menu = document.getElementById('dropdown-menu');
-    menu.classList.toggle('open');
-    if (step === 0) {
-      // Marcamos como paso completable al abrir el dropdown
-    }
+    document.getElementById('dropdown-menu').classList.toggle('open');
   }
 
   function seleccionarTipo(tipo) {
@@ -253,50 +399,93 @@ body{font-family:'Segoe UI',sans-serif;background:#1c1c1c;color:#fff;height:100v
     }
 
     if (step === 0 && tipo === 'Imagen') {
-      tipoElegido = true;
       step = 1;
       mostrarPaso(1);
       toast('Tipo "Imagen" seleccionado');
     }
   }
 
+  /* ── GALERÍA ──────────────────────────────────── */
   function elegirFoto(el, bg) {
     if (step !== 1) return;
     document.querySelectorAll('.gallery-img').forEach(g => g.classList.remove('selected', 'active-step'));
     el.classList.add('selected');
+    fondoElegido = bg;
+    // Preview en monitor
     document.getElementById('monitor-screen').style.background = bg;
-    fotoSeleccionada = bg;
+    // Mostrar botón de confirmar
     document.getElementById('confirm-area').style.display = 'flex';
-    document.getElementById('confirm-area').classList.add('visible');
+    document.getElementById('confirm-msg-text').style.display = 'inline';
     step = 2;
     mostrarPaso(2);
-    toast('Previsualización actualizada');
+    toast('Previsualización actualizada en el monitor');
   }
 
+  /* ── CONFIRMAR ────────────────────────────────── */
   function confirmarSeleccion() {
-    if (step !== 2) return;
-    document.getElementById('tour-next').style.display = 'block';
-    toast('¡Fondo de pantalla aplicado!');
+    if (step !== 2 || !fondoElegido) return;
+    // Aplicar al escritorio real
+    document.getElementById('desktop').style.background = fondoElegido;
     document.getElementById('btn-confirm').disabled = true;
     document.getElementById('btn-confirm').textContent = '✓ Aplicado';
-    document.getElementById('tour-next').click();
+    toast('¡Fondo de pantalla aplicado al escritorio!');
+    step = 3;
+    mostrarPaso(3);
+    // Mostrar hint en el escritorio
+    document.getElementById('minimize-hint').style.display = 'block';
   }
 
+  /* ── MINIMIZAR / RESTAURAR VENTANA ───────────── */
+  function minimizeSettings() {
+    if (step < 3) return; // Solo puede minimizar cuando el tutorial lo pide
+    const win = document.getElementById('window-settings');
+    const tb  = document.getElementById('tb-settings');
+    const dot = document.getElementById('restore-dot');
+    win.classList.add('minimized');
+    tb.classList.add('minimized-app');
+    dot.style.display = 'block';
+    settingsMinimized = true;
+    document.getElementById('minimize-hint').style.display = 'none';
+
+    // Dar tiempo para que el usuario vea el escritorio
+    setTimeout(() => {
+      if (settingsMinimized) {
+        toast('¡Excelente! ¿Ves tu nuevo fondo? Ahora restaura la ventana.');
+        document.getElementById('minimize-hint').style.display = 'block';
+        document.getElementById('minimize-hint').querySelector('p').innerHTML =
+          '¡Hermoso! 🎉<br>Este es tu nuevo fondo de pantalla.<br>Haz clic en <strong>⚙️ Configuración</strong> en la barra de tareas para volver.';
+      }
+    }, 1500);
+  }
+
+  function toggleSettings() {
+    const win = document.getElementById('window-settings');
+    if (win.classList.contains('minimized')) {
+      // Restaurar
+      win.classList.remove('minimized');
+      document.getElementById('tb-settings').classList.remove('minimized-app');
+      document.getElementById('restore-dot').style.display = 'none';
+      settingsMinimized = false;
+      document.getElementById('minimize-hint').style.display = 'none';
+      // Si estábamos en el paso de minimizar, avanzar al completar
+      if (step === 3) {
+        step = 4;
+        setTimeout(() => terminar(), 600);
+      }
+    } else {
+      if (step >= 3) minimizeSettings();
+    }
+  }
+
+  // El reloj y drag son inicializados por simulacion-core.js automáticamente
+
+  /* ── TOAST ────────────────────────────────────── */
   function toast(msg) {
     const t = document.getElementById('toast');
     document.getElementById('toast-msg').textContent = msg;
     t.className = 'toast visible';
-    setTimeout(() => t.classList.remove('visible'), 2000);
+    setTimeout(() => t.classList.remove('visible'), 2500);
   }
-
-  // Clock
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('clock-time').textContent = now.toLocaleTimeString('es', {hour:'2-digit',minute:'2-digit'});
-    document.getElementById('clock-date').textContent = now.toLocaleDateString('es');
-  }
-  updateClock();
-  setInterval(updateClock, 1000);
 
   // Auto-start
   window.addEventListener('load', () => mostrarPaso(0));

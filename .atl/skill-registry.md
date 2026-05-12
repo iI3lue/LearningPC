@@ -1,4 +1,4 @@
-# Skill Registry - LearningPC
+# Skill Registry - PrimerClic
 
 ## Project Stack
 - **Framework**: Electron (v30+)

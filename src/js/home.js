@@ -1,4 +1,4 @@
-// home.js - Dashboard Informativo Learning PC
+// home.js - Dashboard Informativo PrimerClic
 
 (function() {
     // showToast viene de toast.js (módulo compartido)

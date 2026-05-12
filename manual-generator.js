@@ -22,7 +22,7 @@ function createCoverPage(data) {
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { line: FORMAT.lineSpacing },
-      children: [new TextRun({ text: data.subtitulo || 'LearningPC - Aplicación de Aprendizaje Interactivo', size: 26, font: FORMAT.font })],
+      children: [new TextRun({ text: data.subtitulo || 'PrimerClic - Aplicación de Aprendizaje Interactivo', size: 26, font: FORMAT.font })],
     }),
     new Paragraph({ children: [new TextRun({ text: '', break: 2 })] }),
     new Paragraph({
@@ -98,7 +98,7 @@ async function generateManual(outputPath, data) {
 
     // 1. Introducción
     ...createSection('1. Introducción', [
-      { type: 'text', content: 'LearningPC es una aplicación de escritorio diseñada para el aprendizaje interactivo de habilidades informáticas básicas. El aplicativo simula entornos de trabajo reales como Windows 11 y proporciona lecciones teórico-prácticas sobre programación básica con Python.' },
+      { type: 'text', content: 'PrimerClic es una aplicación de escritorio diseñada para el aprendizaje interactivo de habilidades informáticas básicas. El aplicativo simula entornos de trabajo reales como Windows 11 y proporciona lecciones teórico-prácticas sobre programación básica con Python.' },
       { type: 'text', content: '' },
       { type: 'text', content: '¿A quién va dirigido?' },
       { type: 'text', content: 'Este manual está dirigido a usuarios que desean aprender:' },
@@ -143,7 +143,7 @@ async function generateManual(outputPath, data) {
 
     // 4. Navegación principal
     ...createSection('4. Navegación Principal', [
-      { type: 'text', content: 'La interfaz principal de LearningPC presenta una barra lateral con las categoría de aprendizaje y un área de contenido principal.' },
+      { type: 'text', content: 'La interfaz principal de PrimerClic presenta una barra lateral con las categoría de aprendizaje y un área de contenido principal.' },
       { type: 'text', content: '' },
       { type: 'text', content: 'Estructura de categorías:' },
       { type: 'bullet', content: 'Office - Herramientas de Microsoft Office' },
@@ -261,6 +261,6 @@ async function generateManual(outputPath, data) {
   console.log(`Manual de usuario generado: ${outputPath}`);
 }
 
-const outputPath = process.argv[2] || 'Manual_Usuario_LearningPC.docx';
+const outputPath = process.argv[2] || 'Manual_Usuario_PrimerClic.docx';
 
 generateManual(outputPath, {}).catch(console.error);

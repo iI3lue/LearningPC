@@ -1,5 +1,7 @@
 {
-    "name": "learning-pc",
+    "name": "primer-clic",
+    "productName": "PrimerClic",
+    "description": "Una aplicación educativa amigable para aprender a usar Windows e Internet.",
     "version": "1.0.0",
     "main": "main.js",
     "scripts": {

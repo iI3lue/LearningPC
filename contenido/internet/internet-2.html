@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nivel 2: Comandos de Navegación - LearningPC</title>
+    <title>Nivel 2: Comandos de Navegación - PrimerClic</title>
     <link rel="stylesheet" href="../simulacion-core.css">
     <style>
         /* Reutilización de estilos de navegador */
@@ -255,6 +255,27 @@
                 updateTourPopup();
                 mostrarFeedback('¡Perfecto! Has recargado la página.', 'exito');
             }, 500);
+        }
+
+        function mostrarFeedback(mensaje, tipo = 'info') {
+            if (typeof mostrarToast === 'function') {
+                mostrarToast(mensaje, 3000);
+                const toast = document.getElementById('toast-feedback');
+                if(toast) {
+                    toast.style.borderLeft = tipo === 'exito' ? '5px solid #10B981' : (tipo === 'error' ? '5px solid #EF4444' : '5px solid #EAB308');
+                    toast.style.background = '#202124';
+                    toast.style.color = 'white';
+                    toast.style.padding = '12px 24px';
+                    toast.style.borderRadius = '8px';
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '80px';
+                    toast.style.left = '50%';
+                    toast.style.transform = 'translateX(-50%) translateY(0)';
+                    toast.style.zIndex = '9999';
+                }
+            } else {
+                console.log(mensaje);
+            }
         }
 
         function finalizarNivel() {

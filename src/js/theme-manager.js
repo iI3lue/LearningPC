@@ -231,6 +231,41 @@ function initSidebarResizer() {
             localStorage.setItem('sidebar-width', currentWidth);
         }
     });
+
+    // Inyectar custom titlebar (Electron frame: false)
+    injectTitlebar();
+}
+
+function injectTitlebar() {
+    if (document.getElementById('custom-titlebar')) return;
+
+    const titlebar = document.createElement('div');
+    titlebar.id = 'custom-titlebar';
+    // Determinar la ruta correcta al logo dependiendo de en qué página estemos
+    const logoPath = window.location.pathname.includes('/pages/') ? '../assets/images/logo.png' : 'assets/images/logo.png';
+    titlebar.innerHTML = `
+        <div class="titlebar-drag-region"></div>
+        <div class="titlebar-left">
+            <img src="${logoPath}" alt="PrimerClic Logo" class="titlebar-logo" onerror="this.style.display='none'">
+            <span class="titlebar-title">PrimerClic</span>
+        </div>
+        <div class="titlebar-right">
+            <div class="titlebar-btn" id="tb-minimize" title="Minimizar">&#xE921;</div>
+            <div class="titlebar-btn" id="tb-maximize" title="Maximizar">&#xE922;</div>
+            <div class="titlebar-btn tb-close" id="tb-close" title="Cerrar">&#xE8BB;</div>
+        </div>
+    `;
+    document.body.insertBefore(titlebar, document.body.firstChild);
+
+    document.getElementById('tb-minimize').addEventListener('click', () => {
+        if (window.api && window.api.minimize) window.api.minimize();
+    });
+    document.getElementById('tb-maximize').addEventListener('click', () => {
+        if (window.api && window.api.maximize) window.api.maximize();
+    });
+    document.getElementById('tb-close').addEventListener('click', () => {
+        if (window.api && window.api.close) window.api.close();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', iniciar);

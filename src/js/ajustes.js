@@ -42,11 +42,11 @@ function cargarAjustes() {
 }
 
 function _sincronizarUserSettings() {
-    if (!window.LearningPCSettings) return;
+    if (!window.PrimerClicSettings) return;
     const autoEl = document.getElementById('toggle-auto-subcat');
     const promptEl = document.getElementById('toggle-show-prompt');
-    if (autoEl) autoEl.classList.toggle('active', !!window.LearningPCSettings.getAutoContinue());
-    if (promptEl) promptEl.classList.toggle('active', !!window.LearningPCSettings.getShowPrompt());
+    if (autoEl) autoEl.classList.toggle('active', !!window.PrimerClicSettings.getAutoContinue());
+    if (promptEl) promptEl.classList.toggle('active', !!window.PrimerClicSettings.getShowPrompt());
 }
 
 function toggleTema() {
@@ -150,8 +150,8 @@ function toggleAutoSubcat() {
     const solidColor = colores[colorSec] || '#10B981';
     el.style.background = el.classList.contains('active') ? solidColor : 'var(--text-secondary)';
     
-    if (window.LearningPCSettings) {
-        window.LearningPCSettings.setAutoContinue(el.classList.contains('active'));
+    if (window.PrimerClicSettings) {
+        window.PrimerClicSettings.setAutoContinue(el.classList.contains('active'));
     }
 }
 
@@ -164,8 +164,8 @@ function toggleShowPrompt() {
     const solidColor = colores[colorSec] || '#10B981';
     el.style.background = el.classList.contains('active') ? solidColor : 'var(--text-secondary)';
 
-    if (window.LearningPCSettings) {
-        window.LearningPCSettings.setShowPrompt(el.classList.contains('active'));
+    if (window.PrimerClicSettings) {
+        window.PrimerClicSettings.setShowPrompt(el.classList.contains('active'));
     }
 }
 

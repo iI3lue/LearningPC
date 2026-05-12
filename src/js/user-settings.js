@@ -1,4 +1,4 @@
-// Lightweight user settings for LearningPC
+// Lightweight user settings for PrimerClic
 // Persisted in localStorage with a dedicated namespace to avoid collisions
 (function(){
   const KEY_AUTO_CONTINUE = 'auto_subcat_continue';
@@ -24,7 +24,7 @@
   }
 
   // Public API exposed on global window
-  window.LearningPCSettings = {
+  window.PrimerClicSettings = {
     getAutoContinue: function(){ return _load(KEY_AUTO_CONTINUE, defaults[KEY_AUTO_CONTINUE]); },
     setAutoContinue: function(val){ _save(KEY_AUTO_CONTINUE, !!val); },
     getShowPrompt: function(){ return _load(KEY_SHOW_PROMPT, defaults[KEY_SHOW_PROMPT]); },

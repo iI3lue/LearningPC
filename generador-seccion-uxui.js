@@ -49,11 +49,11 @@ function createSection(title, contentArray) {
 async function generateUXSection(outputPath) {
   const sections = [
     ...createSection('4. USABILIDAD, EFICIENCIA Y EFICACIA (UX/UI)', [
-      { type: 'text', content: 'La usabilidad, eficiencia y eficacia en LearningPC se manifiestan a través de elementos diseñados para mejorar la experiencia del usuario. Este proyecto aplica principios de UX/UI para crear una experiencia de aprendizaje intuitiva y efectiva.' },
+      { type: 'text', content: 'La usabilidad, eficiencia y eficacia en PrimerClic se manifiestan a través de elementos diseñados para mejorar la experiencia del usuario. Este proyecto aplica principios de UX/UI para crear una experiencia de aprendizaje intuitiva y efectiva.' },
       { type: 'text', content: '' },
       
       { type: 'text', content: '4.1 USABILIDAD' },
-      { type: 'text', content: 'La usabilidad en LearningPC se manifiesta a través de varios elementos diseñados para facilitar la experiencia del usuario:' },
+      { type: 'text', content: 'La usabilidad en PrimerClic se manifiesta a través de varios elementos diseñados para facilitar la experiencia del usuario:' },
       { type: 'bullet', content: 'Navegación intuitiva - Barra lateral con categorías claras y iconos representativos' },
       { type: 'bullet', content: 'Sistema de breadcrumb para ubicación del usuario' },
       { type: 'bullet', content: 'Marcador visual del nivel actual' },
@@ -84,7 +84,7 @@ async function generateUXSection(outputPath) {
       { type: 'text', content: '' },
 
       { type: 'text', content: '4.3 EFICACIA (UX/UI)' },
-      { type: 'text', content: 'El diseño UX/UI de LearningPC sigue los principios de Windows 11:' },
+      { type: 'text', content: 'El diseño UX/UI de PrimerClic sigue los principios de Windows 11:' },
       { type: 'bullet', content: 'Diseño Visual - Esquema de colores consistente, bordes redondeados (border-radius), sombras y depth para jerarquía visual, modo claro y modo oscuro' },
       { type: 'bullet', content: 'Interacción - Clicks en ventanas para traer al frente (z-index dinámico), drag & drop funcional en simulaciones, teclas de atajo soporte (Escape, F5, Tab)' },
       { type: 'bullet', content: 'Gamificación - Sistema de progreso porcentual, niveles desbloqueados secuencialmente, feedback visual al completar niveles' },
@@ -132,6 +132,6 @@ async function generateUXSection(outputPath) {
   console.log(`Sección UX/UI generada: ${outputPath}`);
 }
 
-const outputPath = process.argv[2] || 'Seccion_UXUI_LearningPC.docx';
+const outputPath = process.argv[2] || 'Seccion_UXUI_PrimerClic.docx';
 
 generateUXSection(outputPath).catch(console.error);

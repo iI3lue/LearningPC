@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulación - Learning PC</title>
+    <title>Simulación - PrimerClic</title>
     <link rel="stylesheet" href="../css/styles.css">
     <script src="../js/user-settings.js"></script>
     <style>
@@ -734,12 +734,12 @@ function actualizarUI() {
                         } else {
                             console.log('[SIMUL] Es el último nivel, mostrando modal');
                             subcatNavDone = true;
-                            const autoEnabled = window.LearningPCSettings && window.LearningPCSettings.isAutoContinueEnabled();
+                            const autoEnabled = window.PrimerClicSettings && window.PrimerClicSettings.isAutoContinueEnabled();
                             console.log('[SIMUL] autoEnabled:', autoEnabled);
                             if (autoEnabled) {
                                 await continuarSiguienteSubcat();
                             } else {
-                                const showPrompt = window.LearningPCSettings ? window.LearningPCSettings.shouldShowPrompt() : true;
+                                const showPrompt = window.PrimerClicSettings ? window.PrimerClicSettings.shouldShowPrompt() : true;
                                 if (showPrompt) {
                                     abrirSubcatModal();
                                 } else {
@@ -775,8 +775,8 @@ function actualizarUI() {
         async function continuarSiguienteSubcat() {
             const remember = document.getElementById('subcat-no-preguntar');
             if (remember && remember.checked) {
-                if (window.LearningPCSettings) {
-                    window.LearningPCSettings.setAutoContinue(true);
+                if (window.PrimerClicSettings) {
+                    window.PrimerClicSettings.setAutoContinue(true);
                 }
             }
 

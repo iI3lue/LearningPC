@@ -1,6 +1,6 @@
 # Resumen de Cambios: Modernización UI y Modo Oscuro
 
-Este documento detalla las mejoras realizadas en la interfaz de las simulaciones de LearningPC para alcanzar un estándar visual moderno (Windows 11) y soporte global de Modo Oscuro.
+Este documento detalla las mejoras realizadas en la interfaz de las simulaciones de PrimerClic para alcanzar un estándar visual moderno (Windows 11) y soporte global de Modo Oscuro.
 
 ## 1. Centralización de Estilos (Arquitectura CSS)
 Se ha implementado una arquitectura de estilos más limpia y mantenible:

@@ -1,4 +1,4 @@
-# Learning PC
+# PrimerClic
 
  Aplicación de escritorio para aprender Windows y programación básica de forma interactiva.
 
@@ -12,7 +12,7 @@
 
 ## 📱 Descripción
 
-Learning PC es una aplicación educativa de escritorio que teach computing fundamentos through interactive simulations. Combines un entorno de aprendizaje gamificado with práctica real en un entorno Windows emulado.
+PrimerClic es una aplicación educativa de escritorio que teach computing fundamentos through interactive simulations. Combines un entorno de aprendizaje gamificado with práctica real en un entorno Windows emulado.
 
 **Target users**: Personas que wants aprender Windows, Atajos de teclado, y básica programación desde cero.
 
@@ -170,7 +170,7 @@ Todos los preferencias se guardan en localStorage del navegador.
 
 ## 📄 Licencia
 
-Uso educativo - Learning PC
+Uso educativo - PrimerClic
 
 ---
 
@@ -180,5 +180,5 @@ Para dudas o sugerencias, abre un issue en el repositorio.
 
 ---
 
-*Learning PC - Aprende Windows y Programación de forma práctica*
+*PrimerClic - Aprende Windows y Programación de forma práctica*
 *Desarrollado por I3lue*

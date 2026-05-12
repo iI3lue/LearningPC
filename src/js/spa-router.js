@@ -1,6 +1,6 @@
 /**
  * spa-router.js
- * Router mínimo para el dashboard SPA de LearningPC.
+ * Router mínimo para el dashboard SPA de PrimerClic.
  * Gestiona la activación de vistas sin recarga de página.
  *
  * Uso:
@@ -12,19 +12,19 @@
     // Mapa de vistas: id del elemento → config
     const VIEWS = {
         home: {
-            title: 'LearningPC — Inicio',
+            title: 'PrimerClic — Inicio',
             navId: 'nav-home',
             headerTitle: 'Panel Principal',
             init: () => { /* home.js se inicializa solo al cargar */ }
         },
         reportes: {
-            title: 'LearningPC — Mis Logros',
+            title: 'PrimerClic — Mis Logros',
             navId: 'nav-reportes',
             headerTitle: 'Mis Logros',
             init: () => window.Reportes?.init()
         },
         ajustes: {
-            title: 'LearningPC — Ajustes',
+            title: 'PrimerClic — Ajustes',
             navId: 'nav-ajustes',
             headerTitle: 'Ajustes',
             init: () => window.Ajustes?.init()

@@ -1,5 +1,5 @@
 /* 
- * styles.css - Learning PC
+ * styles.css - PrimerClic
  * Estilos con Fluent Design y Windows 11 UI
  */
 
@@ -303,8 +303,9 @@ a:hover, button:hover, .nav-item:hover, .categoria-card:hover {
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 20px 0;
-    overflow: hidden;
+    padding: 12px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     height: 100%;
     transition: width var(--duration-normal) var(--ease-fluent);
@@ -331,14 +332,27 @@ a:hover, button:hover, .nav-item:hover, .categoria-card:hover {
     align-items: center;
     gap: 12px;
     padding: 0 16px;
-    height: 64px;
-    margin-bottom: 16px;
+    height: 48px;
+    margin-bottom: 8px;
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--accent-solid);
     overflow: hidden;
     white-space: nowrap;
-    transition: justify-content var(--duration-normal) var(--ease-fluent);
+}
+
+#toggle-sidebar {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    justify-content: center;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+#toggle-sidebar svg {
+    width: 18px;
+    height: 18px;
 }
 
 .logo span {
@@ -356,8 +370,8 @@ a:hover, button:hover, .nav-item:hover, .categoria-card:hover {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-    padding: 16px;
-    margin-bottom: 24px;
+    padding: 8px 16px;
+    margin-bottom: 12px;
     transition: all var(--duration-normal) var(--ease-fluent);
 }
 
@@ -453,7 +467,7 @@ a:hover, button:hover, .nav-item:hover, .categoria-card:hover {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     padding: 0 16px;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 
 .stat-card {
@@ -490,7 +504,7 @@ a:hover, button:hover, .nav-item:hover, .categoria-card:hover {
 
 .header-actions {
     margin-top: auto;
-    padding-top: 16px;
+    padding-top: 8px;
     border-top: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
@@ -503,7 +517,7 @@ a:hover, button:hover, .nav-item:hover, .categoria-card:hover {
     gap: 12px;
     width: calc(100% - 24px);
     margin: 0 12px;
-    height: 44px;
+    height: 36px;
     padding: 0 12px;
     border-radius: 8px;
     color: var(--text-secondary);
@@ -3120,6 +3134,86 @@ button:active {
 }
 
 /* ── Toast Notification ────────────────────────────── */
+/* ── Custom Titlebar (Electron Frame) ──────────────────────── */
+#custom-titlebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 32px;
+    background: var(--card-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 9999;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.titlebar-drag-region {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-app-region: drag;
+    z-index: 1;
+}
+
+.titlebar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 10px;
+    pointer-events: none; /* Que los clics pasen al drag-region */
+    z-index: 2;
+}
+
+.titlebar-logo {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+}
+
+.titlebar-title {
+    font-size: 12px;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.titlebar-right {
+    display: flex;
+    height: 100%;
+    z-index: 2;
+    -webkit-app-region: no-drag;
+}
+
+.titlebar-btn {
+    width: 46px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets', sans-serif;
+    font-size: 10px;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.titlebar-btn:hover {
+    background: rgba(128, 128, 128, 0.2);
+}
+
+.titlebar-btn.tb-close:hover {
+    background: #e81123;
+    color: white;
+}
+
+/* Ajuste global para que el body no quede oculto bajo la titlebar */
+body {
+    padding-top: 32px;
+}
+
 .toast-notification {
     position: fixed;
     bottom: 32px;
@@ -3155,4 +3249,5 @@ button:active {
     font-size: 14px;
     font-weight: 600;
 }
+
 

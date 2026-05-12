@@ -16,6 +16,9 @@ contextBridge.exposeInMainWorld('api', {
 
     // Ventana
     toggleFullScreen: () => ipcRenderer.send('window:toggleFullScreen'),
+    minimize: () => ipcRenderer.send('window:minimize'),
+    maximize: () => ipcRenderer.send('window:maximize'),
+    close: () => ipcRenderer.send('window:close'),
     toggleTheme: () => ipcRenderer.send('theme:toggle'),
     openDevTools: () => ipcRenderer.send('window:openDevTools'),
 
