@@ -1,6 +1,7 @@
 node_modules/
 .DS_Store
 *.db
+!primer_clic.db
 *.db-journal
 dist/
 package-lock.json
